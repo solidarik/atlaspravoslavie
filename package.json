@@ -1,0 +1,90 @@
+{
+  "name": "atlaspravoslavie",
+  "version": "1.0.0",
+  "description": "Atlas of Orthodoxy",
+  "main": "index.js",
+  "engines": {
+    "node": "8.10.0"
+  },
+  "scripts": {
+    "test": "mocha -c",
+    "pytest": "cd test && pytest -s -q --color=yes",
+    "prebuild": "concurrently --kill-others \"npm run parcel-religion\"",
+    "parcel-religion": "parcel build --no-minify --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
+    "watch": "nodemon -w public-src -x npm run parcel-religion",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidarik/atlaspravoslavie.git"
+  },
+  "keywords": [
+    "map",
+    "openlayer",
+    "nodejs",
+    "koa",
+    "Orthodoxy",
+    "events",
+    "churches"
+  ],
+  "author": "Ildar Gubaydullin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/solidarik/atlaspravoslavie/issues"
+  },
+  "homepage": "https://github.com/solidarik/atlaspravoslavie#readme",
+  "dependencies": {
+    "@popperjs/core": "latest",
+    "@types/shelljs": "latest",
+    "axios": "latest",
+    "chalk": "latest",
+    "co-busboy": "latest",
+    "config": "latest",
+    "convex-hull": "latest",
+    "cron": "latest",
+    "d3-geo-projection": "latest",
+    "d3v4": "latest",
+    "jquery": "latest",
+    "koa": "latest",
+    "koa-bodyparser": "latest",
+    "koa-csrf": "latest",
+    "koa-favicon": "latest",
+    "koa-logger": "latest",
+    "koa-passport": "latest",
+    "koa-range": "latest",
+    "koa-router": "latest",
+    "koa-session": "latest",
+    "koa-session-mongoose": "latest",
+    "koa-static": "latest",
+    "main.js": "latest",
+    "moment": "latest",
+    "mongoose": "latest",
+    "monotone-convex-hull-2d": "latest",
+    "nodemw": "latest",
+    "ol": "latest",
+    "ol-ext": "latest",
+    "passport-local": "latest",
+    "proj4": "^2.6.2",
+    "pug": "latest",
+    "shelljs": "^0.8.4",
+    "socket.io": "^3.0.1",
+    "socket.io-client": "^3.0.1",
+    "socket.io-emitter": "latest",
+    "socket.io-redis": "latest",
+    "winston": "latest",
+    "xlsx": "latest"
+  },
+  "devDependencies": {
+    "@babel/core": "latest",
+    "@babel/plugin-syntax-class-properties": "latest",
+    "@babel/plugin-syntax-jsx": "latest",
+    "@babel/preset-react": "latest",
+    "concurrently": "latest",
+    "mocha": "latest",
+    "parcel-bundler": "latest"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}

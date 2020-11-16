@@ -1,0 +1,14 @@
+[
+    {
+        "code": "NV.IND.MANF.ZS",
+        "aliases": ["Manufacturing"],
+        "name": ["Manufacturing, value added", "Производство, добавленная стоимость"],
+        "unit": ["% of GDP", "% ВВП"]
+    },
+    {
+        "code": "SP.POP.TOTL",
+        "aliases": ["Population, total", "Population"],
+        "name": ["Population", "Население"],
+        "unit": ["number of humans", "человек"]
+    }
+]

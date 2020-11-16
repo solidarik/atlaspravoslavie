@@ -1,0 +1,36 @@
+extends layout
+block head
+
+  link(rel='stylesheet' href='/style-about.css')
+
+block content
+    +header('about')
+
+    div(id='content_inner_wrapper')
+        div(id='page_background_videos')
+          video(playsinline muted autoplay loop)
+            source(class='mobile' src="videos/background_video.webm" type="video/webm")
+            source(class='mobile' src="videos/background_video.mp4" type="video/mp4")
+
+    div.content(role="content" id='content' dragable='true')
+        div(class='row')
+            div(class='col-md-5 offset-md-7')
+                blockquote.quote-card
+                    p
+                        | Страна, забывшая свою культуру, историю, традиции и&nbsp;национальных героев – обречена на&nbsp;вымирание
+                    cite
+                        | Лев Николаевич Толстой
+        div(class='row main-text')
+            div(class='col-md-8 offset-md-2')
+                div(id='helmet')
+                div(class="mask")
+                    span(class="mask-span")
+                        p
+                            | Проект посвящен истории православия
+                p(style='text-align:right;font-style: italic;')
+                    | Всегда готовы к сотрудничеству:
+                    br
+                    | Середа Илья, Губайдуллин Ильдар, Мокрев Алексей
+                    br
+                    a(href='mailto:ww3d@inbox.ru?subject=Map history' title='Письмо разработчикам atlaspravoslavie@inbox.ru')
+                        | atlaspravoslavie@inbox.ru
