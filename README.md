@@ -1,4 +1,4 @@
-# atlaspravoslavie
+# Атлас православия
 
 Persons, events, and churches of Orthodoxy
 
