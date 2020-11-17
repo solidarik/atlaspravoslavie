@@ -4,7 +4,7 @@
   "description": "Atlas of Orthodoxy",
   "main": "index.js",
   "engines": {
-    "node": "12.x"
+    "node": "10.x"
   },
   "scripts": {
     "test": "mocha -c",
