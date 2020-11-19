@@ -159,7 +159,7 @@ body {
 #yandex-container {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 2px;
   z-index: 2;
 }
 
