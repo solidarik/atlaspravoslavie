@@ -52,6 +52,8 @@ body::after {
   color: silver;
   font-style: italic;
   line-height: 30px;
+  margin-top: 270px;
+  text-align: center;
 }
 
 body::-webkit-scrollbar-track {
@@ -99,7 +101,7 @@ body::-webkit-scrollbar-thumb {
   max-width: 80%;
 }
 .quote-card cite {
-  font-size: 12px;
+  font-size: 20px;
   margin-top: 10px;
   display: block;
   font-weight: 200;
