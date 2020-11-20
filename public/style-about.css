@@ -88,12 +88,6 @@ body::-webkit-scrollbar-thumb {
   font-style: italic;
 }
 
-@media screen and (max-width: 768px) {
-  .quote-card {
-    position: relative;
-  }
-}
-
 .quote-card p {
   font-size: 18px;
   line-height: 1.5;
@@ -128,12 +122,22 @@ body::-webkit-scrollbar-thumb {
   color: rgba(238, 238, 238, 0.8);
   font-weight: normal;
 }
-@media (max-width: 768px) {
+
+@media screen and (max-width: 768px) {
+  .quote-card {
+    position: relative;
+  }
+
   .quote-card:after {
     font-size: 10em;
     right: 25px;
   }
+
+  .main-text {
+    margin-top: 20px;
+  }
 }
+
 .quote-card.blue-card {
   background: #0078ff;
   color: #ffffff;
