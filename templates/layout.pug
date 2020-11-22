@@ -25,6 +25,24 @@ html
     meta(name="msapplication-TileColor" content="#2b5797")
     meta(name="theme-color" content="#ffffff")
 
+    script.
+      (function(m,e,t,r,i,k,a) {
+        m[i]=m[i]||function(){
+          (m[i].a=m[i].a||[]).push(arguments)
+        };
+        m[i].l=1*new Date();
+        k=e.createElement(t),
+        a=e.getElementsByTagName(t)[0],
+        k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(69498628, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true
+      });
+
     block head
 
   body
@@ -33,4 +51,7 @@ html
       .container-fluid
         block content
 
-    +footer()
+    div(id='yandex-container')
+        span(class='yandex-metrica pull-right')
+            a(href="https://metrika.yandex.ru/stat/?id=69498628&amp;from=informer" target="_blank" rel="nofollow")
+                img(src="https://informer.yandex.ru/informer/69498628/3_0_FFFFFFFF_EFEFEFFF_0_pageviews" style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" title="Яндекс.Метрика: данные за сегодня (просмотры, визиты и уникальные посетители)")
