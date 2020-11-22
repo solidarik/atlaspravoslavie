@@ -1,6 +1,5 @@
-
 "use strict";
-
+import addHolyPersons from './addHolyPersons.js';
 window.app = {};
 var app = window.app;
 
