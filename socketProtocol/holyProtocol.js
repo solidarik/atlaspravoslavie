@@ -1,6 +1,7 @@
 const ServerProtocol = require('../libs/serverProtocol')
 const ChronosModel = require('../models/chronosReligionModel')
 const PersonsModel = require('../models/personsReligionModel')
+const TemplesModel = require('../models/templesModel')
 
 class HolyProtocol extends ServerProtocol {
   init() {
@@ -33,6 +34,7 @@ class HolyProtocol extends ServerProtocol {
 
       const promices = [
         ChronosModel.find(defaultSearchParam),
+        TemplesModel.find(defaultSearchParam)
         /*PersonsModel.find({
           dateBirth: searchDates,
         }),
@@ -50,6 +52,7 @@ class HolyProtocol extends ServerProtocol {
           cb(
             JSON.stringify({
               chronos: res[0],
+              temples: res[1]
               //personsBirth: res[1],
               //personsAchievement: res[2],
               //personsDeath: res[3],

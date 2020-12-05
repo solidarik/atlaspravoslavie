@@ -509,7 +509,7 @@ export class MapControl extends EventEmitter {
   }
 
   refreshInfo(info) {
-    console.log(`refresh info {info}`)
+    console.log(`refresh info ${JSON.stringify(info)}`)
     this.simpleSource.clear()
     this.clusterSource.getSource().clear()
     info.forEach((item) => this.addFeature(item))

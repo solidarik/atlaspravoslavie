@@ -75635,6 +75635,7 @@ var StrHelper = /*#__PURE__*/function () {
     value: function ellipseLongString(input) {
       var len = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
       var end = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '...';
+      if (!input) return input;
       return input.length > len ? input.substring(0, len) + end : input;
     }
   }, {
@@ -82258,7 +82259,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     value: function refreshInfo(info) {
       var _this5 = this;
 
-      console.log("refresh info {info}");
+      console.log("refresh info ".concat(JSON.stringify(info)));
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       info.forEach(function (item) {
@@ -82478,7 +82479,102 @@ var JsHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = JsHelper;
-},{}],"oL5g":[function(require,module,exports) {
+},{}],"WMTm":[function(require,module,exports) {
+"use strict";
+
+var _superFeature = _interopRequireDefault(require("./superFeature"));
+
+var _strHelper = _interopRequireDefault(require("../../helper/strHelper"));
+
+var _dateHelper = _interopRequireDefault(require("../../helper/dateHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
+  _inherits(TemplesFeature, _SuperFeature);
+
+  var _super = _createSuper(TemplesFeature);
+
+  function TemplesFeature() {
+    _classCallCheck(this, TemplesFeature);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(TemplesFeature, null, [{
+    key: "getIcon",
+    value: function getIcon() {
+      return 'images/temples.png';
+    }
+  }, {
+    key: "getCaptionInfo",
+    value: function getCaptionInfo(info) {
+      return "".concat(info.name);
+    }
+  }, {
+    key: "getPopupInfo",
+    value: function getPopupInfo(feature) {
+      var info = feature.get('info');
+      return {
+        icon: this.getIcon(),
+        caption: this.getCaptionInfo(info)
+      };
+    }
+  }, {
+    key: "getHtmlInfo",
+    value: function getHtmlInfo(info) {
+      window.CURRENT_ITEM = info;
+      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.longBrief, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.eparchyUrl, ">\u041C\u0438\u0442\u0440\u043E\u043F\u043E\u043B\u0438\u044F/\u042D\u043F\u0430\u0440\u0445\u0438\u044F</a>\n      </div>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
+      return html;
+    }
+  }, {
+    key: "fillTemplesFeature",
+    value: function fillTemplesFeature(info) {
+      return info.temples.map(function (elem) {
+        return _objectSpread(_objectSpread({}, elem), {}, {
+          icon: TemplesFeature.getIcon(),
+          popupFirst: _strHelper.default.ellipseLongString(elem.longBrief),
+          popupSecond: _dateHelper.default.twoDateToStr2(elem.startDateStr, elem.endDateStr),
+          popupThird: elem.place,
+          oneLine: _strHelper.default.ellipseLongString(elem.name)
+        });
+      });
+    }
+  }]);
+
+  return TemplesFeature;
+}(_superFeature.default);
+
+module.exports = TemplesFeature;
+},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"oL5g":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));
@@ -82729,6 +82825,8 @@ var _jsHelper = _interopRequireDefault(require("../helper/jsHelper"));
 
 var _chronosFeature = _interopRequireDefault(require("./mapLayers/chronosFeature"));
 
+var _templesFeature = _interopRequireDefault(require("./mapLayers/templesFeature"));
+
 var _personFeature = _interopRequireDefault(require("./mapLayers/personFeature"));
 
 var _cookieHelper = require("./cookieHelper");
@@ -82790,7 +82888,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.showHideLegend();
 
     _this.lines = _this.addLines();
-    _this.linesCount = 2;
+    _this.linesCount = 3;
 
     var isCheckArr = _cookieHelper.CookieHelper.getCookie('isCheckArrLegend', undefined);
 
@@ -82829,19 +82927,26 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       var lines = [];
       lines.push({
         id: 0,
-        caption: 'Другие события',
+        caption: 'События',
         classFeature: _chronosFeature.default,
         fillFunction: _chronosFeature.default.fillChronosFeature,
         icon: _chronosFeature.default.getIcon()
       });
       lines.push({
         id: 1,
+        caption: 'Храмы',
+        classFeature: _templesFeature.default,
+        fillFunction: _templesFeature.default.fillTemplesFeature,
+        icon: _templesFeature.default.getIcon()
+      });
+      lines.push({
+        id: 2,
         caption: 'Персоналии',
         classFeature: _personFeature.default,
         fillFunction: this.fillPersonFeature,
         icon: _personFeature.default.getIcon(),
         childs: [{
-          id: 2,
+          id: 3,
           caption: 'Рождения',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -82849,7 +82954,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           icon: _personFeature.default.getBirthIcon(),
           isHide: true
         }, {
-          id: 3,
+          id: 4,
           caption: 'Достижения',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -82857,7 +82962,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           icon: _personFeature.default.getAchievementIcon(),
           isHide: true
         }, {
-          id: 4,
+          id: 5,
           caption: 'Смерти',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -83110,7 +83215,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
 }(_eventEmitter.EventEmitter);
 
 exports.LegendControl = LegendControl;
-},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/personFeature":"oL5g","./cookieHelper":"WAuT"}],"imeZ":[function(require,module,exports) {
+},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g","./cookieHelper":"WAuT"}],"imeZ":[function(require,module,exports) {
 /**
  * Parses an URI
  *

@@ -2,6 +2,7 @@ import { EventEmitter } from './eventEmitter'
 import ClassHelper from '../helper/classHelper'
 import JsHelper from '../helper/jsHelper'
 import ChronosFeature from './mapLayers/chronosFeature'
+import TemplesFeature from './mapLayers/templesFeature'
 import PersonFeature from './mapLayers/personFeature'
 import { CookieHelper } from './cookieHelper'
 //import TileSource from 'ol/source/Tile'
@@ -20,7 +21,7 @@ export class LegendControl extends EventEmitter {
     this.showHideLegend()
 
     this.lines = this.addLines()
-    this.linesCount = 2
+    this.linesCount = 3
     const isCheckArr = CookieHelper.getCookie('isCheckArrLegend', undefined)
     this.isCheckArr = isCheckArr
       ? JSON.parse(isCheckArr)
@@ -59,7 +60,7 @@ export class LegendControl extends EventEmitter {
 
     lines.push({
       id: 0,
-      caption: 'Другие события',
+      caption: 'События',
       classFeature: ChronosFeature,
       fillFunction: ChronosFeature.fillChronosFeature,
       icon: ChronosFeature.getIcon(),
@@ -67,13 +68,21 @@ export class LegendControl extends EventEmitter {
 
     lines.push({
       id: 1,
+      caption: 'Храмы',
+      classFeature: TemplesFeature,
+      fillFunction: TemplesFeature.fillTemplesFeature,
+      icon: TemplesFeature.getIcon(),
+    })
+
+    lines.push({
+      id: 2,
       caption: 'Персоналии',
       classFeature: PersonFeature,
       fillFunction: this.fillPersonFeature,
       icon: PersonFeature.getIcon(),
       childs: [
         {
-          id: 2,
+          id: 3,
           caption: 'Рождения',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
@@ -82,7 +91,7 @@ export class LegendControl extends EventEmitter {
           isHide: true,
         },
         {
-          id: 3,
+          id: 4,
           caption: 'Достижения',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
@@ -91,7 +100,7 @@ export class LegendControl extends EventEmitter {
           isHide: true,
         },
         {
-          id: 4,
+          id: 5,
           caption: 'Смерти',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,

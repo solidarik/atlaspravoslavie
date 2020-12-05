@@ -284,7 +284,6 @@ class InetHelper {
               prop: encodeURI('pageprops|description'),
               ppprop: 'displaytitle',
               gpssearch: encodeURI(stringSearch),
-              gpsnamespace: 0,
               gpslimit: 6,
             },
             isRus

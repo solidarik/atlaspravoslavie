@@ -6,6 +6,7 @@ const inetHelper = require('../helper/inetHelper')
 const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
 const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
+const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 inetHelper.loadCoords(checkedCoordsPath)
 
@@ -34,15 +35,26 @@ Promise.resolve(true)
   //     mediator: personsJsonMediator,
   //   })
   // })
+  // .then(() => {
+  //     return dbHelper.clearDb('chronosReligion')
+  //   })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_chronos_religion',
+  //     procdir: 'out/out_chronos_religion_process',
+  //     errdir: 'out/out_chronos_religion_errors',
+  //     mediator: chronosJsonMediator,
+  //   })
+  // })
   .then(() => {
-      return dbHelper.clearDb('chronosReligion')
-    })
+    return dbHelper.clearDb('temples')
+  })
   .then(() => {
     return dbHelper.saveFilesFrom({
-      source: 'python/out_chronos_religion',
-      procdir: 'out/out_chronos_religion_process',
-      errdir: 'out/out_chronos_religion_errors',
-      mediator: chronosJsonMediator,
+      source: 'python/out_temples',
+      procdir: 'out/out_temples_process',
+      errdir: 'out/out_temples_errors',
+      mediator: templesJsonMediator,
     })
   })
   .then(() => {

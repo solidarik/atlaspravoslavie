@@ -56,6 +56,7 @@ class StrHelper {
   }
 
   static ellipseLongString(input, len = 100, end = '...') {
+    if (!input) return input
     return input.length > len ? input.substring(0, len) + end : input
   }
 

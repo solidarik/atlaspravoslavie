@@ -50,7 +50,7 @@ __all__ = [
     'keep_files_by_template', 'sortlist_by_length', 'sync_files_by_dest',
     'leave_fresh_files', 'remove_items_from_tuples', 'add_prefix_to_array',
     'merge_tuples', 'check_exist_english', 'remove_spaces',
-    'get_date_from_input'
+    'get_date_from_input', 'remove_substring'
 ]
 
 # region CONFIG FUNCTIONS
@@ -189,6 +189,10 @@ def str8_to_date(value: str):
     return python_date, err
 
 
+def remove_substring(inputText, substring=r'([а-я]{1,2}[.])'):
+    return re.sub(substring, '', str(inputText)).strip()
+
+
 def get_date_from_input(inputText):
 
     outputStr = ''
@@ -198,7 +202,18 @@ def get_date_from_input(inputText):
     d, m, y = -1, -1, -999
 
     if not inputText:
-        raise ValueError('Пустая дата')
+        raise ValueError('Empry input str')
+
+    # если ячейка в Excel представлена как "дата"
+    if not isFound:
+        if type(inputText) == float:
+            inputText = int(inputText)
+            dt = datetime.datetime.fromordinal(
+                datetime.datetime(1900, 1, 1).toordinal() + inputText - 2)
+            d, m, y = dt.day, dt.month, dt.year
+            isFound = True
+        else:
+            inputText = re.sub(r'([^\d]{2,})', '', str(inputText))
 
     # если в дате указан год
     if not isFound:
@@ -211,15 +226,6 @@ def get_date_from_input(inputText):
                 outputStr = testStr
         except:
             pass
-
-    # если ячейка в Excel представлена как "дата"
-    if not isFound:
-        if type(inputText) == float:
-            inputText = int(inputText)
-            dt = datetime.datetime.fromordinal(
-                datetime.datetime(1900, 1, 1).toordinal() + inputText - 2)
-            d, m, y = dt.day, dt.month, dt.year
-            isFound = True
 
     # если дата до н.э.
     if not isFound:
