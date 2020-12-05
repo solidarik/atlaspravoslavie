@@ -32,9 +32,15 @@ class HolyProtocol extends ServerProtocol {
         startYear: searchDates,
       }
 
+      const overDateParam = {
+        startYear: {
+          $gte: parseInt(data.year)
+        },
+      }
+
       const promices = [
         ChronosModel.find(defaultSearchParam),
-        TemplesModel.find(defaultSearchParam)
+        TemplesModel.find(overDateParam)
         /*PersonsModel.find({
           dateBirth: searchDates,
         }),
