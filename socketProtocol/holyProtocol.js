@@ -34,7 +34,7 @@ class HolyProtocol extends ServerProtocol {
 
       const overDateParam = {
         startYear: {
-          $gte: parseInt(data.year)
+          $lt: parseInt(data.year)
         },
       }
 
