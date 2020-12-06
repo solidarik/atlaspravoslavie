@@ -4,7 +4,7 @@ var templesSchema = new mongoose.Schema(
   {
     pageId: Number,
 
-    startYear: Number,
+    startYear: {type: Number, index: true},
     startMonth: Number,
     startDay: Number,
     startDateStr: String,

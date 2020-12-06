@@ -1,4 +1,4 @@
-const PersonsModel = require('../models/personsReligionModel')
+const PersonsModel = require('../models/personsModel')
 const StrHelper = require('../helper/strHelper')
 const DateHelper = require('../helper/dateHelper')
 const InetHelper = require('../helper/inetHelper')

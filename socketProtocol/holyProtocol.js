@@ -1,6 +1,6 @@
 const ServerProtocol = require('../libs/serverProtocol')
 const ChronosModel = require('../models/chronosReligionModel')
-const PersonsModel = require('../models/personsReligionModel')
+const PersonsModel = require('../models/personsModel')
 const TemplesModel = require('../models/templesModel')
 
 class HolyProtocol extends ServerProtocol {
@@ -33,9 +33,10 @@ class HolyProtocol extends ServerProtocol {
       }
 
       const overDateParam = {
-        startYear: {
-          $lt: parseInt(data.year)
-        },
+        $or: [
+          {startYear: {$lt: parseInt(data.year)}},
+          {startYear: {$exists: false}}
+        ]
       }
 
       const promices = [

@@ -82552,6 +82552,14 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
   }, {
     key: "getHtmlInfo",
     value: function getHtmlInfo(info) {
+      if (!info.startDateStr) {
+        info.startDateStr = '';
+      }
+
+      if (!info.longBrief) {
+        info.longBrief = '';
+      }
+
       window.CURRENT_ITEM = info;
       var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.longBrief, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.eparchyUrl, ">\u041C\u0438\u0442\u0440\u043E\u043F\u043E\u043B\u0438\u044F/\u042D\u043F\u0430\u0440\u0445\u0438\u044F</a>\n      </div>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
       return html;

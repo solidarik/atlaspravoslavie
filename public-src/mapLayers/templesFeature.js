@@ -20,6 +20,14 @@ class TemplesFeature extends SuperFeature {
   }
 
   static getHtmlInfo(info) {
+    if (!info.startDateStr) {
+      info.startDateStr = ''
+    }
+
+    if (!info.longBrief) {
+      info.longBrief = ''
+    }
+
     window.CURRENT_ITEM = info
     const html = `<div class="temples-info panel-info">
       <h1>${info.name}</h1>
