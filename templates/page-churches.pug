@@ -1,0 +1,37 @@
+extends layout
+block head
+  link(rel='stylesheet' href='libs/materialdesignicons.min.css')
+  link(rel='stylesheet' href='/style-churches.css')
+
+  script(src='/libs/main-churches.js')
+
+block content
+    +header('churches')
+    div.content(role='content' id='content' dragable='true')
+        .row.churches-cont
+            .col-md-6
+                .row.img.image-cont
+                    img.image-center.img-rounded.resized-image(id='imgChurches' src='' alt='' )
+                .row.details.detail-cont
+                    .col-lg-12
+                        blockquote
+                            h5(id='name')
+                            small
+                                cite(id='startDateStr' title='Дата основания')
+                                br
+                                cite(id='place' title='Место расположения')
+                                br
+                                cite(id='eparchyUrl' title='Епархия')
+                                i.icon-map-marker
+                    .col-lg-12
+                        p(id='description')
+            .col-md-6
+                .row.details.detail-cont
+                    h5 Описание
+                    p(id='longBrief')
+    div(id='churches-info-container')
+      button(id="collapse-churches-button" class="btn btn-dark btn-small" type="button" data-toggle="collapse" data-target="#collapse-churches-info" aria-expanded="false" aria-controls="collapseChurchesInfo")
+        span(class="mdi mdi-chevron-double-down")
+      div(class="collapse show" id="collapse-churches-info")
+        div(id='churches-info-content' class='table-responsive')
+             table.table.table-sm.table-borderless(id='churches-table')

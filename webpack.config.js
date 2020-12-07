@@ -1,7 +1,10 @@
 module.exports = {
-    entry: [
-        `${__dirname}/public/main-holy-persons.js`
-    ],
+    entry: {
+       'main-holy-persons' : `${__dirname}/public/main-holy-persons.js`,
+       'main-churches' : `${__dirname}/public/main-churches.js`
+    }
+     
+    ,
     mode: 'development',
     module: {
         rules: [
@@ -17,6 +20,6 @@ module.exports = {
     },
     output: {
       path: `${__dirname}/public/libs`,
-      filename: 'bundle.js',
+      filename: '[name].js',
     },
   };

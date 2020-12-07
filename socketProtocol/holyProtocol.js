@@ -7,6 +7,7 @@ class HolyProtocol extends ServerProtocol {
   init() {
     super.addHandler('clQueryDataByYear', this.getDataByYear)
     super.addHandler('clGetCurrentYear', this.getCurrentYear)
+    super.addHandler('clGetTemples', this.getTemples)
   }
 
   getCurrentYear(socket, msg, cb) {
@@ -34,8 +35,8 @@ class HolyProtocol extends ServerProtocol {
 
       const overDateParam = {
         $or: [
-          {startYear: {$lt: parseInt(data.year)}},
-          {startYear: {$exists: false}}
+          { startYear: { $lt: parseInt(data.year) } },
+          { startYear: { $exists: false } }
         ]
       }
 
@@ -66,6 +67,31 @@ class HolyProtocol extends ServerProtocol {
             })
           )
         })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка парсинга даты: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
+  }
+
+  getTemples(socket, msg, cb) {
+    let res = {}
+
+    try {
+      let data = JSON.parse(msg)
+
+      TemplesModel.find({})
+        .then(
+          (res) => {
+            cb(
+              JSON.stringify({
+                temples: res
+              })
+            )
+          })
         .catch((error) => {
           cb(JSON.stringify({ error: error }))
         })

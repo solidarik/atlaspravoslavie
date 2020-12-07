@@ -1,8 +1,8 @@
 import io from 'socket.io-client'
-import { EventEmitter } from './eventEmitter'
-import { CookieHelper } from './cookieHelper'
+import  EventEmitter  from './eventEmitter'
+import  CookieHelper  from './cookieHelper'
 
-export class ClientProtocol extends EventEmitter {
+export default class ClientProtocol extends EventEmitter {
   constructor() {
     super()
     let socket = io()
@@ -57,6 +57,16 @@ export class ClientProtocol extends EventEmitter {
 
   setCurrentLanguage(lang) {
     this.lang = lang
+  }
+
+  getTemples() {
+    this.socket.emit(
+      'clGetTemples',
+      JSON.stringify({}),
+      (msg) => {
+        this.emit('temples', JSON.parse(msg))
+      }
+    )
   }
 
   getDataByYear(year) {
