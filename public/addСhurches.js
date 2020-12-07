@@ -22,7 +22,7 @@ export default class addСhurches {
       cur.startDateStr
     )
     $('#place').html(
-      '<b>Место расположения</b> - ' + cur.placet
+      '<b>Место расположения</b> - ' + cur.place
     )
     $('#eparchyUrl').html(
       '<b>Епархия</b> - ' +
