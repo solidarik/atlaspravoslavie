@@ -74792,10 +74792,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /**
  *  A vector layer for animated cluster
- * @constructor 
+ * @constructor
  * @extends {ol.layer.Vector}
  * @param {olx.layer.AnimatedClusterOptions=} options extend olx.layer.Options
- *  @param {Number} options.animationDuration animation duration in ms, default is 700ms 
+ *  @param {Number} options.animationDuration animation duration in ms, default is 700ms
  *  @param {ol.easingFunction} animationMethod easing method to use, default ol.easing.easeOut
  */
 var ol_layer_AnimatedCluster = function (opt_options) {
@@ -74835,7 +74835,7 @@ ol_layer_AnimatedCluster.prototype.saveCluster = function () {
     }
   }
 };
-/** 
+/**
  * Get the cluster that contains a feature
  * @private
 */
@@ -74856,9 +74856,9 @@ ol_layer_AnimatedCluster.prototype.getClusterForFeature = function (f, cluster) 
 
   return false;
 };
-/** 
- * Stop animation 
- * @private 
+/**
+ * Stop animation
+ * @private
  */
 
 
@@ -74867,7 +74867,7 @@ ol_layer_AnimatedCluster.prototype.stopAnimation = function () {
   this.animation.cA = [];
   this.animation.cB = [];
 };
-/** 
+/**
  * animate the cluster
  * @private
  */
@@ -75029,8 +75029,8 @@ ol_layer_AnimatedCluster.prototype.animate = function (e) {
         // OL < v4.3 : setImageStyle doesn't check retina
         var imgs = ol_Map.prototype.getFeaturesAtPixel ? false : s.getImage();
         if (imgs)
-        {	sc = imgs.getScale(); 
-          imgs.setScale(sc*ratio); 
+        {	sc = imgs.getScale();
+          imgs.setScale(sc*ratio);
         }
         // OL3 > v3.14
         if (vectorContext.setStyle)
@@ -75069,7 +75069,7 @@ ol_layer_AnimatedCluster.prototype.animate = function (e) {
 
   return;
 };
-/**  
+/**
  * remove clipping after the layer is drawn
  * @private
  */
@@ -75121,7 +75121,7 @@ var _getVectorContext = _interopRequireDefault(require("../util/getVectorContext
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
-  Copyright (c) 2016 Jean-Marc VIGLINO, 
+  Copyright (c) 2016 Jean-Marc VIGLINO,
   released under the CeCILL license (http://www.cecill.info/).
 */
 
@@ -75137,8 +75137,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 *	@param {bool} options.revers revers the animation direction
 *	@param {Number} options.repeat number of time to repeat the animation, default 0
 *	@param {ol.style.Style} options.hiddenStyle a style to display the feature when playing the animation
-*	  to be used to make the feature selectable when playing animation 
-*	  (@see {@link ../examples/map.featureanimation.select.html}), default the feature 
+*	  to be used to make the feature selectable when playing animation
+*	  (@see {@link ../examples/map.featureanimation.select.html}), default the feature
 *	  will be hidden when playing (and not selectable)
 *	@param {ol_easing_Function} options.fade an easing function used to fade in the feature, default none
 *	@param {ol_easing_Function} options.easing an easing function for the animation, default ol_easing_linear
@@ -75167,7 +75167,7 @@ ol_featureAnimation.hiddenStyle = new _Style.default({
     color: 'transparent'
   })
 });
-/** Draw a geometry 
+/** Draw a geometry
 * @param {olx.animateFeatureEvent} e
 * @param {ol.geom} geom geometry for shadow
 * @param {ol.geom} shadow geometry for shadow (ie. style with zIndex = -1)
@@ -75192,13 +75192,13 @@ ol_featureAnimation.prototype.drawGeom_ = function (e, geom, shadow) {
     }
   }
 };
-/** Function to perform manipulations onpostcompose. 
+/** Function to perform manipulations onpostcompose.
  * This function is called with an ol_featureAnimationEvent argument.
- * The function will be overridden by the child implementation.    
+ * The function will be overridden by the child implementation.
  * Return true to keep this function for the next frame, false to remove it.
  * @param {ol_featureAnimationEvent} e
  * @return {bool} true to continue animation.
- * @api 
+ * @api
  */
 
 
@@ -75207,7 +75207,7 @@ ol_featureAnimation.prototype.animate = function ()
 {
   return false;
 };
-/** An animation controler object an object to control animation with start, stop and isPlaying function.    
+/** An animation controler object an object to control animation with start, stop and isPlaying function.
  * To be used with {@link olx.Map#animateFeature} or {@link ol.layer.Vector#animateFeature}
  * @typedef {Object} ol.animationControler
  * @property {function} start - start animation.
@@ -75216,7 +75216,7 @@ ol_featureAnimation.prototype.animate = function ()
  */
 
 /** Animate feature on a map
- * @function 
+ * @function
  * @param {ol.Feature} feature Feature to animate
  * @param {ol_featureAnimation|Array<ol_featureAnimation>} fanim the animation to play
  * @return {olx.animationControler} an object to control animation with start, stop and isPlaying function
@@ -75224,7 +75224,7 @@ ol_featureAnimation.prototype.animate = function ()
 
 
 _Map.default.prototype.animateFeature = function (feature, fanim) {
-  // Get or create an animation layer associated with the map 
+  // Get or create an animation layer associated with the map
   var layer = this._featureAnimationLayer;
 
   if (!layer) {
@@ -75245,7 +75245,7 @@ _Map.default.prototype.animateFeature = function (feature, fanim) {
   });
   layer.animateFeature(feature, fanim);
 };
-/** Animate feature on a vector layer 
+/** Animate feature on a vector layer
  * @fires animationstart, animationend
  * @param {ol.Feature} feature Feature to animate
  * @param {ol_featureAnimation|Array<ol_featureAnimation>} fanim the animation to play
@@ -75438,9 +75438,9 @@ var _FeatureAnimation = _interopRequireDefault(require("./FeatureAnimation"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
-  Copyright (c) 2016 Jean-Marc VIGLINO, 
+  Copyright (c) 2016 Jean-Marc VIGLINO,
   released under the CeCILL license (http://www.cecill.info/).
-  
+
 */
 
 /** Zoom animation: feature zoom in (for points)
@@ -82259,7 +82259,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     value: function refreshInfo(info) {
       var _this5 = this;
 
-      console.log("refresh info ".concat(JSON.stringify(info)));
+      //console.log("refresh info ".concat(JSON.stringify(info)));
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       info.forEach(function (item) {

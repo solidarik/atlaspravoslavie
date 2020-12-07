@@ -77,7 +77,7 @@ function startApp() {
   const clientProtocol = ClientProtocol.create();
   clientProtocol.getTemples();
   clientProtocol.subscribe('temples', (temples) => {
-    console.log(JSON.stringify(temples))
+    //console.log(JSON.stringify(temples))
      var churches = new addСhurches("churches-table", temples);
      churches.clearTable();
      churches.fillTable();

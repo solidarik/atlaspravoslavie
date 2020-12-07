@@ -10,10 +10,10 @@ export default class addСhurches {
   }
 
   rowTableClickHandler(thisThis, thisTr) {
-    console.log("clicked " + $(thisTr).attr('_id'));
-    var _id = $(thisTr).attr('_id');
+    //console.log("clicked " + $(thisTr).attr('id'));
+    var _id = $(thisTr).attr('id');
     var cur = thisThis.data.temples[_id];
-    console.log(cur);
+    //console.log(cur);
     $('#name').html(
       cur.name
     )
@@ -48,8 +48,8 @@ export default class addСhurches {
   }
 
   addDataToTable() {
-    console.log("addDataTotable");
-    console.log(JSON.stringify(this.data));
+    //console.log("addDataTotable");
+    //console.log(JSON.stringify(this.data));
     var obj = this.data.temples;
     this.clearTable()
     var table = $('#' + this.idTable)
@@ -76,7 +76,7 @@ export default class addСhurches {
     for (var i = 0; i < obj.length; i++) {
       row = $(table[0].insertRow(-1))
       row.addClass('hand-cursor')
-      row.attr('_id', i)
+      row.attr('id', i)
       for (var j = 0; j < columnCount; j++) {
         if (j == 5 || j == 7 || j == 8) {
           var cell = $('<td />')
@@ -137,7 +137,7 @@ export default class addСhurches {
   fillTable() {
     //console.log("fillTable");
     if (this.data == null) {
-      console.time('data empty')
+      console.log('data empty')
     } else {
       this.addDataToTable()
     }
