@@ -16,6 +16,15 @@ class TestHelper:
         """Тест получения даты из различных форматов"""
         func = helper.get_date_from_input
 
+        res = func('17.04.1636')
+        assert res["ymd"][0] == 1636
+        assert res["ymd"][1] == 4
+        assert res["ymd"][2] == 17
+        assert res["outputStr"] == '17.04.1636'
+        assert res["isOnlyYear"] == False
+        assert res["isOnlyCentury"] == False
+        assert res["century"] == 17
+
         res = func('286')
         assert res["ymd"][0] == 286
         assert res["ymd"][1] == -1
@@ -60,11 +69,26 @@ class TestHelper:
 
         res = func('100 до н.э.     ')
         assert res["ymd"][0] == -100
+        assert res["century"] == -2
         assert res["ymd"][1] == -1
         assert res["ymd"][2] == -1
         assert res["isOnlyYear"] == True
         assert res["isUserText"] == True
         assert res["outputStr"] == '100 до н.э.'
+
+        res = func('5в')
+        assert res['ymd'][0] == -999
+        assert res["ymd"][1] == -1
+        assert res["ymd"][2] == -1
+        assert res["isOnlyCentury"] == True
+        assert res["century"] == 5
+
+        res = func('100')
+        assert res['ymd'][0] == 100
+        assert res["ymd"][1] == -1
+        assert res["ymd"][2] == -1
+        assert res["isOnlyCentury"] == False
+        assert res["century"] == 2
 
         # assert  ==
         # assert func(10, '123') == '123       '

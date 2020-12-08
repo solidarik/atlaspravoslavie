@@ -17,6 +17,12 @@ class PersonsJsonMediator extends SuperJsonMediator {
 
   processJson(json) {
     return new Promise((resolve, reject) => {
+
+      
+
+      resolve(json)
+      return
+
       if (json.placeBirthCoords) {
         resolve(json)
         return

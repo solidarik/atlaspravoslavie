@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Range } from 'react-range'
 import ReactDOM from 'react-dom'
-import { EventEmitter } from './eventEmitter'
+import EventEmitter from './eventEmitter'
 //import RangeControl from './rangeControl'
 
 class SuperSimple extends React.Component {

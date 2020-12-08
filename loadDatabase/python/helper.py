@@ -12,6 +12,7 @@ import codecs
 import subprocess
 import difflib
 import logging
+import json
 # endregion
 
 
@@ -50,7 +51,8 @@ __all__ = [
     'keep_files_by_template', 'sortlist_by_length', 'sync_files_by_dest',
     'leave_fresh_files', 'remove_items_from_tuples', 'add_prefix_to_array',
     'merge_tuples', 'check_exist_english', 'remove_spaces',
-    'get_date_from_input', 'remove_substring'
+    'get_date_from_input', 'remove_substring', 'load_json', 'save_json',
+    'read_json'
 ]
 
 # region CONFIG FUNCTIONS
@@ -195,91 +197,130 @@ def remove_substring(inputText, substring=r'([а-я]{1,2}[.])'):
 
 def get_date_from_input(inputText):
 
-    outputStr = ''
-    isUserText = False
-    isOnlyYear = False
-    isFound = False
-    d, m, y = -1, -1, -999
+    try:
 
-    if not inputText:
-        raise ValueError('Empry input str')
+        outputStr = ''
+        isUserText = False
+        isOnlyYear = False
+        isOnlyCentury = False
+        isFound = False
+        d, m, y, century = -1, -1, -999, -1
 
-    # если ячейка в Excel представлена как "дата"
-    if not isFound:
-        if type(inputText) == float:
-            inputText = int(inputText)
-            dt = datetime.datetime.fromordinal(
-                datetime.datetime(1900, 1, 1).toordinal() + inputText - 2)
-            d, m, y = dt.day, dt.month, dt.year
-            isFound = True
-        else:
-            inputText = re.sub(r'([^\d]{2,})', '', str(inputText))
+        if not inputText:
+            raise ValueError('Empry input str')
 
-    # если в дате указан год
-    if not isFound:
-        try:
-            testStr = str(int(inputText))
-            if len(testStr) < 5 and int(testStr) < 2020:
-                y = int(testStr)
-                isFound = True
+        if not isFound:
+            if (type(inputText) == str) and ('в' in inputText):
+                inputText = str(inputText).strip()
+                # если век
+                date_groups = get_search_groups_in_regexp(
+                    r'(\d)[в]', inputText)
+                if date_groups:
+                    century = int(date_groups[0])
+                    isOnlyCentury = True
+                    isFound = True
+
+                    # если век до н.э.
+                    date_groups = get_search_groups_in_regexp(
+                        r'(\d*).*до н.*', inputText)
+                    if date_groups:
+                        century = -century
+                        outputStr = inputText
+
+        # если ячейка в Excel представлена как "дата"
+        if not isFound:
+            if type(inputText) == float:
+                inputText = int(inputText)
+                if inputText > 2100:
+                    dt = datetime.datetime.fromordinal(
+                        datetime.datetime(1900, 1, 1).toordinal() + inputText -
+                        2)
+                    d, m, y = dt.day, dt.month, dt.year
+                    isFound = True
+            else:
+                inputText = str(inputText).replace('г.', '')
+
+        # если в дате указан год
+        if not isFound:
+            try:
+                testStr = str(int(inputText))
+                if len(testStr) < 5 and int(testStr) < 2020:
+                    y = int(testStr)
+                    isFound = True
+                    isOnlyYear = True
+                    outputStr = testStr
+            except:
+                pass
+
+        # если дата до н.э.
+        if not isFound:
+            inputText = str(inputText).strip()
+            date_groups = get_search_groups_in_regexp(r'(\d*).*до н.*',
+                                                      inputText)
+            if date_groups:
+                y = int(date_groups[0])
+                y = -y
+                isUserText = True
                 isOnlyYear = True
-                outputStr = testStr
-        except:
-            pass
+                isFound = True
+                outputStr = inputText
 
-    # если дата до н.э.
-    if not isFound:
-        inputText = str(inputText).strip()
-        date_groups = get_search_groups_in_regexp(r'(\d*).*до н.*', inputText)
-        if date_groups:
-            y = int(date_groups[0])
-            y = -y
-            isUserText = True
-            isOnlyYear = True
-            isFound = True
-            outputStr = inputText
+        # если даты формата dd.mm.yyyy или dd/mm/yyyy
+        if not isFound:
+            date_groups = get_search_groups_in_regexp(
+                r'(\d{1,2})\S(\d{1,2})\S(\d{1,4})', inputText)
+            if date_groups:
+                d = int(date_groups[0])
+                m = int(date_groups[1])
+                y = int(date_groups[2])
+                isFound = True
 
-    # если даты формата dd.mm.yyyy или dd/mm/yyyy
-    if not isFound:
-        date_groups = get_search_groups_in_regexp(
-            r'(\d{1,2})\S(\d{1,2})\S(\d{1,4})', inputText)
-        if date_groups:
-            d = int(date_groups[0])
-            m = int(date_groups[1])
-            y = int(date_groups[2])
-            isFound = True
+        # если дата типа "1984, 1 мая"
+        if not isFound:
+            date_groups = get_search_groups_in_regexp(
+                r'(\d*)\s*[,]\s*(\d+)\s*(\S+)', inputText)
+            if date_groups:
+                y = int(date_groups[0])
+                d = int(date_groups[1])
+                m = int(get_month_num(date_groups[2]))
+                isFound = True
 
-    # если дата типа "1984, 1 мая"
-    if not isFound:
-        date_groups = get_search_groups_in_regexp(
-            r'(\d*)\s*[,]\s*(\d+)\s*(\S+)', inputText)
-        if date_groups:
-            y = int(date_groups[0])
-            d = int(date_groups[1])
-            m = int(get_month_num(date_groups[2]))
-            isFound = True
+        # если дата типа "15 июня 1389 (года)"
+        if (not isFound):
+            date_groups = get_search_groups_in_regexp(
+                r'(\d*)\s*(\S*)\s*(\d*)\s*', inputText)
+            if date_groups:
+                d = int(date_groups[0])
+                m = int(get_month_num(date_groups[1]))
+                y = int(date_groups[2])
+                isFound = True
 
-    # если дата типа "15 июня 1389 (года)"
-    if (not isFound):
-        date_groups = get_search_groups_in_regexp(r'(\d*)\s*(\S*)\s*(\d*)\s*',
-                                                  inputText)
-        if date_groups:
-            d = int(date_groups[0])
-            m = int(get_month_num(date_groups[1]))
-            y = int(date_groups[2])
-            isFound = True
+        if not isFound:
+            raise ValueError(
+                f'Не удалось распарсить дату из текста {inputText}')
 
-    if not isFound:
-        raise ValueError(f'Не удалось распарсить дату из текста {inputText}')
+        if y != -999:
+            if y >= 0:
+                century = y // 100 + 1
+            else:
+                century = y // 100
+                if y % 100 == 0:
+                    century -= 1
 
-    if (not isUserText and not isOnlyYear):
-        outputStr = '{:02d}.{:02d}.{}'.format(d, m, y)
-    return {
-        "ymd": [y, m, d],
-        "outputStr": outputStr,
-        "isOnlyYear": isOnlyYear,
-        "isUserText": isUserText
-    }
+        if (not isUserText and not isOnlyYear and not isOnlyCentury):
+            outputStr = '{:02d}.{:02d}.{}'.format(d, m, y)
+        return {
+            "ymd": [y, m, d],
+            "century": century,
+            "outputStr": outputStr,
+            "isOnlyYear": isOnlyYear,
+            "isOnlyCentury": isOnlyCentury,
+            "isUserText": isUserText
+        }
+
+    except:
+        print(inputText)
+        raise Exception(f'Exception in date {inputText}')
 
 
 def get_date_from_filename(filename):
@@ -616,5 +657,27 @@ def get_search_groups_in_regexp(regexp, search_str):
 def remove_new_lines(s):
     return s.replace("  ", " ").replace("\n", " ").replace("\r", " ")
 
+
+# region JSON FUNCTIONS
+
+
+def read_json(file_name, encoding='utf8'):
+    """Чтение (десериализация) JSON. Функция-синоним load_json"""
+    return load_json(file_name, encoding)
+
+
+def load_json(file_name, encoding='utf8'):
+    """Загрузка (десериализация) JSON данных"""
+    with open(get_full_path(file_name), "r", encoding=encoding) as json_file:
+        return json.load(json_file)
+
+
+def save_json(json_obj, file_name, encoding='utf8'):
+    """Сохранение (сериализация) JSON данных"""
+    with open(get_full_path(file_name), 'w', encoding=encoding) as json_file:
+        json_file.write(json.dumps(json_obj, indent=4, ensure_ascii=False))
+
+
+# endregion
 
 # endregion

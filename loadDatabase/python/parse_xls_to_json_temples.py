@@ -10,8 +10,9 @@ print(sys.stdout.encoding)
 root_folder = 'out_temples'
 
 col_name = 0
-col_place, col_date, col_longBrief = tuple(range(2, 5))
-col_abbots, col_srcUrl, col_eparchyUrl = tuple(range(5, 8))
+col_imgUrl = 2
+col_place, col_date, col_longBrief = tuple(range(3, 6))
+col_abbots, col_srcUrl, col_eparchyUrl = tuple(range(6, 9))
 
 
 def IsEmptyValue(row, col):
@@ -77,6 +78,8 @@ for row in range(START_ROW, END_ROW):
                 temples["startDay"] = startDate["ymd"][2]
                 temples["startDateStr"] = startDate["outputStr"]
                 temples["startIsOnlyYear"] = startDate["isOnlyYear"]
+                temples["startIsOnlyCentury"] = startDate["isOnlyCentury"]
+                temples["startCentury"] = startDate["century"]
 
                 endDate = helper.get_date_from_input(dateArr[1])
                 temples["endYear"] = endDate["ymd"][0]
@@ -84,6 +87,8 @@ for row in range(START_ROW, END_ROW):
                 temples["endDay"] = endDate["ymd"][2]
                 temples["endDateStr"] = endDate["outputStr"]
                 temples["endIsOnlyYear"] = endDate["isOnlyYear"]
+                temples["endIsOnlyCentury"] = endDate["isOnlyCentury"]
+                temples["endCentury"] = endDate["century"]
             else:
                 if GetSheetValue(row, col_date):
                     startDate = GetSheetValueDate(row, col_date)
@@ -92,8 +97,11 @@ for row in range(START_ROW, END_ROW):
                     temples["startDay"] = startDate["ymd"][2]
                     temples["startDateStr"] = startDate["outputStr"]
                     temples["startIsOnlyYear"] = startDate["isOnlyYear"]
+                    temples["startIsOnlyCentury"] = startDate["isOnlyCentury"]
+                    temples["startCentury"] = startDate["century"]
 
         temples['name'] = GetSheetValue(row, col_name)
+        temples['imgUrl'] = GetSheetValue(row, col_imgUrl)
         temples['place'] = GetSheetValue(row, col_place)
         temples['surPlace'] = helper.remove_substring(
             GetSheetValue(row, col_place))

@@ -87,6 +87,11 @@ class DbHelper {
         let procpath = path.join(procdir, filename)
         let errpath = path.join(errdir, filename)
 
+        //обход на случай отсутствия массивов (ex persons)
+        if (!Array.isArray(json) ) {
+          json = [json]
+        }
+
         json.forEach((jsonItem) => {
           promises.push(
             new Promise((resolve) => {

@@ -66418,7 +66418,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.EventEmitter = void 0;
+exports.default = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -66474,7 +66474,7 @@ var EventEmitter = /*#__PURE__*/function () {
   return EventEmitter;
 }();
 
-exports.EventEmitter = EventEmitter;
+exports.default = EventEmitter;
 },{}],"vavI":[function(require,module,exports) {
 "use strict";
 
@@ -74792,10 +74792,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /**
  *  A vector layer for animated cluster
- * @constructor
+ * @constructor 
  * @extends {ol.layer.Vector}
  * @param {olx.layer.AnimatedClusterOptions=} options extend olx.layer.Options
- *  @param {Number} options.animationDuration animation duration in ms, default is 700ms
+ *  @param {Number} options.animationDuration animation duration in ms, default is 700ms 
  *  @param {ol.easingFunction} animationMethod easing method to use, default ol.easing.easeOut
  */
 var ol_layer_AnimatedCluster = function (opt_options) {
@@ -74835,7 +74835,7 @@ ol_layer_AnimatedCluster.prototype.saveCluster = function () {
     }
   }
 };
-/**
+/** 
  * Get the cluster that contains a feature
  * @private
 */
@@ -74856,9 +74856,9 @@ ol_layer_AnimatedCluster.prototype.getClusterForFeature = function (f, cluster) 
 
   return false;
 };
-/**
- * Stop animation
- * @private
+/** 
+ * Stop animation 
+ * @private 
  */
 
 
@@ -74867,7 +74867,7 @@ ol_layer_AnimatedCluster.prototype.stopAnimation = function () {
   this.animation.cA = [];
   this.animation.cB = [];
 };
-/**
+/** 
  * animate the cluster
  * @private
  */
@@ -75029,8 +75029,8 @@ ol_layer_AnimatedCluster.prototype.animate = function (e) {
         // OL < v4.3 : setImageStyle doesn't check retina
         var imgs = ol_Map.prototype.getFeaturesAtPixel ? false : s.getImage();
         if (imgs)
-        {	sc = imgs.getScale();
-          imgs.setScale(sc*ratio);
+        {	sc = imgs.getScale(); 
+          imgs.setScale(sc*ratio); 
         }
         // OL3 > v3.14
         if (vectorContext.setStyle)
@@ -75069,7 +75069,7 @@ ol_layer_AnimatedCluster.prototype.animate = function (e) {
 
   return;
 };
-/**
+/**  
  * remove clipping after the layer is drawn
  * @private
  */
@@ -75121,7 +75121,7 @@ var _getVectorContext = _interopRequireDefault(require("../util/getVectorContext
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
-  Copyright (c) 2016 Jean-Marc VIGLINO,
+  Copyright (c) 2016 Jean-Marc VIGLINO, 
   released under the CeCILL license (http://www.cecill.info/).
 */
 
@@ -75137,8 +75137,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 *	@param {bool} options.revers revers the animation direction
 *	@param {Number} options.repeat number of time to repeat the animation, default 0
 *	@param {ol.style.Style} options.hiddenStyle a style to display the feature when playing the animation
-*	  to be used to make the feature selectable when playing animation
-*	  (@see {@link ../examples/map.featureanimation.select.html}), default the feature
+*	  to be used to make the feature selectable when playing animation 
+*	  (@see {@link ../examples/map.featureanimation.select.html}), default the feature 
 *	  will be hidden when playing (and not selectable)
 *	@param {ol_easing_Function} options.fade an easing function used to fade in the feature, default none
 *	@param {ol_easing_Function} options.easing an easing function for the animation, default ol_easing_linear
@@ -75167,7 +75167,7 @@ ol_featureAnimation.hiddenStyle = new _Style.default({
     color: 'transparent'
   })
 });
-/** Draw a geometry
+/** Draw a geometry 
 * @param {olx.animateFeatureEvent} e
 * @param {ol.geom} geom geometry for shadow
 * @param {ol.geom} shadow geometry for shadow (ie. style with zIndex = -1)
@@ -75192,13 +75192,13 @@ ol_featureAnimation.prototype.drawGeom_ = function (e, geom, shadow) {
     }
   }
 };
-/** Function to perform manipulations onpostcompose.
+/** Function to perform manipulations onpostcompose. 
  * This function is called with an ol_featureAnimationEvent argument.
- * The function will be overridden by the child implementation.
+ * The function will be overridden by the child implementation.    
  * Return true to keep this function for the next frame, false to remove it.
  * @param {ol_featureAnimationEvent} e
  * @return {bool} true to continue animation.
- * @api
+ * @api 
  */
 
 
@@ -75207,7 +75207,7 @@ ol_featureAnimation.prototype.animate = function ()
 {
   return false;
 };
-/** An animation controler object an object to control animation with start, stop and isPlaying function.
+/** An animation controler object an object to control animation with start, stop and isPlaying function.    
  * To be used with {@link olx.Map#animateFeature} or {@link ol.layer.Vector#animateFeature}
  * @typedef {Object} ol.animationControler
  * @property {function} start - start animation.
@@ -75216,7 +75216,7 @@ ol_featureAnimation.prototype.animate = function ()
  */
 
 /** Animate feature on a map
- * @function
+ * @function 
  * @param {ol.Feature} feature Feature to animate
  * @param {ol_featureAnimation|Array<ol_featureAnimation>} fanim the animation to play
  * @return {olx.animationControler} an object to control animation with start, stop and isPlaying function
@@ -75224,7 +75224,7 @@ ol_featureAnimation.prototype.animate = function ()
 
 
 _Map.default.prototype.animateFeature = function (feature, fanim) {
-  // Get or create an animation layer associated with the map
+  // Get or create an animation layer associated with the map 
   var layer = this._featureAnimationLayer;
 
   if (!layer) {
@@ -75245,7 +75245,7 @@ _Map.default.prototype.animateFeature = function (feature, fanim) {
   });
   layer.animateFeature(feature, fanim);
 };
-/** Animate feature on a vector layer
+/** Animate feature on a vector layer 
  * @fires animationstart, animationend
  * @param {ol.Feature} feature Feature to animate
  * @param {ol_featureAnimation|Array<ol_featureAnimation>} fanim the animation to play
@@ -75438,9 +75438,9 @@ var _FeatureAnimation = _interopRequireDefault(require("./FeatureAnimation"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
-  Copyright (c) 2016 Jean-Marc VIGLINO,
+  Copyright (c) 2016 Jean-Marc VIGLINO, 
   released under the CeCILL license (http://www.cecill.info/).
-
+  
 */
 
 /** Zoom animation: feature zoom in (for points)
@@ -81735,7 +81735,7 @@ var olTilegrid = _interopRequireWildcard(require("ol/tilegrid"));
 
 var olInteraction = _interopRequireWildcard(require("ol/interaction"));
 
-var _eventEmitter = require("./eventEmitter");
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
 
 var _proj2 = _interopRequireDefault(require("proj4"));
 
@@ -82259,7 +82259,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     value: function refreshInfo(info) {
       var _this5 = this;
 
-      //console.log("refresh info ".concat(JSON.stringify(info)));
+      console.log("refresh info ".concat(JSON.stringify(info)));
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       info.forEach(function (item) {
@@ -82274,7 +82274,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }]);
 
   return MapControl;
-}(_eventEmitter.EventEmitter);
+}(_eventEmitter.default);
 
 exports.MapControl = MapControl;
 
@@ -82753,7 +82753,7 @@ module.exports = PersonFeature;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CookieHelper = void 0;
+exports.default = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -82817,7 +82817,7 @@ var CookieHelper = /*#__PURE__*/function () {
   return CookieHelper;
 }();
 
-exports.CookieHelper = CookieHelper;
+exports.default = CookieHelper;
 },{}],"pD6K":[function(require,module,exports) {
 "use strict";
 
@@ -82826,7 +82826,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.LegendControl = void 0;
 
-var _eventEmitter = require("./eventEmitter");
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
 
 var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
 
@@ -82838,7 +82838,7 @@ var _templesFeature = _interopRequireDefault(require("./mapLayers/templesFeature
 
 var _personFeature = _interopRequireDefault(require("./mapLayers/personFeature"));
 
-var _cookieHelper = require("./cookieHelper");
+var _cookieHelper = _interopRequireDefault(require("./cookieHelper"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -82890,7 +82890,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.legendSpan = document.getElementById('legend-span');
     _this.legendDiv = document.getElementById('legend-div');
 
-    var isVisible = _cookieHelper.CookieHelper.getCookie('isVisibleLegend', false);
+    var isVisible = _cookieHelper.default.getCookie('isVisibleLegend', false);
 
     _this.isVisible = isVisible ? JSON.parse(isVisible) : false;
 
@@ -82899,7 +82899,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.lines = _this.addLines();
     _this.linesCount = 3;
 
-    var isCheckArr = _cookieHelper.CookieHelper.getCookie('isCheckArrLegend', undefined);
+    var isCheckArr = _cookieHelper.default.getCookie('isCheckArrLegend', undefined);
 
     _this.isCheckArr = isCheckArr ? JSON.parse(isCheckArr) : _jsHelper.default.fillArray(true, _this.linesCount);
     _this.items = [];
@@ -83004,7 +83004,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       legend.isVisible = !legend.isVisible;
       legend.showHideLegend.call(legend);
 
-      _cookieHelper.CookieHelper.setCookie('isVisibleLegend', legend.isVisible);
+      _cookieHelper.default.setCookie('isVisibleLegend', legend.isVisible);
     }
   }, {
     key: "getIcons",
@@ -83091,7 +83091,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
 
       this.isCheckArr[rowId] = !this.isCheckArr[rowId];
 
-      _cookieHelper.CookieHelper.setCookie('isCheckArrLegend', JSON.stringify(this.isCheckArr));
+      _cookieHelper.default.setCookie('isCheckArrLegend', JSON.stringify(this.isCheckArr));
 
       this.repaintLegend();
       this.filterInfo();
@@ -83221,7 +83221,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
   }]);
 
   return LegendControl;
-}(_eventEmitter.EventEmitter);
+}(_eventEmitter.default);
 
 exports.LegendControl = LegendControl;
 },{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g","./cookieHelper":"WAuT"}],"imeZ":[function(require,module,exports) {
@@ -91618,13 +91618,13 @@ Object.defineProperty(exports, "Manager", {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ClientProtocol = void 0;
+exports.default = void 0;
 
 var _socket = _interopRequireDefault(require("socket.io-client"));
 
-var _eventEmitter = require("./eventEmitter");
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
 
-var _cookieHelper = require("./cookieHelper");
+var _cookieHelper = _interopRequireDefault(require("./cookieHelper"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -91669,7 +91669,7 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       var data = JSON.parse(msg);
       var serverYear = data.year;
 
-      var cookieYear = _cookieHelper.CookieHelper.getCookie('year');
+      var cookieYear = _cookieHelper.default.getCookie('year');
 
       _this.emit('setCurrentYear', serverYear ? serverYear : cookieYear ? cookieYear : '1945');
     });
@@ -91709,20 +91709,29 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       this.lang = lang;
     }
   }, {
+    key: "getTemples",
+    value: function getTemples() {
+      var _this2 = this;
+
+      this.socket.emit('clGetTemples', JSON.stringify({}), function (msg) {
+        _this2.emit('temples', JSON.parse(msg));
+      });
+    }
+  }, {
     key: "getDataByYear",
     value: function getDataByYear(year) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (undefined === year) {
         return;
       }
 
-      _cookieHelper.CookieHelper.setCookie('year', year);
+      _cookieHelper.default.setCookie('year', year);
 
       this.socket.emit('clQueryDataByYear', JSON.stringify({
         year: year
       }), function (msg) {
-        _this2.emit('refreshInfo', JSON.parse(msg));
+        _this3.emit('refreshInfo', JSON.parse(msg));
       });
     }
   }], [{
@@ -91733,9 +91742,9 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
   }]);
 
   return ClientProtocol;
-}(_eventEmitter.EventEmitter);
+}(_eventEmitter.default);
 
-exports.ClientProtocol = ClientProtocol;
+exports.default = ClientProtocol;
 },{"socket.io-client":"pPpY","./eventEmitter":"STwH","./cookieHelper":"WAuT"}],"s1dy":[function(require,module,exports) {
 "use strict";
 
@@ -91744,7 +91753,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.InfoControl = void 0;
 
-var _eventEmitter = require("./eventEmitter");
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
 
 var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
 
@@ -91872,7 +91881,7 @@ var InfoControl = /*#__PURE__*/function (_EventEmitter) {
   }]);
 
   return InfoControl;
-}(_eventEmitter.EventEmitter); //https://codesandbox.io/s/rlp1j1183n?file=/src/index.js:240-2385
+}(_eventEmitter.default); //https://codesandbox.io/s/rlp1j1183n?file=/src/index.js:240-2385
 
 
 exports.InfoControl = InfoControl;
@@ -102765,7 +102774,7 @@ var _mapControl = require("./mapControl");
 
 var _legendControl = require("./legendControl");
 
-var _clientProtocol = require("./clientProtocol");
+var _clientProtocol = _interopRequireDefault(require("./clientProtocol"));
 
 var _infoControl = require("./infoControl");
 
@@ -102792,7 +102801,7 @@ function changeWindowSize() {
 window.onresize = fixMapHeight; //changeWindowSize
 
 function startApp() {
-  var protocol = _clientProtocol.ClientProtocol.create();
+  var protocol = _clientProtocol.default.create();
 
   var mapControl = _mapControl.MapControl.create();
 

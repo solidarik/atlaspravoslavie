@@ -1,6 +1,6 @@
 import { MapControl } from './mapControl'
 import { LegendControl } from './legendControl'
-import { ClientProtocol } from './clientProtocol'
+import ClientProtocol from './clientProtocol'
 import { InfoControl } from './infoControl'
 
 import $ from 'jquery'

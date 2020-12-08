@@ -18,6 +18,7 @@ class TemplesJsonMediator extends SuperJsonMediator {
       }
 
       let geoName = json.name + ' ' + json.surPlace
+      geoName = geoName.replace(',', '')
 
       inetHelper
         .getCoordsForCityOrCountry(geoName)
@@ -30,6 +31,8 @@ class TemplesJsonMediator extends SuperJsonMediator {
             point: placeCoords[0],
             startIsOnlyYear: json.startIsOnlyYear == 'True' ? true : false,
             endIsOnlyYear: json.endIsOnlyYear == 'True' ? true : false,
+            startIsOnlyCentury: json.startIsOnlyCentury == 'True' ? true : false,
+            endIsOnlyCentury: json.endIsOnlyCentury == 'True' ? true : false,
             pageUrl: StrHelper.generatePageUrl([
               json.name,
               json.place

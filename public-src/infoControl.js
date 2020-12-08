@@ -1,4 +1,4 @@
-import { EventEmitter } from './eventEmitter'
+import EventEmitter from './eventEmitter'
 import ClassHelper from '../helper/classHelper'
 
 export class InfoControl extends EventEmitter {

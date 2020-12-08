@@ -14,6 +14,8 @@ var personsSchema = new mongoose.Schema(
       day: Number,
       dateStr: String,
       isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number,
       place: String,
       placeCoord: [],
     },
@@ -24,13 +26,26 @@ var personsSchema = new mongoose.Schema(
       day: Number,
       dateStr: String,
       isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number,
       place: String,
       placeCoord: [],
     },
 
     achievements: [{
       place: String,
-      placeCoord: []
+      placeCoord: [],
+      date: {
+        year: Number,
+        month: Number,
+        day: Number,
+        dateStr: String,
+        isOnlyYear: Boolean,
+        isOnlyCentury: Boolean,
+        century: Number,
+        place: String,
+        placeCoord: [],
+      }
     }],
 
     holyStatus: {
@@ -38,23 +53,34 @@ var personsSchema = new mongoose.Schema(
       required: 'Статус святости обязателен для заполнения',
     },
 
-    worship: [{
+    worshipDates: [{
       month: Number,
       day: Number,
       dateStr: String,
       isOnlyYear: Boolean
     }],
 
+    canonizationDate: {
+      year: Number,
+      month: Number,
+      day: Number,
+      dateStr: String,
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number,
+    },
+
     profession: String,
 
     description: String,
     fullDescription: String,
 
+    /*
     pageUrl: {
       type: String,
       unique: true,
       required: 'Не определена уникальная ссылка',
-    },
+    },*/
 
     srcUrl: String,
     photoUrl: String,

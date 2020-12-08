@@ -25,17 +25,6 @@ Promise.resolve(true)
   //   })
   // })
   // .then(() => {
-  //   return dbHelper.clearDb('persons')
-  // })
-  // .then(() => {
-  //   return dbHelper.saveFilesFrom({
-  //     source: '../public/data/persons.json',
-  //     procdir: 'out/out_person_process',
-  //     errdir: 'out/out_person_errors',
-  //     mediator: personsJsonMediator,
-  //   })
-  // })
-  // .then(() => {
   //     return dbHelper.clearDb('chronosReligion')
   //   })
   // .then(() => {
@@ -57,6 +46,17 @@ Promise.resolve(true)
       mediator: templesJsonMediator,
     })
   })
+  // .then(() => {
+  //   return dbHelper.clearDb('persons')
+  // })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_persons',
+  //     procdir: 'out/out_person_process',
+  //     errdir: 'out/out_person_errors',
+  //     mediator: personsJsonMediator,
+  //   })
+  // })
   .then(() => {
     log.success(chalk.cyan(`окончание процесса загрузки`))
     dbHelper.free()

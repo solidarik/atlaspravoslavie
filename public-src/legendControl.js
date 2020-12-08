@@ -1,10 +1,10 @@
-import { EventEmitter } from './eventEmitter'
+import EventEmitter from './eventEmitter'
 import ClassHelper from '../helper/classHelper'
 import JsHelper from '../helper/jsHelper'
 import ChronosFeature from './mapLayers/chronosFeature'
 import TemplesFeature from './mapLayers/templesFeature'
 import PersonFeature from './mapLayers/personFeature'
-import { CookieHelper } from './cookieHelper'
+import CookieHelper from './cookieHelper'
 //import TileSource from 'ol/source/Tile'
 
 export class LegendControl extends EventEmitter {
