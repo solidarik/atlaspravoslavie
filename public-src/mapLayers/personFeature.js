@@ -61,7 +61,6 @@ class PersonFeature extends SuperFeature {
 
   static fillPersonItems(info, kind) {
     let res = []
-    console.log(JSON.stringify(info.personsMartyrs))
     switch (kind) {
       case 'martyrs':
         if (!info.personsMartyrs) return res

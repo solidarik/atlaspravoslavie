@@ -82685,7 +82685,6 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "fillPersonItems",
     value: function fillPersonItems(info, kind) {
       var res = [];
-      console.log(JSON.stringify(info.personsMartyrs));
 
       switch (kind) {
         case 'martyrs':
