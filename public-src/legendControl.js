@@ -21,7 +21,7 @@ export class LegendControl extends EventEmitter {
     this.showHideLegend()
 
     this.lines = this.addLines()
-    this.linesCount = 3
+    this.linesCount = 6
     const isCheckArr = CookieHelper.getCookie('isCheckArrLegend', undefined)
     this.isCheckArr = isCheckArr
       ? JSON.parse(isCheckArr)
@@ -48,10 +48,9 @@ export class LegendControl extends EventEmitter {
 
   fillPersonFeature(info) {
     let res = []
-    return res
-    res = res.concat(PersonFeature.fillPersonItems(info, 'birth'))
-    res = res.concat(PersonFeature.fillPersonItems(info, 'achievement'))
-    res = res.concat(PersonFeature.fillPersonItems(info, 'death'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'martyrs'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'reverends'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'holy'))
     return res
   }
 
@@ -76,37 +75,37 @@ export class LegendControl extends EventEmitter {
 
     lines.push({
       id: 2,
-      caption: 'Персоналии',
+      caption: 'Лики',
       classFeature: PersonFeature,
       fillFunction: this.fillPersonFeature,
-      icon: PersonFeature.getIcon(),
+      // icon: PersonFeature.getIcon(),
       childs: [
         {
           id: 3,
-          caption: 'Рождения',
+          caption: 'Мученики',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'birth',
-          icon: PersonFeature.getBirthIcon(),
-          isHide: true,
+          fillFunctionKind: 'martyrs',
+          icon: PersonFeature.getMartyrsIcon(),
+          isHide: false,
         },
         {
           id: 4,
-          caption: 'Достижения',
+          caption: 'Преподобные',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'achievement',
-          icon: PersonFeature.getAchievementIcon(),
-          isHide: true,
+          fillFunctionKind: 'reverends',
+          icon: PersonFeature.getReverendsIcon(),
+          isHide: false,
         },
         {
           id: 5,
-          caption: 'Смерти',
+          caption: 'Святые',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'death',
-          icon: PersonFeature.getDeathIcon(),
-          isHide: true,
+          fillFunctionKind: 'holy',
+          icon: PersonFeature.getHolyIcon(),
+          isHide: false,
         },
       ],
     })

@@ -15,65 +15,72 @@ class PersonsJsonMediator extends SuperJsonMediator {
     return json.placeBirthCoords.length > 0
   }
 
+  deleteAbbrev(place) {
+    if (!place)
+      return undefined
+
+    place = place.replace(',', '').replace('"', '')
+    //по сути это контекст return place.replace(/^\S{1,2}[.]+\s/g, '')
+    return place
+  }
+
   processJson(json) {
     return new Promise((resolve, reject) => {
 
-      
-
-      resolve(json)
-      return
-
-      if (json.placeBirthCoords) {
-        resolve(json)
-        return
-      }
-
       let promises = [
-        InetHelper.getCoordsForCityOrCountry(json.PlaceAchievement),
-        InetHelper.getCoordsForCityOrCountry(json.PlaceBirth),
-        InetHelper.getCoordsForCityOrCountry(json.PlaceDeath),
+        InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.birth.place)),
+        InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.death.place))
       ]
+
+      json.achievements.forEach((achiev) => {
+        promises.push(
+          InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(achiev.place))
+        )
+      })
 
       Promise.all(promises)
         .then((coords) => {
-          const placeAchievementCoords = coords[0]
-          const placeBirthCoords = coords[1]
-          const placeDeathCoords = coords[2]
+          const birthCoords = coords[0]
+          const deathCoords = coords[1]
 
-          const newJson = {
-            surname: json.Surname,
-            name: json.Name,
-            middlename: json.MiddleName,
-            dateBirth: DateHelper.ignoreAlterDate(json.DateBirth),
-            dateBirthStr: json.DateBirth,
-            dateDeath: DateHelper.ignoreAlterDate(json.DateDeath),
-            dateDeathStr: json.DateDeath,
-            dateAchievement: DateHelper.ignoreAlterDate(json.DateAchievement),
-            dateAchievementStr: json.DateAchievement,
-            deathYearStr: DateHelper.betweenYearTwoDates(
-              json.DateBirth,
-              json.DateDeath
-            ),
-            achievementYearStr: DateHelper.betweenYearTwoDates(
-              json.DateBirth,
-              json.DateAchievement
-            ),
-            description: json.Description,
-            fullDescription: json.FullDescription,
-            pageUrl: StrHelper.generatePageUrl([json.Surname, json.Name]),
-            srcUrl: json.Source,
-            photoUrl: json.PhotoUrl,
-            linkUrl: json.Link,
-            placeAchievement: json.PlaceAchievement,
-            placeAchievementCoords: placeAchievementCoords,
-            placeBirth: json.PlaceBirth,
-            placeBirthCoords: placeBirthCoords,
-            placeDeath: json.PlaceDeath,
-            placeDeathCoords: placeDeathCoords,
-            activity: json.FieldActivity,
+          if (birthCoords && birthCoords.length == 0)
+              resolve({
+                error: `не удалось определить координаты рождения`,
+                errorPlace: json.birth.place })
+
+          if (deathCoords && deathCoords.length == 0)
+              resolve({
+                error: `не удалось определить координаты смерти`,
+                errorPlace: json.death.place })
+
+          for (let i = 2; i < json.achievements.length + 2; i++) {
+            if (coords[i] && coords[i].length == 0) {
+              errorPlace = json.achievemnts[i - 2].place
+              resolve({
+                error: `не удалось определить координаты достижения для ${errorPlace}`,
+                errorPlace: errorPlace })
+            } else {
+              json.achievements[i-2] = {
+                ...json.achievements[i-2],
+                placeCoord: coords[i]
+              }
+            }
           }
 
-          resolve(newJson)
+          json = {
+            ...json,
+            birth: {
+              ...json.birth,
+              placeCoord: birthCoords
+            },
+            death: {
+              ...json.death,
+              placeCoord: deathCoords
+            },
+            pageUrl: StrHelper.generatePageUrl([json.surname, json.name, json.middlename])
+          }
+
+          resolve(json)
         })
         .catch((err) => reject(`ошибка в processJson: ${err}`))
     })

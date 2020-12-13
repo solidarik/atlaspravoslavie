@@ -200,6 +200,9 @@ def get_date_from_input(inputText):
     try:
 
         outputStr = ''
+        if type(inputText) == str:
+            inputText = str(inputText).strip()
+            outputStr = inputText
         isUserText = False
         isOnlyYear = False
         isOnlyCentury = False
@@ -211,10 +214,10 @@ def get_date_from_input(inputText):
 
         if not isFound:
             if (type(inputText) == str) and ('в' in inputText):
-                inputText = str(inputText).strip()
+                inputText = remove_spaces(str(inputText))
                 # если век
                 date_groups = get_search_groups_in_regexp(
-                    r'(\d)[в]', inputText)
+                    r'(\d*)[в]', inputText)
                 if date_groups:
                     century = int(date_groups[0])
                     isOnlyCentury = True
@@ -225,7 +228,6 @@ def get_date_from_input(inputText):
                         r'(\d*).*до н.*', inputText)
                     if date_groups:
                         century = -century
-                        outputStr = inputText
 
         # если ячейка в Excel представлена как "дата"
         if not isFound:
@@ -237,14 +239,18 @@ def get_date_from_input(inputText):
                         2)
                     d, m, y = dt.day, dt.month, dt.year
                     isFound = True
-            else:
-                inputText = str(inputText).replace('г.', '')
+
+        if not isFound and type(inputText) == str:
+            inputText = remove_spaces(inputText)
+            inputText = inputText.replace('г.', '').replace('гг.', '')
+            inputText = inputText.replace('гг', '')
+            inputText = remove_substring(inputText, r'г$')
 
         # если в дате указан год
         if not isFound:
             try:
                 testStr = str(int(inputText))
-                if len(testStr) < 5 and int(testStr) < 2020:
+                if len(testStr) < 5 and int(testStr) < 2022:
                     y = int(testStr)
                     isFound = True
                     isOnlyYear = True
@@ -254,8 +260,7 @@ def get_date_from_input(inputText):
 
         # если дата до н.э.
         if not isFound:
-            inputText = str(inputText).strip()
-            date_groups = get_search_groups_in_regexp(r'(\d*).*до н.*',
+            date_groups = get_search_groups_in_regexp(r'(\d*).*дон.*',
                                                       inputText)
             if date_groups:
                 y = int(date_groups[0])
@@ -263,7 +268,6 @@ def get_date_from_input(inputText):
                 isUserText = True
                 isOnlyYear = True
                 isFound = True
-                outputStr = inputText
 
         # если даты формата dd.mm.yyyy или dd/mm/yyyy
         if not isFound:
@@ -288,7 +292,7 @@ def get_date_from_input(inputText):
         # если дата типа "15 июня 1389 (года)"
         if (not isFound):
             date_groups = get_search_groups_in_regexp(
-                r'(\d*)\s*(\S*)\s*(\d*)\s*', inputText)
+                r'(\d*)\s*([^0-9]*)\s*(\d*)\s*', inputText)
             if date_groups:
                 d = int(date_groups[0])
                 m = int(get_month_num(date_groups[1]))

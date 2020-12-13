@@ -22,8 +22,6 @@ import { default as olAnimatedCluster } from 'ol-ext/layer/AnimatedCluster'
 import { default as olFeatureAnimationZoom } from 'ol-ext/featureanimation/Zoom'
 import { easeOut } from 'ol/easing'
 import ClassHelper from '../helper/classHelper'
-import StrHelper from '../helper/strHelper'
-import ChronosFeature from './mapLayers/chronosFeature'
 
 const MAP_PARAMS = {
   min_year: 1914,

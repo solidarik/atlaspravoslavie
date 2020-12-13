@@ -132,6 +132,9 @@ class DbHelper {
           let countObjects = 0
           res.forEach((r) => {
             countObjects += r.hasOwnProperty('error') ? 0 : 1
+            if (r.hasOwnProperty('errorPlace')) {
+              log.warn(r.errorPlace)
+            }
           })
           const status = `количество успешно обработанных элементов: ${countObjects} из ${res.length}`
           log.info(status)

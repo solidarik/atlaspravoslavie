@@ -35,28 +35,28 @@ Promise.resolve(true)
   //     mediator: chronosJsonMediator,
   //   })
   // })
-  .then(() => {
-    return dbHelper.clearDb('temples')
-  })
-  .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_temples',
-      procdir: 'out/out_temples_process',
-      errdir: 'out/out_temples_errors',
-      mediator: templesJsonMediator,
-    })
-  })
   // .then(() => {
-  //   return dbHelper.clearDb('persons')
+  //   return dbHelper.clearDb('temples')
   // })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
-  //     source: 'python/out_persons',
-  //     procdir: 'out/out_person_process',
-  //     errdir: 'out/out_person_errors',
-  //     mediator: personsJsonMediator,
+  //     source: 'python/out_temples',
+  //     procdir: 'out/out_temples_process',
+  //     errdir: 'out/out_temples_errors',
+  //     mediator: templesJsonMediator,
   //   })
   // })
+  .then(() => {
+    return dbHelper.clearDb('persons')
+  })
+  .then(() => {
+    return dbHelper.saveFilesFrom({
+      source: 'python/out_persons',
+      procdir: 'out/out_person_process',
+      errdir: 'out/out_person_errors',
+      mediator: personsJsonMediator,
+    })
+  })
   .then(() => {
     log.success(chalk.cyan(`окончание процесса загрузки`))
     dbHelper.free()

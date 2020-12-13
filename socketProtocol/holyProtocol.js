@@ -8,6 +8,10 @@ class HolyProtocol extends ServerProtocol {
     super.addHandler('clQueryDataByYear', this.getDataByYear)
     super.addHandler('clGetCurrentYear', this.getCurrentYear)
     super.addHandler('clGetTemples', this.getTemples)
+    super.addHandler('clGetPersons', this.getPersons)
+    super.addHandler('clGetPersonsMartyrs', this.getPersonsMartyrs)
+    super.addHandler('clGetPersonsReverends', this.getPersonsReverends)
+    super.addHandler('clGetPersonsHoly', this.getPersonsHoly)
   }
 
   getCurrentYear(socket, msg, cb) {
@@ -42,7 +46,10 @@ class HolyProtocol extends ServerProtocol {
 
       const promices = [
         ChronosModel.find(defaultSearchParam),
-        TemplesModel.find(overDateParam)
+        TemplesModel.find(overDateParam),
+        PersonsModel.find({"groupStatus": "мученик", "birth.place": {$exists: true} }),
+        PersonsModel.find({"groupStatus": "преподобный", "birth.place": {$exists: true}}),
+        PersonsModel.find({"groupStatus": "святой", "birth.place": {$exists: true}})
         /*PersonsModel.find({
           dateBirth: searchDates,
         }),
@@ -60,10 +67,10 @@ class HolyProtocol extends ServerProtocol {
           cb(
             JSON.stringify({
               chronos: res[0],
-              temples: res[1]
-              //personsBirth: res[1],
-              //personsAchievement: res[2],
-              //personsDeath: res[3],
+              temples: res[1],
+              personsMartyrs: res[2],
+              personsReverends: res[3],
+              personsHoly: res[4],
             })
           )
         })
@@ -77,29 +84,42 @@ class HolyProtocol extends ServerProtocol {
     }
   }
 
-  getTemples(socket, msg, cb) {
+  trycatch(func, cb) {
     let res = {}
-
     try {
-      let data = JSON.parse(msg)
-
-      TemplesModel.find({})
+      func()
         .then(
           (res) => {
-            cb(
-              JSON.stringify({
-                temples: res
-              })
-            )
+            cb(JSON.stringify({persons: res}))
           })
         .catch((error) => {
           cb(JSON.stringify({ error: error }))
         })
     } catch (err) {
-      res.err = 'Ошибка парсинга даты: ' + err
+      res.err = 'Ошибка парсинга: ' + err
       res.events = ''
       cb(JSON.stringify(res))
     }
+  }
+
+  getTemples(socket, msg, cb) {
+    this.trycatch(TemplesModel.find({}, cb))
+  }
+
+  getPersons(socket, msg, cb) {
+    this.trycatch(PersonsModel.find({}, cb))
+  }
+
+  getPersonsMartyrs(socket, msg, cb) {
+    this.trycatch(PersonsModel.find({"groupStatus": "мученик"}, cb))
+  }
+
+  getPersonsReverends(socket, msg, cb) {
+    this.trycatch(PersonsModel.find({"groupStatus": "преподобный"}, cb))
+  }
+
+  getPersonsHoly(socket, msg, cb) {
+    this.trycatch(PersonsModel.find({"groupStatus": "святой"}, cb))
   }
 }
 

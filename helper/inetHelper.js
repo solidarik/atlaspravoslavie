@@ -63,7 +63,10 @@ class InetHelper {
   }
 
   async getCoordsForCityOrCountry(input) {
-    const promises = input.split(';').map((local) => {
+    if (!input)
+      return input
+
+      const promises = input.split(';').map((local) => {
       return this.getLocalCoordsForName(local.trim())
     })
 

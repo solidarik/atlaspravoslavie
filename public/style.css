@@ -529,6 +529,11 @@ table {
   background: rgb(108, 117, 125);
 }
 
+.person-info p {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
 .slider-selection {
   background: rgb(206, 212, 218);
   color: yellow;

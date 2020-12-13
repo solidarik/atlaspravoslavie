@@ -1,3 +1,4 @@
+from typing import Tuple
 import xlrd
 import sys
 import os
@@ -14,19 +15,20 @@ col_birthDate, col_birthPlace = tuple(range(3, 5))
 col_monkname = 5
 
 col_achievement_start = 6
-col_achievement_counts = 3
+col_achievement_end = 10
 
 col_canonizationDate = 12
 col_status = 13
-col_worshipDates = 14
+col_groupStatus = 14
+col_worshipDays = 15
 
-col_professional = 15
-col_fullDescription = 16
-col_srcUrl = 17
-col_photoUrl = 18
+col_profession = 16
+col_fullDescription = 17
+col_srcUrl = 18
+col_photoUrl = 19
 
-col_deathDate = 19
-col_deathPlace = 20
+col_deathDate = 20
+col_deathPlace = 21
 
 
 def IsEmptyValue(row, col):
@@ -41,6 +43,21 @@ def GetSheetValue(row, col, isSimple=False):
     else:
         v = str(cell_value)
     return v.replace('"', '\\"').rstrip().rstrip(',')
+
+
+def GetSheetValueDateRange(row: int, col: int) -> Tuple[dict, dict]:
+    sheetValue = GetSheetValue(row, col)
+    if not sheetValue:
+        return {}, {}
+
+    if '-' in sheetValue:
+        dateArr = sheetValue.split('-')
+        start = helper.get_date_from_input(dateArr[0])
+        end = helper.get_date_from_input(dateArr[1])
+        return start, end
+    else:
+        start = helper.get_date_from_input(sheetValue)
+        return start, {}
 
 
 def GetSheetValueDate(row, col):
@@ -85,10 +102,11 @@ for row in range(START_ROW, END_ROW):
         persons['surname'] = GetSheetValue(row, col_surname)
         persons['name'] = GetSheetValue(row, col_name)
         persons['middlename'] = GetSheetValue(row, col_middlename)
+        persons['monkname'] = capitalizeFirst(GetSheetValue(row, col_monkname))
 
+        birthObj = {}
         birthDate = GetSheetValue(row, col_birthDate, True)
         if ('' != birthDate):
-            birthObj = {}
             birthDate = GetSheetValueDate(row, col_birthDate)
             birthObj["year"] = birthDate["ymd"][0]
             birthObj["month"] = birthDate["ymd"][1]
@@ -97,11 +115,80 @@ for row in range(START_ROW, END_ROW):
             birthObj["dateStr"] = birthDate["outputStr"]
             birthObj["isOnlyYear"] = birthDate["isOnlyYear"]
             birthObj["isOnlyCentury"] = birthDate["isOnlyCentury"]
-            persons["birth"] = birthObj
+        birthPlace = GetSheetValue(row, col_birthPlace)
+        if birthPlace and 'неизвест' not in birthPlace.lower():
+            birthPlace = birthPlace.replace('\\"', '')
+            birthObj["place"] = capitalizeFirst(birthPlace)
+        persons["birth"] = birthObj
 
-        holyStatus = GetSheetValue(row, col_status)
-        if holyStatus not in ['blalbalba']:
-            raise Exception(f'Неправильный статус священника {holyStatus}')
+        deathObj = {}
+        deathDate = GetSheetValue(row, col_deathDate, True)
+        if ('' != deathDate):
+            deathDate = GetSheetValueDate(row, col_deathDate)
+            deathObj["year"] = deathDate["ymd"][0]
+            deathObj["month"] = deathDate["ymd"][1]
+            deathObj["day"] = deathDate["ymd"][2]
+            deathObj["century"] = deathDate["century"]
+            deathObj["dateStr"] = deathDate["outputStr"]
+            deathObj["isOnlyYear"] = deathDate["isOnlyYear"]
+            deathObj["isOnlyCentury"] = deathDate["isOnlyCentury"]
+        deathPlace = GetSheetValue(row, col_deathPlace)
+        if deathPlace and 'неизвест' not in deathPlace.lower():
+            deathObj["place"] = capitalizeFirst(deathPlace)
+        persons["death"] = deathObj
+
+        groupStatus = GetSheetValue(row, col_groupStatus)
+        groupStatus = groupStatus.lower().replace('мучение', 'мученик')
+        if groupStatus not in ['мученик', 'святой', 'преподобный']:
+            raise Exception(f'Неправильный статус священника {groupStatus}')
+        persons['groupStatus'] = groupStatus
+        persons['status'] = GetSheetValue(row, col_status)
+
+        achievs = []
+        col_achiev = col_achievement_start
+        while col_achiev <= col_achievement_end:
+            achievString = GetSheetValue(row, col_achiev)
+            if achievString and 'неизвест' not in achievString.lower():
+                achievObj = {}
+                achievObj["place"] = capitalizeFirst(achievString)
+                achievObj["start"], achievObj["end"] = GetSheetValueDateRange(
+                    row, col_achiev + 1)
+                achievs.append(achievObj)
+            col_achiev += 2
+        persons["achievements"] = achievs
+
+        worshipArr = []
+        worships = GetSheetValue(row, col_worshipDays)
+        if worships:
+            worships = helper.remove_spaces(worships)
+            worships = worships.replace('.', '').replace(';', '/')
+            worships = worships.split('/')
+            for worship in worships:
+                worshipObj = {}
+                worshipObj["day"] = int(worship[0:2])
+                worshipObj["month"] = int(worship[2:4])
+                worshipArr.append(worshipObj)
+        persons["worshipDays"] = worshipArr
+
+        canonizationDate = GetSheetValue(row, col_canonizationDate)
+        if ('' != canonizationDate):
+            canonizationDate = GetSheetValueDate(row, col_canonizationDate)
+            canonizationObj = {}
+            canonizationObj["year"] = canonizationDate["ymd"][0]
+            canonizationObj["month"] = canonizationDate["ymd"][1]
+            canonizationObj["day"] = canonizationDate["ymd"][2]
+            canonizationObj["century"] = canonizationDate["century"]
+            canonizationObj["dateStr"] = canonizationDate["outputStr"]
+            canonizationObj["isOnlyYear"] = canonizationDate["isOnlyYear"]
+            canonizationObj["isOnlyCentury"] = canonizationDate[
+                "isOnlyCentury"]
+            persons["canonizationDate"] = canonizationObj
+
+        persons["profession"] = GetSheetValue(row, col_profession)
+        persons["fullDescription"] = GetSheetValue(row, col_fullDescription)
+
+        persons["srcUrl"] = GetSheetValue(row, col_srcUrl)
+        persons["photoUrl"] = GetSheetValue(row, col_photoUrl)
 
         entities.append(persons)
         continue

@@ -75562,7 +75562,856 @@ var ClassHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = ClassHelper;
-},{}],"IGBU":[function(require,module,exports) {
+},{}],"p4qv":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MapControl = void 0;
+
+var _ol = require("ol");
+
+var olStyle = _interopRequireWildcard(require("ol/style"));
+
+var olGeom = _interopRequireWildcard(require("ol/geom"));
+
+var _Feature = _interopRequireDefault(require("ol/Feature"));
+
+var _proj = require("ol/proj");
+
+var olControl = _interopRequireWildcard(require("ol/control"));
+
+var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
+
+var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
+
+var olSource = _interopRequireWildcard(require("ol/source"));
+
+var olTilegrid = _interopRequireWildcard(require("ol/tilegrid"));
+
+var olInteraction = _interopRequireWildcard(require("ol/interaction"));
+
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
+
+var _proj2 = _interopRequireDefault(require("proj4"));
+
+var _proj3 = require("ol/proj/proj4");
+
+var _AnimatedCluster = _interopRequireDefault(require("ol-ext/layer/AnimatedCluster"));
+
+var _Zoom = _interopRequireDefault(require("ol-ext/featureanimation/Zoom"));
+
+var _easing = require("ol/easing");
+
+var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var MAP_PARAMS = {
+  min_year: 1914,
+  max_year: 1965,
+  isEnableAnimate: true
+};
+
+var MapControl = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(MapControl, _EventEmitter);
+
+  var _super = _createSuper(MapControl);
+
+  function MapControl() {
+    var _this;
+
+    _classCallCheck(this, MapControl);
+
+    _this = _super.call(this); //first must
+
+    window.map = _assertThisInitialized(_this);
+    var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
+
+    _proj2.default.defs('EPSG:3395', '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+
+    (0, _proj3.register)(_proj2.default);
+    var projection = (0, _proj.get)('EPSG:3395');
+    projection.setExtent(yaex);
+    var rasterLayer = new _Tile.default({
+      preload: 5,
+      zIndex: 0,
+      // source: new olSource.OSM(),
+      source: new olSource.XYZ({
+        projection: 'EPSG:3395',
+        tileGrid: olTilegrid.createXYZ({
+          extent: yaex
+        }),
+        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
+      })
+    });
+    _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
+    _this.isDisableSavePermalink = true;
+    _this.isDisableMoveend = false;
+
+    _this.readViewFromPermalink();
+
+    var view = new _ol.View({
+      center: _this.center ? _this.center : new _proj.fromLonLat([56.004, 54.695]),
+      // ufa place
+      zoom: _this.zoom ? _this.zoom : 3 // projection: 'EPSG:4326',
+      // projection: 'EPSG:3857',
+      // projection: 'EPSG:3395',
+
+    });
+    /* temporarily disable-popup
+    this.popup = new olPopup({
+      popupClass: 'default shadow', //"default shadow", "tooltips", "warning" "black" "default", "tips", "shadow",
+      closeBox: true,
+      onshow: function () {
+        // console.log('You opened the box')
+      },
+      onclose: function () {
+        // console.log('You close the box')
+      },
+      positioning: 'auto',
+      autoPan: true,
+      autoPanAnimation: { duration: this.isEnableAnimate ? 250 : 0 },
+    })
+    */
+
+    var map = new _ol.Map({
+      interactions: olInteraction.defaults({
+        altShiftDragRotate: false,
+        pinchRotate: false
+      }),
+      controls: olControl.defaults({
+        attribution: false,
+        zoom: false
+      }).extend([//new olControl.FullScreen()
+      ]),
+      layers: [rasterLayer],
+      //disable-popup overlays: [this.popup],
+      target: 'map',
+      view: view
+    });
+
+    function getStyleSimple(feature, _) {
+      var classFeature = feature.get('classFeature');
+      var style = classFeature.getStyleFeature(feature, window.map.view.getZoom());
+      return style;
+    }
+
+    function getStyleCluster(feature, _) {
+      var size = feature.get('features').length;
+
+      if (size == 1) {
+        var oneFeature = feature.get('features')[0];
+        var classFeature = oneFeature.get('classFeature');
+
+        var _style = classFeature.getStyleFeature(oneFeature, window.map.view.getZoom());
+
+        return _style;
+      }
+
+      var redColor = '255,0,51';
+      var cyanColor = '0,162,232';
+      var greenColor = '34,177,76';
+      var color = size > 10 ? redColor : size > 5 ? greenColor : cyanColor;
+      var radius = Math.max(8, Math.min(size, 20)) + 5;
+      var dash = 2 * Math.PI * radius / 6;
+      dash = [0, dash, dash, dash, dash, dash, dash];
+      var style = new olStyle.Style({
+        image: new olStyle.Circle({
+          radius: radius,
+          stroke: new olStyle.Stroke({
+            color: 'rgba(' + color + ',0.6)',
+            width: 15,
+            lineDash: dash,
+            lineCap: 'butt'
+          }),
+          fill: new olStyle.Fill({
+            color: 'rgba(' + color + ',0.9)'
+          })
+        }),
+        text: new olStyle.Text({
+          text: size.toString(),
+          font: '14px Helvetica',
+          //textBaseline: 'top',
+          fill: new olStyle.Fill({
+            color: '#fff'
+          })
+        })
+      });
+      return style;
+    } // Simple Source
+
+
+    var simpleSource = new olSource.Vector();
+    var simpleLayer = new _Vector.default({
+      source: simpleSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: getStyleSimple
+    });
+    _this.simpleLayer = simpleLayer;
+    _this.simpleSource = simpleSource;
+    map.addLayer(simpleLayer); // Cluster Source
+
+    var clusterSource = new olSource.Cluster({
+      distance: 10,
+      source: new olSource.Vector()
+    });
+    var clusterLayer = new _AnimatedCluster.default({
+      name: 'Cluster',
+      source: clusterSource,
+      animationDuration: _this.isEnableAnimate ? 400 : 0,
+      style: getStyleCluster
+    });
+    _this.clusterLayer = clusterLayer;
+    map.addLayer(clusterLayer);
+    _this.clusterSource = clusterSource;
+    map.on('click', function (event) {
+      // disable-popup window.map.popup.hide()
+      _this.emit('mapclick', undefined);
+
+      var coordinates = event.coordinate;
+      var lonLatCoords = new _proj.toLonLat(coordinates);
+      console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords));
+      var featureEvent = undefined;
+      var isHit = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
+        featureEvent = feature;
+        return feature.get('kind');
+      }, {
+        hitTolerance: 5
+      });
+      if (!featureEvent) return; //simple feature
+
+      var features = featureEvent.get('features');
+
+      if (!features) {
+        features = [];
+        features[0] = featureEvent;
+      }
+
+      if (features.length > 0) {
+        _this.emit('selectFeatures', features);
+      }
+
+      var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
+      _this.currentFeatureCoord = featureCoord;
+
+      _this.showPulse();
+
+      return;
+    });
+    map.on('moveend', function () {
+      if (_this.isDisableMoveend) {
+        _this.isDisableMoveend = false;
+        return;
+      }
+
+      window.map.savePermalink.call(window.map);
+    });
+    map.on('pointermove', function (event) {
+      var feature = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
+        return feature;
+      }, {
+        hitTolerance: 5
+      });
+      var isHit = feature ? true : false;
+
+      if (isHit) {
+        map.getTargetElement().style.cursor = 'pointer';
+      } else {
+        map.getTargetElement().style.cursor = '';
+      }
+    });
+    _this.map = map;
+    _this.view = view;
+    setTimeout(function () {
+      _this.addYearLayer();
+    }, 10);
+    return _this;
+  }
+
+  _createClass(MapControl, [{
+    key: "createGeom",
+    value: function createGeom(mo) {
+      var geom;
+
+      switch (mo.kind) {
+        case 'Point':
+          geom = new ol.geom.Point(mo.coords);
+          break;
+
+        case 'LineString':
+          geom = new ol.geom.LineString(mo.coords);
+          break;
+
+        case 'Polygon':
+          geom = new ol.geom.Polygon(mo.coords);
+          break;
+      }
+
+      return geom;
+    }
+  }, {
+    key: "showAdditionalInfo",
+    value: function showAdditionalInfo(info) {
+      this.emit('showAdditionalInfo', undefined);
+      this.hidePulse();
+      this.simpleLayer.setVisible(false);
+      this.clusterLayer.setVisible(false);
+
+      _classHelper.default.addClass(document.getElementById('year-control'), 'hide-element');
+    }
+  }, {
+    key: "returnNormalMode",
+    value: function returnNormalMode() {
+      this.emit('returnNormalMode', undefined);
+
+      _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
+
+      this.showPulse();
+      this.simpleLayer.setVisible(true);
+      this.clusterLayer.setVisible(true);
+    }
+  }, {
+    key: "pulseFeature",
+    value: function pulseFeature(coord) {
+      var f = new _Feature.default(new olGeom.Point(coord));
+      f.setStyle(new olStyle.Style({
+        image: new olStyle.Circle({
+          radius: 30,
+          stroke: new olStyle.Stroke({
+            color: 'red',
+            width: 3
+          })
+        }) // image: new olStyle.RegularShape({
+        //   fill: new olStyle.Fill({
+        //     color: '#fff',
+        //   }),
+        //   stroke: new olStyle.Stroke({ color: 'black', width: 3 }),
+        //   points: 4,
+        //   radius: 80,
+        //   radius2: 0,
+        //   angle: 0,
+        // }),
+
+      }));
+      this.map.animateFeature(f, new _Zoom.default({
+        fade: _easing.easeOut,
+        duration: 1500,
+        easing: _easing.easeOut
+      }));
+    }
+  }, {
+    key: "setCurrentYearFromServer",
+    value: function setCurrentYearFromServer(year) {
+      this.changeYear(year);
+      this.addYearControl();
+    }
+  }, {
+    key: "addYearControl",
+    value: function addYearControl() {
+      var _this2 = this;
+
+      this.map.addControl(new YearControl({
+        caption: 'Выбрать год событий',
+        year: this.currentYear,
+        handler: function handler(year) {
+          _this2.changeYear(year);
+        }
+      }));
+    }
+  }, {
+    key: "addYearLayer",
+    value: function addYearLayer() {
+      var _this3 = this;
+
+      var yearLayer = new _Tile.default({
+        preload: 5,
+        opacity: 0.2,
+        zIndex: 2,
+        source: new olSource.XYZ({
+          tileUrlFunction: function tileUrlFunction(tileCoord, pixelRatio, projection) {
+            return _this3.getGeacronLayerUrl.call(_this3, tileCoord, pixelRatio, projection);
+          }
+        })
+      });
+      this.yearLayer = yearLayer;
+      this.map.addLayer(yearLayer);
+    }
+  }, {
+    key: "fixMapHeight",
+    value: function fixMapHeight() {
+      this.isDisableMoveend = true;
+      this.map.updateSize();
+    }
+  }, {
+    key: "updateView",
+    value: function updateView() {
+      if (this.isEnableAnimate) {
+        this.view.animate({
+          center: this.center,
+          zoom: this.zoom,
+          duration: 200
+        });
+      } else {
+        this.view.setCenter(this.center);
+        this.view.setZoom(this.zoom);
+      }
+    }
+  }, {
+    key: "readViewFromState",
+    value: function readViewFromState(state) {
+      this.center = state.center;
+      this.zoom = state.zoom;
+    }
+  }, {
+    key: "readViewFromPermalink",
+    value: function readViewFromPermalink() {
+      if (window.location.hash !== '') {
+        var hash = window.location.hash.replace('#map=', '');
+        var parts = hash.split('/');
+
+        if (parts.length === 3) {
+          this.zoom = parseInt(parts[0], 10);
+          this.center = [parseFloat(parts[1]), parseFloat(parts[2])];
+        }
+      }
+    }
+  }, {
+    key: "savePermalink",
+    value: function savePermalink() {
+      if (this.isDisableSavePermalink) {
+        this.isDisableSavePermalink = false;
+      }
+
+      var center = this.view.getCenter();
+      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
+      var state = {
+        zoom: this.view.getZoom(),
+        center: this.view.getCenter()
+      };
+      window.history.pushState(state, 'map', hash);
+    }
+  }, {
+    key: "getGeacronLayerUrl",
+    value: function getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
+      if (!this.currentYear) return;
+      var ano = this.currentYear;
+      var anow = '' + ano;
+      anow = anow.replace('-', 'B');
+      anow = anow == '1951' ? '1950' : anow == '1960' ? '1959' : anow;
+      var z = tileCoord[0];
+      var x = tileCoord[1];
+      var y = tileCoord[2];
+      if (z == 0 || z > 6) return;
+      var url = "http://cdn.geacron.com/tiles/area/".concat(anow, "/Z").concat(z, "/").concat(y, "/").concat(x, ".png");
+      return url;
+    }
+  }, {
+    key: "getYandexLayerUrl",
+    value: function getYandexLayerUrl(tileCoord, pixelRatio, projection) {
+      var z = tileCoord[0];
+      var x = tileCoord[1];
+      var y = -tileCoord[2] - 1;
+      var url = "http://vec01.maps.yandex.net/tiles?l=map&v=4.55.2&z=".concat(z, "&x=").concat(x, "&y=").concat(y, "&scale=2&lang=ru_RU");
+      return url;
+    }
+  }, {
+    key: "hidePopup",
+    value: function hidePopup() {
+      /* disable-popup
+      window.map.popup.hide()
+      */
+    }
+  }, {
+    key: "hidePulse",
+    value: function hidePulse() {
+      clearInterval(window.pulse);
+    }
+  }, {
+    key: "showPulse",
+    value: function showPulse() {
+      var _this4 = this;
+
+      clearInterval(window.pulse);
+      window.pulse = setInterval(function () {
+        _this4.pulseFeature(_this4.currentFeatureCoord);
+      }, 1000);
+    }
+  }, {
+    key: "changeYear",
+    value: function changeYear(year) {
+      this.hidePopup();
+      this.hidePulse();
+      this.currentYear = year;
+      this.yearLayer.getSource().refresh();
+      this.emit('changeYear', year);
+    }
+  }, {
+    key: "createGeom",
+    value: function createGeom(mo) {
+      var geom;
+
+      switch (mo.kind) {
+        case 'Point':
+          geom = new olGeom.Point(mo.coords);
+          break;
+
+        case 'LineString':
+          geom = new olGeom.LineString(mo.coords);
+          break;
+
+        case 'Polygon':
+          geom = new olGeom.Polygon(mo.coords);
+          break;
+      }
+
+      return geom;
+    }
+  }, {
+    key: "addFeature",
+    value: function addFeature(item) {
+      var ft = new _Feature.default({
+        info: item,
+        classFeature: item.classFeature,
+        geometry: new olGeom.Point(item.point)
+      });
+      var source = item.simple ? this.simpleSource : this.clusterSource.getSource();
+      source.addFeature(ft);
+    }
+  }, {
+    key: "refreshInfo",
+    value: function refreshInfo(info) {
+      var _this5 = this;
+
+      console.log("refresh info ".concat(JSON.stringify(info)));
+      this.simpleSource.clear();
+      this.clusterSource.getSource().clear();
+      info.forEach(function (item) {
+        return _this5.addFeature(item);
+      });
+    }
+  }], [{
+    key: "create",
+    value: function create() {
+      return new MapControl();
+    }
+  }]);
+
+  return MapControl;
+}(_eventEmitter.default);
+
+exports.MapControl = MapControl;
+
+window.onpopstate = function (event) {
+  var map = window.map;
+  map.isDisableSavePermalink = true;
+  map.isDisableMoveend = true;
+  event.state ? map.readViewFromState.call(map, event.state) : map.readViewFromPermalink.call(map);
+  map.updateView.call(map);
+};
+
+var SuperCustomControl = /*#__PURE__*/function (_olControl$Control) {
+  _inherits(SuperCustomControl, _olControl$Control);
+
+  var _super2 = _createSuper(SuperCustomControl);
+
+  function SuperCustomControl(inputParams) {
+    _classCallCheck(this, SuperCustomControl);
+
+    return _super2.call(this, inputParams);
+  }
+
+  _createClass(SuperCustomControl, [{
+    key: "getBSIconHTML",
+    value: function getBSIconHTML(name) {
+      return '<span class="' + name + '"></span>';
+    }
+  }]);
+
+  return SuperCustomControl;
+}(olControl.Control);
+
+var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
+  _inherits(YearControl, _SuperCustomControl);
+
+  var _super3 = _createSuper(YearControl);
+
+  _createClass(YearControl, null, [{
+    key: "min_year",
+    get: function get() {
+      return MAP_PARAMS.min_year;
+    }
+  }, {
+    key: "max_year",
+    get: function get() {
+      return MAP_PARAMS.max_year;
+    }
+  }]);
+
+  function YearControl(inputParams) {
+    var _this6;
+
+    _classCallCheck(this, YearControl);
+
+    _this6 = _super3.call(this, inputParams);
+    var caption = inputParams.caption;
+    var hint = inputParams.hint || caption;
+    _this6.year = inputParams.year;
+    _this6.handler = inputParams.handler;
+    var yearInput = document.createElement('input');
+    yearInput.className = 'input-without-focus';
+    yearInput.title = hint;
+    yearInput.setAttribute('id', 'year-input');
+    yearInput.value = _this6.year;
+    yearInput.addEventListener('keyup', function (event) {
+      if (event.keyCode == 13) {
+        _this6._inputKeyUp();
+
+        event.preventDefault();
+      }
+    });
+    _this6.yearInput = yearInput;
+    var yearLeftButton = document.createElement('button');
+    yearLeftButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-backward-2');
+    yearLeftButton.title = 'Предыдущий год';
+    yearLeftButton.setAttribute('id', 'year-left-button');
+    yearLeftButton.addEventListener('click', function () {
+      _this6._leftButtonClick();
+    }, false); // yearLeftButton.addEventListener('touchstart', () => { this._leftButtonClick(); }, false);
+
+    var yearRightButton = document.createElement('button');
+    yearRightButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-forward-2');
+    yearRightButton.title = 'Следующий год';
+    yearRightButton.setAttribute('id', 'year-right-button');
+    yearRightButton.addEventListener('click', function () {
+      _this6._rightButtonClick();
+    }, false); // yearRightButton.addEventListener('touchstart', () => { this._rightButtonClick(); }, false);
+
+    var parentDiv = document.createElement('div');
+    parentDiv.className = 'ol-control';
+    parentDiv.setAttribute('id', 'year-control');
+    parentDiv.appendChild(yearLeftButton);
+    parentDiv.appendChild(yearInput);
+    parentDiv.appendChild(yearRightButton);
+    _this6.element = parentDiv;
+    olControl.Control.call(_assertThisInitialized(_this6), {
+      label: 'test',
+      hint: 'test',
+      tipLabel: caption,
+      element: parentDiv // target: get(inputParams, "target")
+
+    });
+    return _this6;
+  }
+
+  _createClass(YearControl, [{
+    key: "_leftButtonClick",
+    value: function _leftButtonClick() {
+      if (!this._checkYear(this.year, -1)) return;
+      this.year = parseInt(this.year) - 1;
+
+      this._setNewYear(this.year);
+    }
+  }, {
+    key: "_rightButtonClick",
+    value: function _rightButtonClick() {
+      if (!this._checkYear(this.year, +1)) return;
+      this.year = parseInt(this.year) + 1;
+
+      this._setNewYear(this.year);
+    }
+  }, {
+    key: "_inputKeyUp",
+    value: function _inputKeyUp() {
+      var year = this.yearInput.value;
+
+      if (!this._checkYear(year, 0, this.year)) {
+        this.yearInput.value = this.year;
+        return;
+      }
+
+      this.year = parseInt(year);
+
+      this._setNewYear(this.year);
+    }
+  }, {
+    key: "_checkYear",
+    value: function _checkYear(year, incr) {
+      var oldValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+      //var reg = /^[1,2][8,9,0]\d{2}$/
+      var reg = /^\d+$/;
+      if (!reg.test(year)) return false;
+      var intYear = parseInt(year) + incr;
+      if (intYear < YearControl.min_year) return true; //temporarily
+
+      if (intYear > YearControl.max_year) return true; //temporarily
+
+      if (oldValue == intYear) return false;
+      return true;
+    }
+  }, {
+    key: "_setNewYear",
+    value: function _setNewYear(year) {
+      this.yearInput.value = this.year;
+      this.handler(this.year);
+    }
+  }]);
+
+  return YearControl;
+}(SuperCustomControl);
+},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq"}],"uf5M":[function(require,module,exports) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var JsHelper = /*#__PURE__*/function () {
+  function JsHelper() {
+    _classCallCheck(this, JsHelper);
+  }
+
+  _createClass(JsHelper, null, [{
+    key: "fillArray",
+    value: function fillArray(value, len) {
+      if (len == 0) return [];
+      var a = [value];
+
+      while (a.length * 2 <= len) {
+        a = a.concat(a);
+      }
+
+      if (a.length < len) a = a.concat(a.slice(0, len - a.length));
+      return a;
+    }
+  }, {
+    key: "getMapSize",
+    value: function getMapSize(x) {
+      var len = 0;
+
+      for (var count in x) {
+        len++;
+      }
+
+      return len;
+    }
+  }, {
+    key: "isNaN",
+    value: function isNaN(x) {}
+  }]);
+
+  return JsHelper;
+}();
+
+module.exports = JsHelper;
+},{}],"hPGt":[function(require,module,exports) {
+"use strict";
+
+var olStyle = _interopRequireWildcard(require("ol/style"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SuperFeature = /*#__PURE__*/function () {
+  function SuperFeature() {
+    _classCallCheck(this, SuperFeature);
+  }
+
+  _createClass(SuperFeature, null, [{
+    key: "getKind",
+    value: function getKind() {
+      return undefined;
+    }
+  }, {
+    key: "getCaptionInfo",
+    value: function getCaptionInfo(info) {
+      return 'Суперкласс';
+    }
+  }, {
+    key: "getIcon",
+    value: function getIcon() {
+      var icon = 'images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
+      // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+      // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
+      // '<rect x="7" y="1" width="10" height="2"/><polygon points="13 14 13 8 11 8 11 16 18 16 18 14 13 14"/>' +
+      // '</svg>'
+
+      return icon;
+    }
+  }, {
+    key: "getStyleFeature",
+    value: function getStyleFeature(feature, zoom) {
+      var style = new olStyle.Style({
+        image: new olStyle.Icon({
+          // anchor: [0, 0],
+          imgSize: [32, 32],
+          src: feature.get('info').icon,
+          //color: '#ff0000',
+          // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
+          scale: 1,
+          radius: 7,
+          opacity: 1
+        })
+      });
+      return [style];
+    }
+  }, {
+    key: "getPopupInfo",
+    value: function getPopupInfo(feature) {
+      return {
+        icon: feature.get('info').icon,
+        date: now(),
+        caption: 'Not implemented'
+      };
+    }
+  }, {
+    key: "getHtmlInfo",
+    value: function getHtmlInfo(feature) {
+      return 'Not implemented';
+    }
+  }]);
+
+  return SuperFeature;
+}();
+
+module.exports = SuperFeature;
+},{"ol/style":"TZKB"}],"IGBU":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -75751,85 +76600,7 @@ var StrHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = StrHelper;
-},{}],"hPGt":[function(require,module,exports) {
-"use strict";
-
-var olStyle = _interopRequireWildcard(require("ol/style"));
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var SuperFeature = /*#__PURE__*/function () {
-  function SuperFeature() {
-    _classCallCheck(this, SuperFeature);
-  }
-
-  _createClass(SuperFeature, null, [{
-    key: "getKind",
-    value: function getKind() {
-      return undefined;
-    }
-  }, {
-    key: "getCaptionInfo",
-    value: function getCaptionInfo(info) {
-      return 'Суперкласс';
-    }
-  }, {
-    key: "getIcon",
-    value: function getIcon() {
-      var icon = 'images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
-      // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
-      // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
-      // '<rect x="7" y="1" width="10" height="2"/><polygon points="13 14 13 8 11 8 11 16 18 16 18 14 13 14"/>' +
-      // '</svg>'
-
-      return icon;
-    }
-  }, {
-    key: "getStyleFeature",
-    value: function getStyleFeature(feature, zoom) {
-      var style = new olStyle.Style({
-        image: new olStyle.Icon({
-          // anchor: [0, 0],
-          imgSize: [32, 32],
-          src: feature.get('info').icon,
-          //color: '#ff0000',
-          // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
-          scale: 1,
-          radius: 7,
-          opacity: 1
-        })
-      });
-      return [style];
-    }
-  }, {
-    key: "getPopupInfo",
-    value: function getPopupInfo(feature) {
-      return {
-        icon: feature.get('info').icon,
-        date: now(),
-        caption: 'Not implemented'
-      };
-    }
-  }, {
-    key: "getHtmlInfo",
-    value: function getHtmlInfo(feature) {
-      return 'Not implemented';
-    }
-  }]);
-
-  return SuperFeature;
-}();
-
-module.exports = SuperFeature;
-},{"ol/style":"TZKB"}],"a2Bw":[function(require,module,exports) {
+},{}],"a2Bw":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 //! moment.js
@@ -81705,782 +82476,7 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = ChronosFeature;
-},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"p4qv":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.MapControl = void 0;
-
-var _ol = require("ol");
-
-var olStyle = _interopRequireWildcard(require("ol/style"));
-
-var olGeom = _interopRequireWildcard(require("ol/geom"));
-
-var _Feature = _interopRequireDefault(require("ol/Feature"));
-
-var _proj = require("ol/proj");
-
-var olControl = _interopRequireWildcard(require("ol/control"));
-
-var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
-
-var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
-
-var olSource = _interopRequireWildcard(require("ol/source"));
-
-var olTilegrid = _interopRequireWildcard(require("ol/tilegrid"));
-
-var olInteraction = _interopRequireWildcard(require("ol/interaction"));
-
-var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
-
-var _proj2 = _interopRequireDefault(require("proj4"));
-
-var _proj3 = require("ol/proj/proj4");
-
-var _AnimatedCluster = _interopRequireDefault(require("ol-ext/layer/AnimatedCluster"));
-
-var _Zoom = _interopRequireDefault(require("ol-ext/featureanimation/Zoom"));
-
-var _easing = require("ol/easing");
-
-var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
-
-var _strHelper = _interopRequireDefault(require("../helper/strHelper"));
-
-var _chronosFeature = _interopRequireDefault(require("./mapLayers/chronosFeature"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var MAP_PARAMS = {
-  min_year: 1914,
-  max_year: 1965,
-  isEnableAnimate: true
-};
-
-var MapControl = /*#__PURE__*/function (_EventEmitter) {
-  _inherits(MapControl, _EventEmitter);
-
-  var _super = _createSuper(MapControl);
-
-  function MapControl() {
-    var _this;
-
-    _classCallCheck(this, MapControl);
-
-    _this = _super.call(this); //first must
-
-    window.map = _assertThisInitialized(_this);
-    var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
-
-    _proj2.default.defs('EPSG:3395', '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
-
-    (0, _proj3.register)(_proj2.default);
-    var projection = (0, _proj.get)('EPSG:3395');
-    projection.setExtent(yaex);
-    var rasterLayer = new _Tile.default({
-      preload: 5,
-      zIndex: 0,
-      // source: new olSource.OSM(),
-      source: new olSource.XYZ({
-        projection: 'EPSG:3395',
-        tileGrid: olTilegrid.createXYZ({
-          extent: yaex
-        }),
-        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
-      })
-    });
-    _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
-    _this.isDisableSavePermalink = true;
-    _this.isDisableMoveend = false;
-
-    _this.readViewFromPermalink();
-
-    var view = new _ol.View({
-      center: _this.center ? _this.center : new _proj.fromLonLat([56.004, 54.695]),
-      // ufa place
-      zoom: _this.zoom ? _this.zoom : 3 // projection: 'EPSG:4326',
-      // projection: 'EPSG:3857',
-      // projection: 'EPSG:3395',
-
-    });
-    /* temporarily disable-popup
-    this.popup = new olPopup({
-      popupClass: 'default shadow', //"default shadow", "tooltips", "warning" "black" "default", "tips", "shadow",
-      closeBox: true,
-      onshow: function () {
-        // console.log('You opened the box')
-      },
-      onclose: function () {
-        // console.log('You close the box')
-      },
-      positioning: 'auto',
-      autoPan: true,
-      autoPanAnimation: { duration: this.isEnableAnimate ? 250 : 0 },
-    })
-    */
-
-    var map = new _ol.Map({
-      interactions: olInteraction.defaults({
-        altShiftDragRotate: false,
-        pinchRotate: false
-      }),
-      controls: olControl.defaults({
-        attribution: false,
-        zoom: false
-      }).extend([//new olControl.FullScreen()
-      ]),
-      layers: [rasterLayer],
-      //disable-popup overlays: [this.popup],
-      target: 'map',
-      view: view
-    });
-
-    function getStyleSimple(feature, _) {
-      var classFeature = feature.get('classFeature');
-      var style = classFeature.getStyleFeature(feature, window.map.view.getZoom());
-      return style;
-    }
-
-    function getStyleCluster(feature, _) {
-      var size = feature.get('features').length;
-
-      if (size == 1) {
-        var oneFeature = feature.get('features')[0];
-        var classFeature = oneFeature.get('classFeature');
-
-        var _style = classFeature.getStyleFeature(oneFeature, window.map.view.getZoom());
-
-        return _style;
-      }
-
-      var redColor = '255,0,51';
-      var cyanColor = '0,162,232';
-      var greenColor = '34,177,76';
-      var color = size > 10 ? redColor : size > 5 ? greenColor : cyanColor;
-      var radius = Math.max(8, Math.min(size, 20)) + 5;
-      var dash = 2 * Math.PI * radius / 6;
-      dash = [0, dash, dash, dash, dash, dash, dash];
-      var style = new olStyle.Style({
-        image: new olStyle.Circle({
-          radius: radius,
-          stroke: new olStyle.Stroke({
-            color: 'rgba(' + color + ',0.6)',
-            width: 15,
-            lineDash: dash,
-            lineCap: 'butt'
-          }),
-          fill: new olStyle.Fill({
-            color: 'rgba(' + color + ',0.9)'
-          })
-        }),
-        text: new olStyle.Text({
-          text: size.toString(),
-          font: '14px Helvetica',
-          //textBaseline: 'top',
-          fill: new olStyle.Fill({
-            color: '#fff'
-          })
-        })
-      });
-      return style;
-    } // Simple Source
-
-
-    var simpleSource = new olSource.Vector();
-    var simpleLayer = new _Vector.default({
-      source: simpleSource,
-      zIndex: 1,
-      updateWhileAnimating: true,
-      updateWhileInteracting: true,
-      style: getStyleSimple
-    });
-    _this.simpleLayer = simpleLayer;
-    _this.simpleSource = simpleSource;
-    map.addLayer(simpleLayer); // Cluster Source
-
-    var clusterSource = new olSource.Cluster({
-      distance: 10,
-      source: new olSource.Vector()
-    });
-    var clusterLayer = new _AnimatedCluster.default({
-      name: 'Cluster',
-      source: clusterSource,
-      animationDuration: _this.isEnableAnimate ? 400 : 0,
-      style: getStyleCluster
-    });
-    _this.clusterLayer = clusterLayer;
-    map.addLayer(clusterLayer);
-    _this.clusterSource = clusterSource;
-    map.on('click', function (event) {
-      // disable-popup window.map.popup.hide()
-      _this.emit('mapclick', undefined);
-
-      var coordinates = event.coordinate;
-      var lonLatCoords = new _proj.toLonLat(coordinates);
-      console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords));
-      var featureEvent = undefined;
-      var isHit = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
-        featureEvent = feature;
-        return feature.get('kind');
-      }, {
-        hitTolerance: 5
-      });
-      if (!featureEvent) return; //simple feature
-
-      var features = featureEvent.get('features');
-
-      if (!features) {
-        features = [];
-        features[0] = featureEvent;
-      }
-
-      if (features.length > 0) {
-        _this.emit('selectFeatures', features);
-      }
-
-      var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
-      _this.currentFeatureCoord = featureCoord;
-
-      _this.showPulse();
-
-      return;
-    });
-    map.on('moveend', function () {
-      if (_this.isDisableMoveend) {
-        _this.isDisableMoveend = false;
-        return;
-      }
-
-      window.map.savePermalink.call(window.map);
-    });
-    map.on('pointermove', function (event) {
-      var feature = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
-        return feature;
-      }, {
-        hitTolerance: 5
-      });
-      var isHit = feature ? true : false;
-
-      if (isHit) {
-        map.getTargetElement().style.cursor = 'pointer';
-      } else {
-        map.getTargetElement().style.cursor = '';
-      }
-    });
-    _this.map = map;
-    _this.view = view;
-    setTimeout(function () {
-      _this.addYearLayer();
-    }, 10);
-    return _this;
-  }
-
-  _createClass(MapControl, [{
-    key: "createGeom",
-    value: function createGeom(mo) {
-      var geom;
-
-      switch (mo.kind) {
-        case 'Point':
-          geom = new ol.geom.Point(mo.coords);
-          break;
-
-        case 'LineString':
-          geom = new ol.geom.LineString(mo.coords);
-          break;
-
-        case 'Polygon':
-          geom = new ol.geom.Polygon(mo.coords);
-          break;
-      }
-
-      return geom;
-    }
-  }, {
-    key: "showAdditionalInfo",
-    value: function showAdditionalInfo(info) {
-      this.emit('showAdditionalInfo', undefined);
-      this.hidePulse();
-      this.simpleLayer.setVisible(false);
-      this.clusterLayer.setVisible(false);
-
-      _classHelper.default.addClass(document.getElementById('year-control'), 'hide-element');
-    }
-  }, {
-    key: "returnNormalMode",
-    value: function returnNormalMode() {
-      this.emit('returnNormalMode', undefined);
-
-      _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
-
-      this.showPulse();
-      this.simpleLayer.setVisible(true);
-      this.clusterLayer.setVisible(true);
-    }
-  }, {
-    key: "pulseFeature",
-    value: function pulseFeature(coord) {
-      var f = new _Feature.default(new olGeom.Point(coord));
-      f.setStyle(new olStyle.Style({
-        image: new olStyle.Circle({
-          radius: 30,
-          stroke: new olStyle.Stroke({
-            color: 'red',
-            width: 3
-          })
-        }) // image: new olStyle.RegularShape({
-        //   fill: new olStyle.Fill({
-        //     color: '#fff',
-        //   }),
-        //   stroke: new olStyle.Stroke({ color: 'black', width: 3 }),
-        //   points: 4,
-        //   radius: 80,
-        //   radius2: 0,
-        //   angle: 0,
-        // }),
-
-      }));
-      this.map.animateFeature(f, new _Zoom.default({
-        fade: _easing.easeOut,
-        duration: 1500,
-        easing: _easing.easeOut
-      }));
-    }
-  }, {
-    key: "setCurrentYearFromServer",
-    value: function setCurrentYearFromServer(year) {
-      this.changeYear(year);
-      this.addYearControl();
-    }
-  }, {
-    key: "addYearControl",
-    value: function addYearControl() {
-      var _this2 = this;
-
-      this.map.addControl(new YearControl({
-        caption: 'Выбрать год событий',
-        year: this.currentYear,
-        handler: function handler(year) {
-          _this2.changeYear(year);
-        }
-      }));
-    }
-  }, {
-    key: "addYearLayer",
-    value: function addYearLayer() {
-      var _this3 = this;
-
-      var yearLayer = new _Tile.default({
-        preload: 5,
-        opacity: 0.2,
-        zIndex: 2,
-        source: new olSource.XYZ({
-          tileUrlFunction: function tileUrlFunction(tileCoord, pixelRatio, projection) {
-            return _this3.getGeacronLayerUrl.call(_this3, tileCoord, pixelRatio, projection);
-          }
-        })
-      });
-      this.yearLayer = yearLayer;
-      this.map.addLayer(yearLayer);
-    }
-  }, {
-    key: "fixMapHeight",
-    value: function fixMapHeight() {
-      this.isDisableMoveend = true;
-      this.map.updateSize();
-    }
-  }, {
-    key: "updateView",
-    value: function updateView() {
-      if (this.isEnableAnimate) {
-        this.view.animate({
-          center: this.center,
-          zoom: this.zoom,
-          duration: 200
-        });
-      } else {
-        this.view.setCenter(this.center);
-        this.view.setZoom(this.zoom);
-      }
-    }
-  }, {
-    key: "readViewFromState",
-    value: function readViewFromState(state) {
-      this.center = state.center;
-      this.zoom = state.zoom;
-    }
-  }, {
-    key: "readViewFromPermalink",
-    value: function readViewFromPermalink() {
-      if (window.location.hash !== '') {
-        var hash = window.location.hash.replace('#map=', '');
-        var parts = hash.split('/');
-
-        if (parts.length === 3) {
-          this.zoom = parseInt(parts[0], 10);
-          this.center = [parseFloat(parts[1]), parseFloat(parts[2])];
-        }
-      }
-    }
-  }, {
-    key: "savePermalink",
-    value: function savePermalink() {
-      if (this.isDisableSavePermalink) {
-        this.isDisableSavePermalink = false;
-      }
-
-      var center = this.view.getCenter();
-      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
-      var state = {
-        zoom: this.view.getZoom(),
-        center: this.view.getCenter()
-      };
-      window.history.pushState(state, 'map', hash);
-    }
-  }, {
-    key: "getGeacronLayerUrl",
-    value: function getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
-      if (!this.currentYear) return;
-      var ano = this.currentYear;
-      var anow = '' + ano;
-      anow = anow.replace('-', 'B');
-      anow = anow == '1951' ? '1950' : anow == '1960' ? '1959' : anow;
-      var z = tileCoord[0];
-      var x = tileCoord[1];
-      var y = tileCoord[2];
-      if (z == 0 || z > 6) return;
-      var url = "http://cdn.geacron.com/tiles/area/".concat(anow, "/Z").concat(z, "/").concat(y, "/").concat(x, ".png");
-      return url;
-    }
-  }, {
-    key: "getYandexLayerUrl",
-    value: function getYandexLayerUrl(tileCoord, pixelRatio, projection) {
-      var z = tileCoord[0];
-      var x = tileCoord[1];
-      var y = -tileCoord[2] - 1;
-      var url = "http://vec01.maps.yandex.net/tiles?l=map&v=4.55.2&z=".concat(z, "&x=").concat(x, "&y=").concat(y, "&scale=2&lang=ru_RU");
-      return url;
-    }
-  }, {
-    key: "hidePopup",
-    value: function hidePopup() {
-      /* disable-popup
-      window.map.popup.hide()
-      */
-    }
-  }, {
-    key: "hidePulse",
-    value: function hidePulse() {
-      clearInterval(window.pulse);
-    }
-  }, {
-    key: "showPulse",
-    value: function showPulse() {
-      var _this4 = this;
-
-      clearInterval(window.pulse);
-      window.pulse = setInterval(function () {
-        _this4.pulseFeature(_this4.currentFeatureCoord);
-      }, 1000);
-    }
-  }, {
-    key: "changeYear",
-    value: function changeYear(year) {
-      this.hidePopup();
-      this.hidePulse();
-      this.currentYear = year;
-      this.yearLayer.getSource().refresh();
-      this.emit('changeYear', year);
-    }
-  }, {
-    key: "createGeom",
-    value: function createGeom(mo) {
-      var geom;
-
-      switch (mo.kind) {
-        case 'Point':
-          geom = new olGeom.Point(mo.coords);
-          break;
-
-        case 'LineString':
-          geom = new olGeom.LineString(mo.coords);
-          break;
-
-        case 'Polygon':
-          geom = new olGeom.Polygon(mo.coords);
-          break;
-      }
-
-      return geom;
-    }
-  }, {
-    key: "addFeature",
-    value: function addFeature(item) {
-      var ft = new _Feature.default({
-        info: item,
-        classFeature: item.classFeature,
-        geometry: new olGeom.Point(item.point)
-      });
-      var source = item.simple ? this.simpleSource : this.clusterSource.getSource();
-      source.addFeature(ft);
-    }
-  }, {
-    key: "refreshInfo",
-    value: function refreshInfo(info) {
-      var _this5 = this;
-
-      console.log("refresh info ".concat(JSON.stringify(info)));
-      this.simpleSource.clear();
-      this.clusterSource.getSource().clear();
-      info.forEach(function (item) {
-        return _this5.addFeature(item);
-      });
-    }
-  }], [{
-    key: "create",
-    value: function create() {
-      return new MapControl();
-    }
-  }]);
-
-  return MapControl;
-}(_eventEmitter.default);
-
-exports.MapControl = MapControl;
-
-window.onpopstate = function (event) {
-  var map = window.map;
-  map.isDisableSavePermalink = true;
-  map.isDisableMoveend = true;
-  event.state ? map.readViewFromState.call(map, event.state) : map.readViewFromPermalink.call(map);
-  map.updateView.call(map);
-};
-
-var SuperCustomControl = /*#__PURE__*/function (_olControl$Control) {
-  _inherits(SuperCustomControl, _olControl$Control);
-
-  var _super2 = _createSuper(SuperCustomControl);
-
-  function SuperCustomControl(inputParams) {
-    _classCallCheck(this, SuperCustomControl);
-
-    return _super2.call(this, inputParams);
-  }
-
-  _createClass(SuperCustomControl, [{
-    key: "getBSIconHTML",
-    value: function getBSIconHTML(name) {
-      return '<span class="' + name + '"></span>';
-    }
-  }]);
-
-  return SuperCustomControl;
-}(olControl.Control);
-
-var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
-  _inherits(YearControl, _SuperCustomControl);
-
-  var _super3 = _createSuper(YearControl);
-
-  _createClass(YearControl, null, [{
-    key: "min_year",
-    get: function get() {
-      return MAP_PARAMS.min_year;
-    }
-  }, {
-    key: "max_year",
-    get: function get() {
-      return MAP_PARAMS.max_year;
-    }
-  }]);
-
-  function YearControl(inputParams) {
-    var _this6;
-
-    _classCallCheck(this, YearControl);
-
-    _this6 = _super3.call(this, inputParams);
-    var caption = inputParams.caption;
-    var hint = inputParams.hint || caption;
-    _this6.year = inputParams.year;
-    _this6.handler = inputParams.handler;
-    var yearInput = document.createElement('input');
-    yearInput.className = 'input-without-focus';
-    yearInput.title = hint;
-    yearInput.setAttribute('id', 'year-input');
-    yearInput.value = _this6.year;
-    yearInput.addEventListener('keyup', function (event) {
-      if (event.keyCode == 13) {
-        _this6._inputKeyUp();
-
-        event.preventDefault();
-      }
-    });
-    _this6.yearInput = yearInput;
-    var yearLeftButton = document.createElement('button');
-    yearLeftButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-backward-2');
-    yearLeftButton.title = 'Предыдущий год';
-    yearLeftButton.setAttribute('id', 'year-left-button');
-    yearLeftButton.addEventListener('click', function () {
-      _this6._leftButtonClick();
-    }, false); // yearLeftButton.addEventListener('touchstart', () => { this._leftButtonClick(); }, false);
-
-    var yearRightButton = document.createElement('button');
-    yearRightButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-forward-2');
-    yearRightButton.title = 'Следующий год';
-    yearRightButton.setAttribute('id', 'year-right-button');
-    yearRightButton.addEventListener('click', function () {
-      _this6._rightButtonClick();
-    }, false); // yearRightButton.addEventListener('touchstart', () => { this._rightButtonClick(); }, false);
-
-    var parentDiv = document.createElement('div');
-    parentDiv.className = 'ol-control';
-    parentDiv.setAttribute('id', 'year-control');
-    parentDiv.appendChild(yearLeftButton);
-    parentDiv.appendChild(yearInput);
-    parentDiv.appendChild(yearRightButton);
-    _this6.element = parentDiv;
-    olControl.Control.call(_assertThisInitialized(_this6), {
-      label: 'test',
-      hint: 'test',
-      tipLabel: caption,
-      element: parentDiv // target: get(inputParams, "target")
-
-    });
-    return _this6;
-  }
-
-  _createClass(YearControl, [{
-    key: "_leftButtonClick",
-    value: function _leftButtonClick() {
-      if (!this._checkYear(this.year, -1)) return;
-      this.year = parseInt(this.year) - 1;
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_rightButtonClick",
-    value: function _rightButtonClick() {
-      if (!this._checkYear(this.year, +1)) return;
-      this.year = parseInt(this.year) + 1;
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_inputKeyUp",
-    value: function _inputKeyUp() {
-      var year = this.yearInput.value;
-
-      if (!this._checkYear(year, 0, this.year)) {
-        this.yearInput.value = this.year;
-        return;
-      }
-
-      this.year = parseInt(year);
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_checkYear",
-    value: function _checkYear(year, incr) {
-      var oldValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      //var reg = /^[1,2][8,9,0]\d{2}$/
-      var reg = /^\d+$/;
-      if (!reg.test(year)) return false;
-      var intYear = parseInt(year) + incr;
-      if (intYear < YearControl.min_year) return true; //temporarily
-
-      if (intYear > YearControl.max_year) return true; //temporarily
-
-      if (oldValue == intYear) return false;
-      return true;
-    }
-  }, {
-    key: "_setNewYear",
-    value: function _setNewYear(year) {
-      this.yearInput.value = this.year;
-      this.handler(this.year);
-    }
-  }]);
-
-  return YearControl;
-}(SuperCustomControl);
-},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq","../helper/strHelper":"IGBU","./mapLayers/chronosFeature":"iHtK"}],"uf5M":[function(require,module,exports) {
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var JsHelper = /*#__PURE__*/function () {
-  function JsHelper() {
-    _classCallCheck(this, JsHelper);
-  }
-
-  _createClass(JsHelper, null, [{
-    key: "fillArray",
-    value: function fillArray(value, len) {
-      if (len == 0) return [];
-      var a = [value];
-
-      while (a.length * 2 <= len) {
-        a = a.concat(a);
-      }
-
-      if (a.length < len) a = a.concat(a.slice(0, len - a.length));
-      return a;
-    }
-  }, {
-    key: "getMapSize",
-    value: function getMapSize(x) {
-      var len = 0;
-
-      for (var count in x) {
-        len++;
-      }
-
-      return len;
-    }
-  }, {
-    key: "isNaN",
-    value: function isNaN(x) {}
-  }]);
-
-  return JsHelper;
-}();
-
-module.exports = JsHelper;
-},{}],"WMTm":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"WMTm":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));
@@ -82636,22 +82632,22 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
   _createClass(PersonFeature, null, [{
     key: "getIcon",
     value: function getIcon() {
-      return 'images/red_small.png';
+      return 'images/faces.png';
     }
   }, {
-    key: "getBirthIcon",
-    value: function getBirthIcon() {
-      return 'images/mapIcons/tagBirth.png';
+    key: "getMartyrsIcon",
+    value: function getMartyrsIcon() {
+      return 'images/persons_martyrs.png';
     }
   }, {
-    key: "getAchievementIcon",
-    value: function getAchievementIcon() {
-      return 'images/red_small.png';
+    key: "getReverendsIcon",
+    value: function getReverendsIcon() {
+      return 'images/persons_reverends.png';
     }
   }, {
-    key: "getDeathIcon",
-    value: function getDeathIcon() {
-      return 'images/mapIcons/tagDeath.png';
+    key: "getHolyIcon",
+    value: function getHolyIcon() {
+      return 'images/persons_holy.png';
     }
   }, {
     key: "getCaptionInfo",
@@ -82673,7 +82669,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     value: function getHtmlInfo(info) {
       window.CURRENT_ITEM = info;
       var delimSymbol = '<br/>';
-      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, "</h1>\n      <h2>").concat(info.activity, "</h2>\n      <table class=\"table table-sm table-borderless\" id=\"table-info\">\n        <tbody>\n          ").concat(info.dateAchievementStr ? '<tr><td>Подвиг</td><td>' + info.dateAchievementStr + ' (' + info.achievementYearStr + ')' + delimSymbol + info.placeAchievement + '</td></tr>' : '', "\n          ").concat(info.dateDeathStr && info.dateDeathStr !== info.dateAchievementStr ? '<tr><td>Смерть</td><td>' + info.dateDeathStr + ' (' + info.deathYearStr + ')' + delimSymbol + info.placeDeath + '</td></tr>' : '', "\n        </tbody>\n      </table>\n      <p>").concat(info.description, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, " ").concat(info.monkname, "</h1>\n      <h2>").concat(info.status, "</h2>\n      <h2>\u041C\u0435\u0441\u0442\u043E \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.place, "</h2>\n      <h2>\u0414\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.dateStr, "\n      <p>").concat(info.fullDescription, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {
@@ -82689,43 +82685,35 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "fillPersonItems",
     value: function fillPersonItems(info, kind) {
       var res = [];
+      console.log(JSON.stringify(info.personsMartyrs));
 
       switch (kind) {
-        case 'birth':
-          if (!info.personBirth) return res;
-          res = info.personBirth.map(function (elem) {
+        case 'martyrs':
+          if (!info.personsMartyrs) return res;
+          res = info.personsMartyrs.map(function (elem) {
             return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.placeBirthCoords[0],
-              icon: PersonFeature.getBirthIcon(),
-              popupFirst: "".concat(PersonFeature.getFio(elem)),
-              popupSecond: "\u0414\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ".concat(_dateHelper.default.dateToStr(elem.dateBirth)),
-              popupThird: "\u041C\u0435\u0441\u0442\u043E \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ".concat(elem.placeBirth)
+              point: elem.birth.placeCoord[0],
+              icon: PersonFeature.getMartyrsIcon()
             });
           });
           break;
 
-        case 'achievement':
-          if (!info.personsAchievement) return res;
-          res = info.personsAchievement.map(function (elem) {
+        case 'reverends':
+          if (!info.personsReverends) return res;
+          res = info.personsReverends.map(function (elem) {
             return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.placeAchievementCoords[0],
-              icon: PersonFeature.getAchievementIcon(),
-              popupFirst: "".concat(PersonFeature.getFio(elem)),
-              popupSecond: "\u0414\u0430\u0442\u0430 \u043F\u043E\u0434\u0432\u0438\u0433\u0430: ".concat(_dateHelper.default.dateToStr(elem.dateAchievement)),
-              popupThird: "\u041C\u0435\u0441\u0442\u043E \u043F\u043E\u0434\u0432\u0438\u0433\u0430: ".concat(_strHelper.default.shrinkStringBeforeDelim(elem.placeAchievement, ';'))
+              point: elem.birth.placeCoord[0],
+              icon: PersonFeature.getReverendsIcon()
             });
           });
           break;
 
-        case 'death':
-          if (!info.personsDeath) return res;
-          res = info.personsDeath.map(function (elem) {
+        case 'holy':
+          if (!info.personsHoly) return res;
+          res = info.personsHoly.map(function (elem) {
             return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.placeDeathCoords[0],
-              icon: PersonFeature.getDeathIcon(),
-              popupFirst: "".concat(PersonFeature.getFio(elem)),
-              popupSecond: "\u0414\u0430\u0442\u0430 \u0441\u043C\u0435\u0440\u0442\u0438: ".concat(_dateHelper.default.dateToStr(elem.dateDeath)),
-              popupThird: "\u041C\u0435\u0441\u0442\u043E \u0441\u043C\u0435\u0440\u0442\u0438: ".concat(elem.placeDeath)
+              point: elem.birth.placeCoord[0],
+              icon: PersonFeature.getHolyIcon()
             });
           });
           break;
@@ -82897,7 +82885,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.showHideLegend();
 
     _this.lines = _this.addLines();
-    _this.linesCount = 3;
+    _this.linesCount = 6;
 
     var isCheckArr = _cookieHelper.default.getCookie('isCheckArrLegend', undefined);
 
@@ -82924,10 +82912,9 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     key: "fillPersonFeature",
     value: function fillPersonFeature(info) {
       var res = [];
-      return res;
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'achievement'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'death'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'holy'));
       return res;
     }
   }, {
@@ -82950,34 +82937,34 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
       lines.push({
         id: 2,
-        caption: 'Персоналии',
+        caption: 'Лики',
         classFeature: _personFeature.default,
         fillFunction: this.fillPersonFeature,
-        icon: _personFeature.default.getIcon(),
+        // icon: PersonFeature.getIcon(),
         childs: [{
           id: 3,
-          caption: 'Рождения',
+          caption: 'Мученики',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'birth',
-          icon: _personFeature.default.getBirthIcon(),
-          isHide: true
+          fillFunctionKind: 'martyrs',
+          icon: _personFeature.default.getMartyrsIcon(),
+          isHide: false
         }, {
           id: 4,
-          caption: 'Достижения',
+          caption: 'Преподобные',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'achievement',
-          icon: _personFeature.default.getAchievementIcon(),
-          isHide: true
+          fillFunctionKind: 'reverends',
+          icon: _personFeature.default.getReverendsIcon(),
+          isHide: false
         }, {
           id: 5,
-          caption: 'Смерти',
+          caption: 'Святые',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'death',
-          icon: _personFeature.default.getDeathIcon(),
-          isHide: true
+          fillFunctionKind: 'holy',
+          icon: _personFeature.default.getHolyIcon(),
+          isHide: false
         }]
       });
       return lines;
