@@ -93,6 +93,14 @@ def get_month_num(input):
     return -1
 
 
+def get_text_of_month_parent_case(num):
+    assert (1 <= num and num <= 12)
+    months = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа',
+        'сентября', 'октября', 'ноября', 'декабря'
+    ]
+    return months[num - 1]
+
 def get_text_of_month(num):
 
     assert (1 <= num and num <= 12)

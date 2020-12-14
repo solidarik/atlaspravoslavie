@@ -165,8 +165,12 @@ for row in range(START_ROW, END_ROW):
             worships = worships.split('/')
             for worship in worships:
                 worshipObj = {}
-                worshipObj["day"] = int(worship[0:2])
-                worshipObj["month"] = int(worship[2:4])
+                day = int(worship[0:2])
+                month = int(worship[2:4])
+                worshipObj["day"] = day
+                worshipObj["month"] = month
+                worshipObj[
+                    "dateStr"] = f'{day} {helper.get_text_of_month_parent_case(month)}'
                 worshipArr.append(worshipObj)
         persons["worshipDays"] = worshipArr
 

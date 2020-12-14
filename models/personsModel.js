@@ -67,7 +67,8 @@ var personsSchema = new mongoose.Schema(
 
     worshipDays: [{
       day: Number,
-      month: Number
+      month: Number,
+      dateStr: String
     }],
 
     canonizationDate: {

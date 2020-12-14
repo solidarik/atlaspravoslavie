@@ -5,6 +5,7 @@ Thubms.db
 *.class
 *.py[co]
 
+default.js
 secret*
 
 *.class

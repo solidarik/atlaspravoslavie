@@ -82668,8 +82668,17 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "getHtmlInfo",
     value: function getHtmlInfo(info) {
       window.CURRENT_ITEM = info;
-      var delimSymbol = '<br/>';
-      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, " ").concat(info.monkname, "</h1>\n      <h2>").concat(info.status, "</h2>\n      <h2>\u041C\u0435\u0441\u0442\u043E \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.place, "</h2>\n      <h2>\u0414\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.dateStr, "\n      <p>").concat(info.fullDescription, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
+      var worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания';
+      worshipStr += ': ' + info.worshipDays.map(function (item) {
+        return item.dateStr;
+      }).join(', ');
+      var monkname = '';
+
+      if (info.monkname) {
+        monkname = "<h1>\u0418\u043C\u044F \u0432 \u043C\u043E\u043D\u0430\u0448\u0435\u0441\u0442\u0432\u0435: ".concat(info.monkname, "</h1>");
+      }
+
+      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, "</h1>\n      ").concat(monkname, "\n      <h2>").concat(info.status, "</h2>\n      <h2>\u041C\u0435\u0441\u0442\u043E \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.place, "</h2>\n      <h2>\u0414\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F: ").concat(info.birth.dateStr, "</h2>\n      <h2>").concat(worshipStr, "</h2>\n      <p>").concat(info.fullDescription, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {

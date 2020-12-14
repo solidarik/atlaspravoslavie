@@ -34,12 +34,23 @@ class PersonFeature extends SuperFeature {
 
   static getHtmlInfo(info) {
     window.CURRENT_ITEM = info
-    const delimSymbol = '<br/>'
+
+    let worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания'
+    worshipStr += ': ' + info.worshipDays.map((item) => item.dateStr).join(', ')
+
+    let monkname = ''
+    if (info.monkname) {
+      monkname = `<h1>Имя в монашестве: ${info.monkname}</h1>`
+    }
+
+
     const html = `<div class="person-info panel-info">
-      <h1>${info.surname} ${info.name} ${info.middlename} ${info.monkname}</h1>
+      <h1>${info.surname} ${info.name} ${info.middlename}</h1>
+      ${monkname}
       <h2>${info.status}</h2>
       <h2>Место рождения: ${info.birth.place}</h2>
-      <h2>Дата рождения: ${info.birth.dateStr}
+      <h2>Дата рождения: ${info.birth.dateStr}</h2>
+      <h2>${worshipStr}</h2>
       <p>${info.fullDescription}</p>
       <div class="source-info">
         <a target='_blank' rel='noopener noreferrer' href=${
