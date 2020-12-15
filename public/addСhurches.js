@@ -39,8 +39,8 @@ export default class addСhurches {
       'Подробнее...</a>'
     )
 
-    //$('#imgChurches').src = thisThis.data[id].PhotoUrl
-    //$('#imgChurches').attr('src', thisThis.data[id].PhotoUrl)
+    $('#imgChurches').src = cur.imgUrl
+    $('#imgChurches').attr('src', cur.imgUrl)
 
 
     $(thisTr).addClass('event-active-row')
@@ -58,18 +58,24 @@ export default class addСhurches {
     var columnCount = columns.length
     var row = $(table[0].insertRow(-1))
     for (var i = 0; i < columnCount; i++) {
-      if (i == 5 || i == 7 || i == 8 ) {
-        var headerCell = $('<th />')
+      //if (i == 5 || i == 7 || i == 8 )
+      {
         if (columns[i] == 'name') {
+          var headerCell = $('<th />')
           headerCell.html('Название')
+          row.append(headerCell)
         } else if (columns[i] == 'startDateStr') {
+          var headerCell = $('<th />')
           headerCell.html('Основание')
+          row.append(headerCell)
         } else if (columns[i] == 'place') {
+          var headerCell = $('<th />')
           headerCell.html('Расположение')
+          row.append(headerCell)
         } else {
-          headerCell.html('N/A')
+          //headerCell.html('N/A')
         }
-        row.append(headerCell)
+
       }
     }
 
@@ -78,7 +84,9 @@ export default class addСhurches {
       row.addClass('hand-cursor')
       row.attr('id', i)
       for (var j = 0; j < columnCount; j++) {
-        if (j == 5 || j == 7 || j == 8) {
+        //if (j == 5 || j == 7 || j == 8)
+        if (columns[j] == 'name' || columns[j] == 'startDateStr' || columns[j] == 'place')
+        {
           var cell = $('<td />')
           cell.html(obj[i][columns[j]])
           row.append(cell)

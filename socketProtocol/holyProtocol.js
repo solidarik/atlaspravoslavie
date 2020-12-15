@@ -103,7 +103,26 @@ class HolyProtocol extends ServerProtocol {
   }
 
   getTemples(socket, msg, cb) {
-    trycatch(TemplesModel.find({}), cb)
+    let res = {}
+
+    try {
+      TemplesModel.find({})
+        .then(
+          (res) => {
+            cb(
+              JSON.stringify({
+                temples: res
+              })
+            )
+          })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка парсинга даты: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
   }
 
   getPersons(socket, msg, cb) {
