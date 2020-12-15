@@ -76112,7 +76112,6 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     value: function refreshInfo(info) {
       var _this5 = this;
 
-      console.log("refresh info ".concat(JSON.stringify(info)));
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       info.forEach(function (item) {

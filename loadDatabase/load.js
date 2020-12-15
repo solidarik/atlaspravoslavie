@@ -24,39 +24,39 @@ Promise.resolve(true)
   //     mediator: usersJsonMediator
   //   })
   // })
+  .then(() => {
+      return dbHelper.clearDb('chronosReligion')
+    })
+  .then(() => {
+    return dbHelper.saveFilesFrom({
+      source: 'python/out_chronos_religion',
+      procdir: 'out/out_chronos_religion_process',
+      errdir: 'out/out_chronos_religion_errors',
+      mediator: chronosJsonMediator,
+    })
+  })
   // .then(() => {
-  //     return dbHelper.clearDb('chronosReligion')
-  //   })
+  //   return dbHelper.clearDb('temples')
+  // })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
-  //     source: 'python/out_chronos_religion',
-  //     procdir: 'out/out_chronos_religion_process',
-  //     errdir: 'out/out_chronos_religion_errors',
-  //     mediator: chronosJsonMediator,
+  //     source: 'python/out_temples',
+  //     procdir: 'out/out_temples_process',
+  //     errdir: 'out/out_temples_errors',
+  //     mediator: templesJsonMediator,
   //   })
   // })
-  .then(() => {
-    return dbHelper.clearDb('temples')
-  })
-  .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_temples',
-      procdir: 'out/out_temples_process',
-      errdir: 'out/out_temples_errors',
-      mediator: templesJsonMediator,
-    })
-  })
-  .then(() => {
-    return dbHelper.clearDb('persons')
-  })
-  .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_persons',
-      procdir: 'out/out_person_process',
-      errdir: 'out/out_person_errors',
-      mediator: personsJsonMediator,
-    })
-  })
+  // .then(() => {
+  //   return dbHelper.clearDb('persons')
+  // })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_persons',
+  //     procdir: 'out/out_person_process',
+  //     errdir: 'out/out_person_errors',
+  //     mediator: personsJsonMediator,
+  //   })
+  // })
   .then(() => {
     log.success(chalk.cyan(`окончание процесса загрузки`))
     dbHelper.free()

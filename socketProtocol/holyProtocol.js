@@ -3,6 +3,24 @@ const ChronosModel = require('../models/chronosReligionModel')
 const PersonsModel = require('../models/personsModel')
 const TemplesModel = require('../models/templesModel')
 
+function trycatch(func, cb){
+  let res = {}
+  try {
+    func()
+      .then(
+        (res) => {
+          cb(JSON.stringify({persons: res}))
+        })
+      .catch((error) => {
+        cb(JSON.stringify({ error: error }))
+      })
+  } catch (err) {
+    res.err = 'Ошибка парсинга: ' + err
+    res.events = ''
+    cb(JSON.stringify(res))
+  }
+}
+
 class HolyProtocol extends ServerProtocol {
   init() {
     super.addHandler('clQueryDataByYear', this.getDataByYear)
@@ -84,42 +102,24 @@ class HolyProtocol extends ServerProtocol {
     }
   }
 
-  trycatch(func, cb) {
-    let res = {}
-    try {
-      func()
-        .then(
-          (res) => {
-            cb(JSON.stringify({persons: res}))
-          })
-        .catch((error) => {
-          cb(JSON.stringify({ error: error }))
-        })
-    } catch (err) {
-      res.err = 'Ошибка парсинга: ' + err
-      res.events = ''
-      cb(JSON.stringify(res))
-    }
-  }
-
   getTemples(socket, msg, cb) {
-    this.trycatch(TemplesModel.find({}, cb))
+    trycatch(TemplesModel.find({}), cb)
   }
 
   getPersons(socket, msg, cb) {
-    this.trycatch(PersonsModel.find({}, cb))
+    trycatch(PersonsModel.find({}), cb)
   }
 
   getPersonsMartyrs(socket, msg, cb) {
-    this.trycatch(PersonsModel.find({"groupStatus": "мученик"}, cb))
+    trycatch(PersonsModel.find({"groupStatus": "мученик"}), cb)
   }
 
   getPersonsReverends(socket, msg, cb) {
-    this.trycatch(PersonsModel.find({"groupStatus": "преподобный"}, cb))
+    trycatch(PersonsModel.find({"groupStatus": "преподобный"}), cb)
   }
 
   getPersonsHoly(socket, msg, cb) {
-    this.trycatch(PersonsModel.find({"groupStatus": "святой"}, cb))
+    trycatch(PersonsModel.find({"groupStatus": "святой"}), cb)
   }
 }
 
