@@ -2,6 +2,8 @@ extends layout
 block head
 
   link(rel='stylesheet' href='/style-about.css')
+  script(src='/libs/d3.min.js')
+  script(src='/main-about.js')
 
 block content
     +header('about')
@@ -16,13 +18,13 @@ block content
         div(class='row')
             div(class='col-md-5 offset-md-7')
                 blockquote.quote-card
-                    p
+                    p(id='quote')
                         | Русская история требует защиты со стороны гражданского общества.
                         | Мы не имеем права на безразличие перед лицом попыток ее злонамеренного искажения,
                         | мы должны уберечь от разрушения ее ключевые вехи. Это те рубежи,
                         | которые мы не имеем права сдать.
                         | Только так мы сможем сохранить себя как народ, сохранить нашу страну и нашу цивилизацию.
-                    cite
+                    cite(id='quotePerson')
                         | Патриарх Кирилл
         div(class='row main-text')
             div(class='col-md-8 offset-md-2')
