@@ -3,7 +3,7 @@ import addСhurches from './addСhurches.js';
 import ClientProtocol from '../public-src/clientProtocol.js'
 window.app = {};
 var app = window.app;
-
+var slideIndex = 1;
 // Production steps of ECMA-262, Edition 5, 15.4.4.18
 // Reference: http://es5.github.io/#x15.4.4.18
 if (!Array.prototype.forEach) {
@@ -78,10 +78,11 @@ function startApp() {
   clientProtocol.getTemples();
   clientProtocol.subscribe('temples', (temples) => {
     //console.log(JSON.stringify(temples))
-     var churches = new addСhurches("churches-table", temples);
-     churches.clearTable();
-     churches.fillTable();
+    var churches = new addСhurches("churches-table", temples);
+    churches.clearTable();
+    churches.fillTable(showSlides,plusSlides,currentSlide);
     $("#churches-table tr:eq(0) td:first-child span").click();
+    //showSlides(slideIndex);
   })
 }
 
@@ -96,6 +97,37 @@ $(document).ready(function () {
     }
   });
 });
+
+
+// Next/previous controls
+function plusSlides(n) {
+  console.log('plusSlides, n='+n);
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  console.log('currentSlide,n='+n);
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) { slideIndex = 1 }
+  if (n < 1) { slideIndex = slides.length }
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+    slides[i].className = slides[i].className.replace(" show", "");
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex - 1].style.display = "block";
+  slides[slideIndex - 1].className += " show";
+  dots[slideIndex - 1].className += " active";
+}
 
 /////////////////////////////////////////////////
 function addEvent(evnt, elem, func) {

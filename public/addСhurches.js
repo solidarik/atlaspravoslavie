@@ -9,7 +9,7 @@ export default class addСhurches {
     dvTable.html('')
   }
 
-  rowTableClickHandler(thisThis, thisTr) {
+  rowTableClickHandler(thisThis, thisTr, showSlides,plusSlides,currentSlide) {
     //console.log("clicked " + $(thisTr).attr('id'));
     var _id = $(thisTr).attr('id');
     var cur = thisThis.data.temples[_id];
@@ -32,22 +32,111 @@ export default class addСhurches {
       'Перейти</a>'
     )
     $('#longBrief').html(
-      cur.longBrief+
+      cur.longBrief +
       " <a target='_blank' rel='noopener noreferrer' href='" +
       cur.srcUrl +
       "'>" +
       'Подробнее...</a>'
     )
 
-    $('#imgChurches').src = cur.imgUrl
-    $('#imgChurches').attr('src', cur.imgUrl)
+    //$('#imgChurches').src = '/images/temples/'+cur.pageUrl+'.jpg'
+    //$('#imgChurches').attr('src', '/images/temples/'+cur.pageUrl+'.jpg')
+    let imgCount = 3;
+    let elm = document.getElementById('image-cont');
+    elm.innerHTML = '';
+    let elemSC = document.createElement('div');
+    elemSC.classList.add("slideshow-container");
+    elm.appendChild(elemSC);
+    for (let index = 1; index <= imgCount; index++) {
+      let elemMS = document.createElement('div');
+      elemMS.classList.add("mySlides");
+      elemMS.classList.add("fade");
+      elemSC.appendChild(elemMS);
+      let elemNT = document.createElement('div');
+      elemNT.classList.add("numbertext");
+      elemNT.innerHTML = index+' / '+imgCount;
+      let img = document.createElement('img');
+      img.classList.add("image-center");
+      img.classList.add("img-rounded");
+      img.classList.add("resized-image");
+      img.src = '/images/temples/' + cur.pageUrl + '.jpg';
+      elemMS.appendChild(img);
+    }
+    let al = document.createElement('a');
+    al.classList.add("prev");
+    al.innerHTML = '&#10094;';
+    al.onclick = function(){plusSlides(-1)};
+    elemSC.appendChild(al);
 
+    let ar = document.createElement('a');
+    ar.classList.add("next");
+    ar.innerHTML = '&#10095;';
+    ar.onclick = function(){plusSlides(1)};
+    elemSC.appendChild(ar);
+
+    let elemBR = document.createElement('div');
+    elemBR.classList.add("w-100");
+    //<div class="w-100"></div>
+    elm.appendChild(elemBR);
+
+    let elemDD = document.createElement('div');
+    elemDD.style = "margin-left: auto; margin-right: auto;"
+    elm.appendChild(elemDD);
+
+    for (let index = 1; index <= imgCount; index++) {
+      let elemD = document.createElement('span');
+      elemD.classList.add("dot");
+      elemD.onclick = function(){currentSlide(index)};
+      elemDD.appendChild(elemD);
+    }
+
+    showSlides(1);
+
+
+    // $('#image-cont').html(
+    //   '<!-- Slideshow container --> ' +
+    //   '<div class="slideshow-container"> ' +
+
+    //   '  <!-- Full-width images with number and caption text --> ' +
+    //   '  <div class="mySlides fade"> ' +
+    //   '    <div class="numbertext">1 / 3</div> ' +
+    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" > ' +
+    //   '    <div class="text">Caption Text</div> ' +
+    //   '  </div> ' +
+
+    //   '  <div class="mySlides fade"> ' +
+    //   '    <div class="numbertext">2 / 3</div> ' +
+    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" style="width:100%"> ' +
+    //   '    <div class="text">Caption Two</div> ' +
+    //   '  </div> ' +
+
+    //   '  <div class="mySlides fade"> ' +
+    //   '    <div class="numbertext">3 / 3</div> ' +
+    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" style="width:100%"> ' +
+    //   '    <div class="text">Caption Three</div> ' +
+    //   '  </div> ' +
+
+    //   '  <!-- Next and previous buttons --> ' +
+    //   '  <a class="prev" onclick="plusSlides(-1)">&#10094;</a> ' +
+    //   '  <a class="next" onclick="plusSlides(1)">&#10095;</a> ' +
+    //   '</div> ' +
+    //   '<br> ' +
+
+    //   '<!-- The dots/circles --> ' +
+    //   '<div style="text-align:center"> ' +
+    //   '  <span class="dot" onclick="currentSlide(1)"></span> ' +
+    //   '  <span class="dot" onclick="currentSlide(2)"></span> ' +
+    //   '  <span class="dot" onclick="currentSlide(3)"></span> ' +
+    //   '</div> '
+    // );
 
     $(thisTr).addClass('event-active-row')
     $(thisTr).siblings().removeClass('event-active-row')
+
+
   }
 
-  addDataToTable() {
+  addDataToTable(showSlides,plusSlides,currentSlide) {
     //console.log("addDataTotable");
     //console.log(JSON.stringify(this.data));
     var obj = this.data.temples;
@@ -85,8 +174,7 @@ export default class addСhurches {
       row.attr('id', i)
       for (var j = 0; j < columnCount; j++) {
         //if (j == 5 || j == 7 || j == 8)
-        if (columns[j] == 'name' || columns[j] == 'startDateStr' || columns[j] == 'place')
-        {
+        if (columns[j] == 'name' || columns[j] == 'startDateStr' || columns[j] == 'place') {
           var cell = $('<td />')
           cell.html(obj[i][columns[j]])
           row.append(cell)
@@ -134,7 +222,7 @@ export default class addСhurches {
 
     document.querySelectorAll('#' + this.idTable + ' tr').forEach((e) =>
       e.addEventListener('click', function () {
-        thisThis.rowTableClickHandler(thisThis, this)
+        thisThis.rowTableClickHandler(thisThis, this, showSlides,plusSlides,currentSlide)
       })
     )
 
@@ -142,12 +230,12 @@ export default class addСhurches {
     $('#0').trigger('click')
   }
 
-  fillTable() {
+  fillTable(showSlides,plusSlides,currentSlide) {
     //console.log("fillTable");
     if (this.data == null) {
       console.log('data empty')
     } else {
-      this.addDataToTable()
+      this.addDataToTable(showSlides,plusSlides,currentSlide)
     }
   }
 }
