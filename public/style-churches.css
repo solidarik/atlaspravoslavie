@@ -98,13 +98,28 @@ td {
   line-height: 1.5em;
 }
 
+@media (max-width:600px) {
 .resized-image {
   width: auto;
-  height: 270px;
+  height: 200px;
   /* border-image: url(img/border.png) 25% stretch;
   border-width: 40px;
   border-style: solid; */
 }
+}
+
+@media (min-width:600px) {
+  .resized-image {
+    width: auto;
+    height: 270px;
+    /* border-image: url(img/border.png) 25% stretch;
+    border-width: 40px;
+    border-style: solid; */
+  }
+
+}
+
+
 
 .right {
   float: right;
