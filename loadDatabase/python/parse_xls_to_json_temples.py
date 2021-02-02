@@ -13,7 +13,7 @@ col_name = 0
 col_imgUrl = 2
 col_place, col_date, col_longBrief = tuple(range(3, 6))
 col_abbots, col_srcUrl, col_eparchyUrl = tuple(range(6, 9))
-
+col_imgUrl_1,col_imgUrl_2,col_imgUrl_3,col_imgUrl_4,col_imgUrl_5  = tuple(range(9, 14))
 
 def IsEmptyValue(row, col):
     v = scheet.cell(row, col).value
@@ -102,6 +102,12 @@ for row in range(START_ROW, END_ROW):
 
         temples['name'] = GetSheetValue(row, col_name)
         temples['imgUrl'] = GetSheetValue(row, col_imgUrl)
+        temples['imgUrl_1'] = GetSheetValue(row, col_imgUrl_1)
+        temples['imgUrl_2'] = GetSheetValue(row, col_imgUrl_2)
+        temples['imgUrl_3'] = GetSheetValue(row, col_imgUrl_3)
+        temples['imgUrl_4'] = GetSheetValue(row, col_imgUrl_4)
+        temples['imgUrl_5'] = GetSheetValue(row, col_imgUrl_5)
+
         temples['place'] = GetSheetValue(row, col_place)
         temples['surPlace'] = helper.remove_substring(
             GetSheetValue(row, col_place))

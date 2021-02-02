@@ -48,14 +48,36 @@ function loadImages(collName, imgUrlFieldName) {
         dbo.collection(collName).find({}).toArray(function (err, result) {
             if (err) throw err;
             result.forEach(function (item) {
-                if (item[imgUrlFieldName].trim()!=='') {
-                    var parsed = url.parse(item[imgUrlFieldName].trim());
-                    if (path.extname(parsed.pathname) == '') {
+
+                for (let index = 0; index <= 5; index++) {
+                    let iUFN;
+                    if (index > 0) {
+                        iUFN = imgUrlFieldName + '_' + index;
                     }
-                    download(encodeURI(item[imgUrlFieldName]), '.\\public\\images\\' + collName + '\\' + item.pageUrl + '.jpg'/*path.extname(parsed.pathname)*/, item[imgUrlFieldName].trim(), item.name);
-                }
-                else{
-                    console.log('Not image url to '+item.name);
+                    else {
+                        iUFN = imgUrlFieldName;
+                    }
+
+                    if (item.hasOwnProperty(iUFN)) {
+                        if (item[iUFN].trim() !== '') {
+                            var parsed = url.parse(item[iUFN].trim());
+                            if (path.extname(parsed.pathname) == '') {
+                            }
+                            let pu;
+                            if(index > 0){
+                               pu = item.pageUrl + '_' + index
+                            }else{
+                                pu = item.pageUrl;
+                            }
+                            download(encodeURI(item[iUFN]), '.\\public\\images\\' + collName + '\\' + pu + '.jpg', item[iUFN].trim(), item.name);
+                        }
+                        else {
+                            console.log('Not image url to ' + item.name);
+                        }
+                    }
+                    {
+                        console.log('Not item.hasOwnProperty(iUFN) - ' + item.name);
+                    }
                 }
             })
             db.close();
@@ -63,5 +85,5 @@ function loadImages(collName, imgUrlFieldName) {
     });
 }
 
-//loadImages('temples','imgUrl');
+loadImages('temples','imgUrl');
 //loadImages('personsreligions', 'photoUrl');

@@ -41,26 +41,46 @@ export default class addСhurches {
 
     //$('#imgChurches').src = '/images/temples/'+cur.pageUrl+'.jpg'
     //$('#imgChurches').attr('src', '/images/temples/'+cur.pageUrl+'.jpg')
-    let imgCount = 3;
+    let imgCount = 5;
     let elm = document.getElementById('image-cont');
     elm.innerHTML = '';
     let elemSC = document.createElement('div');
     elemSC.classList.add("slideshow-container");
     elm.appendChild(elemSC);
-    for (let index = 1; index <= imgCount; index++) {
-      let elemMS = document.createElement('div');
-      elemMS.classList.add("mySlides");
-      elemMS.classList.add("fade");
-      elemSC.appendChild(elemMS);
-      let elemNT = document.createElement('div');
-      elemNT.classList.add("numbertext");
-      elemNT.innerHTML = index+' / '+imgCount;
-      let img = document.createElement('img');
-      img.classList.add("image-center");
-      img.classList.add("img-rounded");
-      img.classList.add("resized-image");
-      img.src = '/images/temples/' + cur.pageUrl + '.jpg';
-      elemMS.appendChild(img);
+    for (let index = 0; index <= imgCount; index++) {
+
+      let iUFN;
+      if (index > 0) {
+          iUFN = 'imgUrl' + '_' + index;
+      }
+      else {
+          iUFN = 'imgUrl';
+      }
+      if(cur.hasOwnProperty(iUFN)){
+        let pu;
+        if(index > 0){
+           pu = cur.pageUrl + '_' + index
+        }else{
+            pu = cur.pageUrl;
+        }
+        let elemMS = document.createElement('div');
+        elemMS.classList.add("mySlides");
+        elemMS.classList.add("fade");
+        elemSC.appendChild(elemMS);
+        let elemNT = document.createElement('div');
+        elemNT.classList.add("numbertext");
+        elemNT.innerHTML = index+' / '+imgCount;
+        let img = document.createElement('img');
+        img.classList.add("image-center");
+        img.classList.add("img-rounded");
+        img.classList.add("resized-image");
+        img.src = '/images/temples/' + pu + '.jpg';
+        elemMS.appendChild(img);
+      }
+
+
+
+
     }
     let al = document.createElement('a');
     al.classList.add("prev");
@@ -83,7 +103,7 @@ export default class addСhurches {
     elemDD.style = "margin-left: auto; margin-right: auto;"
     elm.appendChild(elemDD);
 
-    for (let index = 1; index <= imgCount; index++) {
+    for (let index = 0; index <= imgCount; index++) {
       let elemD = document.createElement('span');
       elemD.classList.add("dot");
       elemD.onclick = function(){currentSlide(index)};
