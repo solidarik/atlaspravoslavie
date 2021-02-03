@@ -82336,6 +82336,12 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
       } else {
         this.yearInput.value = this.year;
       }
+
+      this.handler({
+        'year': this.year,
+        'century': this.century,
+        'kind': kind
+      });
     }
   }, {
     key: "yearCenturyClick",

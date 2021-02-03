@@ -657,7 +657,14 @@ class YearControl extends SuperCustomControl {
       this.yearInput.value = DateHelper.intCenturyToStr(this.century)
     } else {
       this.yearInput.value = this.year
+
     }
+
+    this.handler({
+      'year': this.year,
+      'century': this.century,
+      'kind': kind
+    })
   }
 
   yearCenturyClick() {

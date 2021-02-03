@@ -47,7 +47,7 @@ class HolyProtocol extends ServerProtocol {
 
       const searchDates = {
         $gte: parseInt(data.range[0]),
-        $lt: parseInt(data.range[1]),
+        $lt: parseInt(data.range[1]) + 1,
       }
 
       const defaultSearchParam = {
