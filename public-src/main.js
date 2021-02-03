@@ -29,9 +29,8 @@ function startApp() {
   const legendControl = LegendControl.create()
   const infoControl = InfoControl.create()
 
-  protocol.subscribe('setCurrentYear', (year) => {
-    console.log(`year from the server ${year}`)
-    mapControl.setCurrentYearFromServer(year)
+  protocol.subscribe('setCurrentYear', (obj) => {
+    mapControl.setCurrentYearFromServer(obj)
   })
 
   protocol.subscribe('refreshInfo', (info) => {
@@ -49,8 +48,8 @@ function startApp() {
     infoControl.hide()
   })
 
-  mapControl.subscribe('changeYear', (year) => {
-    protocol.getDataByYear(year)
+  mapControl.subscribe('changeYear', (dateObject) => {
+    protocol.getDataByYear(dateObject)
     infoControl.hide()
   })
 

@@ -10,14 +10,14 @@ const it_name = (v) => {
 
 const check_equal = (v, func) => {
   if (Array.isArray(v[1])) {
-    assert.equal(func(v[0]).join(), v[1].join())
+    assert.strictEqual(func(v[0]).join(), v[1].join())
   } else if (v[1] && typeof v[1].isoWeekday === 'function') {
     if (!func(v[0]).isSame(v[1])) {
       log.warn(`${func(v[0])} ${v[1]}, result: ${func(v[0]).isSame(v[1])}`)
     }
-    assert.equal(true, func(v[0]).isSame(v[1]))
+    assert.strictEqual(true, func(v[0]).isSame(v[1]))
   } else {
-    assert.equal(func(v[0]), v[1])
+    assert.strictEqual(func(v[0]), v[1])
   }
 }
 

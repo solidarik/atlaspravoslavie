@@ -1,6 +1,7 @@
 import io from 'socket.io-client'
 import  EventEmitter  from './eventEmitter'
 import  CookieHelper  from './cookieHelper'
+import DateHelper from '../helper/dateHelper'
 
 export default class ClientProtocol extends EventEmitter {
   constructor() {
@@ -11,13 +12,19 @@ export default class ClientProtocol extends EventEmitter {
     this.dict = new Map() //key - hash (tobject), value {объект}
 
     socket.emit('clGetCurrentYear', '', (msg) => {
-      const data = JSON.parse(msg)
-      const serverYear = data.year
-      const cookieYear = CookieHelper.getCookie('year')
+      const server = JSON.parse(msg)
+      const client = {
+        'year': CookieHelper.getCookie('year'),
+        'century': CookieHelper.getCookie('century'),
+        'kind': CookieHelper.getCookie('kind')
+      }
 
       this.emit(
-        'setCurrentYear',
-        serverYear ? serverYear : cookieYear ? cookieYear : '1945'
+        'setCurrentYear', {
+          'year': server.year ? server.year : client.year ? client.year : 1945,
+          'century': server.century ? server.century : client.century ? client.century : 20,
+          'kind': server.kind ? server.kind : client.kind ? client.kind : 'year',
+        }
       )
     })
 
@@ -69,16 +76,30 @@ export default class ClientProtocol extends EventEmitter {
     )
   }
 
-  getDataByYear(year) {
-    if (undefined === year) {
+  getDataByYear(dateObject) {
+    if (undefined === dateObject.year) {
       return
     }
 
+    const year = dateObject.year
+    const century = dateObject.century
+    const kind = dateObject.kind
+
     CookieHelper.setCookie('year', year)
+    CookieHelper.setCookie('century', century)
+    CookieHelper.setCookie('kind', kind)
+
+    let dateRange = []
+    if (kind == 'year') {
+      dateRange = [year, year]
+    } else {
+      dateRange = DateHelper.getCenturyRange(century)
+    }
 
     this.socket.emit(
       'clQueryDataByYear',
-      JSON.stringify({ year: year }),
+
+      JSON.stringify({ range: dateRange }),
       (msg) => {
         this.emit('refreshInfo', JSON.parse(msg))
       }

@@ -75562,855 +75562,7 @@ var ClassHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = ClassHelper;
-},{}],"p4qv":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.MapControl = void 0;
-
-var _ol = require("ol");
-
-var olStyle = _interopRequireWildcard(require("ol/style"));
-
-var olGeom = _interopRequireWildcard(require("ol/geom"));
-
-var _Feature = _interopRequireDefault(require("ol/Feature"));
-
-var _proj = require("ol/proj");
-
-var olControl = _interopRequireWildcard(require("ol/control"));
-
-var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
-
-var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
-
-var olSource = _interopRequireWildcard(require("ol/source"));
-
-var olTilegrid = _interopRequireWildcard(require("ol/tilegrid"));
-
-var olInteraction = _interopRequireWildcard(require("ol/interaction"));
-
-var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
-
-var _proj2 = _interopRequireDefault(require("proj4"));
-
-var _proj3 = require("ol/proj/proj4");
-
-var _AnimatedCluster = _interopRequireDefault(require("ol-ext/layer/AnimatedCluster"));
-
-var _Zoom = _interopRequireDefault(require("ol-ext/featureanimation/Zoom"));
-
-var _easing = require("ol/easing");
-
-var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var MAP_PARAMS = {
-  min_year: 1914,
-  max_year: 1965,
-  isEnableAnimate: true
-};
-
-var MapControl = /*#__PURE__*/function (_EventEmitter) {
-  _inherits(MapControl, _EventEmitter);
-
-  var _super = _createSuper(MapControl);
-
-  function MapControl() {
-    var _this;
-
-    _classCallCheck(this, MapControl);
-
-    _this = _super.call(this); //first must
-
-    window.map = _assertThisInitialized(_this);
-    var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
-
-    _proj2.default.defs('EPSG:3395', '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
-
-    (0, _proj3.register)(_proj2.default);
-    var projection = (0, _proj.get)('EPSG:3395');
-    projection.setExtent(yaex);
-    var rasterLayer = new _Tile.default({
-      preload: 5,
-      zIndex: 0,
-      // source: new olSource.OSM(),
-      source: new olSource.XYZ({
-        projection: 'EPSG:3395',
-        tileGrid: olTilegrid.createXYZ({
-          extent: yaex
-        }),
-        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
-      })
-    });
-    _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
-    _this.isDisableSavePermalink = true;
-    _this.isDisableMoveend = false;
-
-    _this.readViewFromPermalink();
-
-    var view = new _ol.View({
-      center: _this.center ? _this.center : new _proj.fromLonLat([56.004, 54.695]),
-      // ufa place
-      zoom: _this.zoom ? _this.zoom : 3 // projection: 'EPSG:4326',
-      // projection: 'EPSG:3857',
-      // projection: 'EPSG:3395',
-
-    });
-    /* temporarily disable-popup
-    this.popup = new olPopup({
-      popupClass: 'default shadow', //"default shadow", "tooltips", "warning" "black" "default", "tips", "shadow",
-      closeBox: true,
-      onshow: function () {
-        // console.log('You opened the box')
-      },
-      onclose: function () {
-        // console.log('You close the box')
-      },
-      positioning: 'auto',
-      autoPan: true,
-      autoPanAnimation: { duration: this.isEnableAnimate ? 250 : 0 },
-    })
-    */
-
-    var map = new _ol.Map({
-      interactions: olInteraction.defaults({
-        altShiftDragRotate: false,
-        pinchRotate: false
-      }),
-      controls: olControl.defaults({
-        attribution: false,
-        zoom: false
-      }).extend([//new olControl.FullScreen()
-      ]),
-      layers: [rasterLayer],
-      //disable-popup overlays: [this.popup],
-      target: 'map',
-      view: view
-    });
-
-    function getStyleSimple(feature, _) {
-      var classFeature = feature.get('classFeature');
-      var style = classFeature.getStyleFeature(feature, window.map.view.getZoom());
-      return style;
-    }
-
-    function getStyleCluster(feature, _) {
-      var size = feature.get('features').length;
-
-      if (size == 1) {
-        var oneFeature = feature.get('features')[0];
-        var classFeature = oneFeature.get('classFeature');
-
-        var _style = classFeature.getStyleFeature(oneFeature, window.map.view.getZoom());
-
-        return _style;
-      }
-
-      var redColor = '255,0,51';
-      var cyanColor = '0,162,232';
-      var greenColor = '34,177,76';
-      var color = size > 10 ? redColor : size > 5 ? greenColor : cyanColor;
-      var radius = Math.max(8, Math.min(size, 20)) + 5;
-      var dash = 2 * Math.PI * radius / 6;
-      dash = [0, dash, dash, dash, dash, dash, dash];
-      var style = new olStyle.Style({
-        image: new olStyle.Circle({
-          radius: radius,
-          stroke: new olStyle.Stroke({
-            color: 'rgba(' + color + ',0.6)',
-            width: 15,
-            lineDash: dash,
-            lineCap: 'butt'
-          }),
-          fill: new olStyle.Fill({
-            color: 'rgba(' + color + ',0.9)'
-          })
-        }),
-        text: new olStyle.Text({
-          text: size.toString(),
-          font: '14px Helvetica',
-          //textBaseline: 'top',
-          fill: new olStyle.Fill({
-            color: '#fff'
-          })
-        })
-      });
-      return style;
-    } // Simple Source
-
-
-    var simpleSource = new olSource.Vector();
-    var simpleLayer = new _Vector.default({
-      source: simpleSource,
-      zIndex: 1,
-      updateWhileAnimating: true,
-      updateWhileInteracting: true,
-      style: getStyleSimple
-    });
-    _this.simpleLayer = simpleLayer;
-    _this.simpleSource = simpleSource;
-    map.addLayer(simpleLayer); // Cluster Source
-
-    var clusterSource = new olSource.Cluster({
-      distance: 10,
-      source: new olSource.Vector()
-    });
-    var clusterLayer = new _AnimatedCluster.default({
-      name: 'Cluster',
-      source: clusterSource,
-      animationDuration: _this.isEnableAnimate ? 400 : 0,
-      style: getStyleCluster
-    });
-    _this.clusterLayer = clusterLayer;
-    map.addLayer(clusterLayer);
-    _this.clusterSource = clusterSource;
-    map.on('click', function (event) {
-      // disable-popup window.map.popup.hide()
-      _this.emit('mapclick', undefined);
-
-      var coordinates = event.coordinate;
-      var lonLatCoords = new _proj.toLonLat(coordinates);
-      console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords));
-      var featureEvent = undefined;
-      var isHit = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
-        featureEvent = feature;
-        return feature.get('kind');
-      }, {
-        hitTolerance: 5
-      });
-      if (!featureEvent) return; //simple feature
-
-      var features = featureEvent.get('features');
-
-      if (!features) {
-        features = [];
-        features[0] = featureEvent;
-      }
-
-      if (features.length > 0) {
-        _this.emit('selectFeatures', features);
-      }
-
-      var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
-      _this.currentFeatureCoord = featureCoord;
-
-      _this.showPulse();
-
-      return;
-    });
-    map.on('moveend', function () {
-      if (_this.isDisableMoveend) {
-        _this.isDisableMoveend = false;
-        return;
-      }
-
-      window.map.savePermalink.call(window.map);
-    });
-    map.on('pointermove', function (event) {
-      var feature = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
-        return feature;
-      }, {
-        hitTolerance: 5
-      });
-      var isHit = feature ? true : false;
-
-      if (isHit) {
-        map.getTargetElement().style.cursor = 'pointer';
-      } else {
-        map.getTargetElement().style.cursor = '';
-      }
-    });
-    _this.map = map;
-    _this.view = view;
-    setTimeout(function () {
-      _this.addYearLayer();
-    }, 10);
-    return _this;
-  }
-
-  _createClass(MapControl, [{
-    key: "createGeom",
-    value: function createGeom(mo) {
-      var geom;
-
-      switch (mo.kind) {
-        case 'Point':
-          geom = new ol.geom.Point(mo.coords);
-          break;
-
-        case 'LineString':
-          geom = new ol.geom.LineString(mo.coords);
-          break;
-
-        case 'Polygon':
-          geom = new ol.geom.Polygon(mo.coords);
-          break;
-      }
-
-      return geom;
-    }
-  }, {
-    key: "showAdditionalInfo",
-    value: function showAdditionalInfo(info) {
-      this.emit('showAdditionalInfo', undefined);
-      this.hidePulse();
-      this.simpleLayer.setVisible(false);
-      this.clusterLayer.setVisible(false);
-
-      _classHelper.default.addClass(document.getElementById('year-control'), 'hide-element');
-    }
-  }, {
-    key: "returnNormalMode",
-    value: function returnNormalMode() {
-      this.emit('returnNormalMode', undefined);
-
-      _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
-
-      this.showPulse();
-      this.simpleLayer.setVisible(true);
-      this.clusterLayer.setVisible(true);
-    }
-  }, {
-    key: "pulseFeature",
-    value: function pulseFeature(coord) {
-      var f = new _Feature.default(new olGeom.Point(coord));
-      f.setStyle(new olStyle.Style({
-        image: new olStyle.Circle({
-          radius: 30,
-          stroke: new olStyle.Stroke({
-            color: 'red',
-            width: 3
-          })
-        }) // image: new olStyle.RegularShape({
-        //   fill: new olStyle.Fill({
-        //     color: '#fff',
-        //   }),
-        //   stroke: new olStyle.Stroke({ color: 'black', width: 3 }),
-        //   points: 4,
-        //   radius: 80,
-        //   radius2: 0,
-        //   angle: 0,
-        // }),
-
-      }));
-      this.map.animateFeature(f, new _Zoom.default({
-        fade: _easing.easeOut,
-        duration: 1500,
-        easing: _easing.easeOut
-      }));
-    }
-  }, {
-    key: "setCurrentYearFromServer",
-    value: function setCurrentYearFromServer(year) {
-      this.changeYear(year);
-      this.addYearControl();
-    }
-  }, {
-    key: "addYearControl",
-    value: function addYearControl() {
-      var _this2 = this;
-
-      this.map.addControl(new YearControl({
-        caption: 'Выбрать год событий',
-        year: this.currentYear,
-        handler: function handler(year) {
-          _this2.changeYear(year);
-        }
-      }));
-    }
-  }, {
-    key: "addYearLayer",
-    value: function addYearLayer() {
-      var _this3 = this;
-
-      var yearLayer = new _Tile.default({
-        preload: 5,
-        opacity: 0.2,
-        zIndex: 2,
-        source: new olSource.XYZ({
-          tileUrlFunction: function tileUrlFunction(tileCoord, pixelRatio, projection) {
-            return _this3.getGeacronLayerUrl.call(_this3, tileCoord, pixelRatio, projection);
-          }
-        })
-      });
-      this.yearLayer = yearLayer;
-      this.map.addLayer(yearLayer);
-    }
-  }, {
-    key: "fixMapHeight",
-    value: function fixMapHeight() {
-      this.isDisableMoveend = true;
-      this.map.updateSize();
-    }
-  }, {
-    key: "updateView",
-    value: function updateView() {
-      if (this.isEnableAnimate) {
-        this.view.animate({
-          center: this.center,
-          zoom: this.zoom,
-          duration: 200
-        });
-      } else {
-        this.view.setCenter(this.center);
-        this.view.setZoom(this.zoom);
-      }
-    }
-  }, {
-    key: "readViewFromState",
-    value: function readViewFromState(state) {
-      this.center = state.center;
-      this.zoom = state.zoom;
-    }
-  }, {
-    key: "readViewFromPermalink",
-    value: function readViewFromPermalink() {
-      if (window.location.hash !== '') {
-        var hash = window.location.hash.replace('#map=', '');
-        var parts = hash.split('/');
-
-        if (parts.length === 3) {
-          this.zoom = parseInt(parts[0], 10);
-          this.center = [parseFloat(parts[1]), parseFloat(parts[2])];
-        }
-      }
-    }
-  }, {
-    key: "savePermalink",
-    value: function savePermalink() {
-      if (this.isDisableSavePermalink) {
-        this.isDisableSavePermalink = false;
-      }
-
-      var center = this.view.getCenter();
-      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
-      var state = {
-        zoom: this.view.getZoom(),
-        center: this.view.getCenter()
-      };
-      window.history.pushState(state, 'map', hash);
-    }
-  }, {
-    key: "getGeacronLayerUrl",
-    value: function getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
-      if (!this.currentYear) return;
-      var ano = this.currentYear;
-      var anow = '' + ano;
-      anow = anow.replace('-', 'B');
-      anow = anow == '1951' ? '1950' : anow == '1960' ? '1959' : anow;
-      var z = tileCoord[0];
-      var x = tileCoord[1];
-      var y = tileCoord[2];
-      if (z == 0 || z > 6) return;
-      var url = "http://cdn.geacron.com/tiles/area/".concat(anow, "/Z").concat(z, "/").concat(y, "/").concat(x, ".png");
-      return url;
-    }
-  }, {
-    key: "getYandexLayerUrl",
-    value: function getYandexLayerUrl(tileCoord, pixelRatio, projection) {
-      var z = tileCoord[0];
-      var x = tileCoord[1];
-      var y = -tileCoord[2] - 1;
-      var url = "http://vec01.maps.yandex.net/tiles?l=map&v=4.55.2&z=".concat(z, "&x=").concat(x, "&y=").concat(y, "&scale=2&lang=ru_RU");
-      return url;
-    }
-  }, {
-    key: "hidePopup",
-    value: function hidePopup() {
-      /* disable-popup
-      window.map.popup.hide()
-      */
-    }
-  }, {
-    key: "hidePulse",
-    value: function hidePulse() {
-      clearInterval(window.pulse);
-    }
-  }, {
-    key: "showPulse",
-    value: function showPulse() {
-      var _this4 = this;
-
-      clearInterval(window.pulse);
-      window.pulse = setInterval(function () {
-        _this4.pulseFeature(_this4.currentFeatureCoord);
-      }, 1000);
-    }
-  }, {
-    key: "changeYear",
-    value: function changeYear(year) {
-      this.hidePopup();
-      this.hidePulse();
-      this.currentYear = year;
-      this.yearLayer.getSource().refresh();
-      this.emit('changeYear', year);
-    }
-  }, {
-    key: "createGeom",
-    value: function createGeom(mo) {
-      var geom;
-
-      switch (mo.kind) {
-        case 'Point':
-          geom = new olGeom.Point(mo.coords);
-          break;
-
-        case 'LineString':
-          geom = new olGeom.LineString(mo.coords);
-          break;
-
-        case 'Polygon':
-          geom = new olGeom.Polygon(mo.coords);
-          break;
-      }
-
-      return geom;
-    }
-  }, {
-    key: "addFeature",
-    value: function addFeature(item) {
-      var ft = new _Feature.default({
-        info: item,
-        classFeature: item.classFeature,
-        geometry: new olGeom.Point(item.point)
-      });
-      var source = item.simple ? this.simpleSource : this.clusterSource.getSource();
-      source.addFeature(ft);
-    }
-  }, {
-    key: "refreshInfo",
-    value: function refreshInfo(info) {
-      var _this5 = this;
-
-      this.simpleSource.clear();
-      this.clusterSource.getSource().clear();
-      info.forEach(function (item) {
-        return _this5.addFeature(item);
-      });
-    }
-  }], [{
-    key: "create",
-    value: function create() {
-      return new MapControl();
-    }
-  }]);
-
-  return MapControl;
-}(_eventEmitter.default);
-
-exports.MapControl = MapControl;
-
-window.onpopstate = function (event) {
-  var map = window.map;
-  map.isDisableSavePermalink = true;
-  map.isDisableMoveend = true;
-  event.state ? map.readViewFromState.call(map, event.state) : map.readViewFromPermalink.call(map);
-  map.updateView.call(map);
-};
-
-var SuperCustomControl = /*#__PURE__*/function (_olControl$Control) {
-  _inherits(SuperCustomControl, _olControl$Control);
-
-  var _super2 = _createSuper(SuperCustomControl);
-
-  function SuperCustomControl(inputParams) {
-    _classCallCheck(this, SuperCustomControl);
-
-    return _super2.call(this, inputParams);
-  }
-
-  _createClass(SuperCustomControl, [{
-    key: "getBSIconHTML",
-    value: function getBSIconHTML(name) {
-      return '<span class="' + name + '"></span>';
-    }
-  }]);
-
-  return SuperCustomControl;
-}(olControl.Control);
-
-var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
-  _inherits(YearControl, _SuperCustomControl);
-
-  var _super3 = _createSuper(YearControl);
-
-  _createClass(YearControl, null, [{
-    key: "min_year",
-    get: function get() {
-      return MAP_PARAMS.min_year;
-    }
-  }, {
-    key: "max_year",
-    get: function get() {
-      return MAP_PARAMS.max_year;
-    }
-  }]);
-
-  function YearControl(inputParams) {
-    var _this6;
-
-    _classCallCheck(this, YearControl);
-
-    _this6 = _super3.call(this, inputParams);
-    var caption = inputParams.caption;
-    var hint = inputParams.hint || caption;
-    _this6.year = inputParams.year;
-    _this6.handler = inputParams.handler;
-    var yearInput = document.createElement('input');
-    yearInput.className = 'input-without-focus';
-    yearInput.title = hint;
-    yearInput.setAttribute('id', 'year-input');
-    yearInput.value = _this6.year;
-    yearInput.addEventListener('keyup', function (event) {
-      if (event.keyCode == 13) {
-        _this6._inputKeyUp();
-
-        event.preventDefault();
-      }
-    });
-    _this6.yearInput = yearInput;
-    var yearLeftButton = document.createElement('button');
-    yearLeftButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-backward-2');
-    yearLeftButton.title = 'Предыдущий год';
-    yearLeftButton.setAttribute('id', 'year-left-button');
-    yearLeftButton.addEventListener('click', function () {
-      _this6._leftButtonClick();
-    }, false); // yearLeftButton.addEventListener('touchstart', () => { this._leftButtonClick(); }, false);
-
-    var yearRightButton = document.createElement('button');
-    yearRightButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-forward-2');
-    yearRightButton.title = 'Следующий год';
-    yearRightButton.setAttribute('id', 'year-right-button');
-    yearRightButton.addEventListener('click', function () {
-      _this6._rightButtonClick();
-    }, false); // yearRightButton.addEventListener('touchstart', () => { this._rightButtonClick(); }, false);
-
-    var parentDiv = document.createElement('div');
-    parentDiv.className = 'ol-control';
-    parentDiv.setAttribute('id', 'year-control');
-    parentDiv.appendChild(yearLeftButton);
-    parentDiv.appendChild(yearInput);
-    parentDiv.appendChild(yearRightButton);
-    _this6.element = parentDiv;
-    olControl.Control.call(_assertThisInitialized(_this6), {
-      label: 'test',
-      hint: 'test',
-      tipLabel: caption,
-      element: parentDiv // target: get(inputParams, "target")
-
-    });
-    return _this6;
-  }
-
-  _createClass(YearControl, [{
-    key: "_leftButtonClick",
-    value: function _leftButtonClick() {
-      if (!this._checkYear(this.year, -1)) return;
-      this.year = parseInt(this.year) - 1;
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_rightButtonClick",
-    value: function _rightButtonClick() {
-      if (!this._checkYear(this.year, +1)) return;
-      this.year = parseInt(this.year) + 1;
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_inputKeyUp",
-    value: function _inputKeyUp() {
-      var year = this.yearInput.value;
-
-      if (!this._checkYear(year, 0, this.year)) {
-        this.yearInput.value = this.year;
-        return;
-      }
-
-      this.year = parseInt(year);
-
-      this._setNewYear(this.year);
-    }
-  }, {
-    key: "_checkYear",
-    value: function _checkYear(year, incr) {
-      var oldValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      //var reg = /^[1,2][8,9,0]\d{2}$/
-      var reg = /^\d+$/;
-      if (!reg.test(year)) return false;
-      var intYear = parseInt(year) + incr;
-      if (intYear < YearControl.min_year) return true; //temporarily
-
-      if (intYear > YearControl.max_year) return true; //temporarily
-
-      if (oldValue == intYear) return false;
-      return true;
-    }
-  }, {
-    key: "_setNewYear",
-    value: function _setNewYear(year) {
-      this.yearInput.value = this.year;
-      this.handler(this.year);
-    }
-  }]);
-
-  return YearControl;
-}(SuperCustomControl);
-},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq"}],"uf5M":[function(require,module,exports) {
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var JsHelper = /*#__PURE__*/function () {
-  function JsHelper() {
-    _classCallCheck(this, JsHelper);
-  }
-
-  _createClass(JsHelper, null, [{
-    key: "fillArray",
-    value: function fillArray(value, len) {
-      if (len == 0) return [];
-      var a = [value];
-
-      while (a.length * 2 <= len) {
-        a = a.concat(a);
-      }
-
-      if (a.length < len) a = a.concat(a.slice(0, len - a.length));
-      return a;
-    }
-  }, {
-    key: "getMapSize",
-    value: function getMapSize(x) {
-      var len = 0;
-
-      for (var count in x) {
-        len++;
-      }
-
-      return len;
-    }
-  }, {
-    key: "isNaN",
-    value: function isNaN(x) {}
-  }]);
-
-  return JsHelper;
-}();
-
-module.exports = JsHelper;
-},{}],"hPGt":[function(require,module,exports) {
-"use strict";
-
-var olStyle = _interopRequireWildcard(require("ol/style"));
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var SuperFeature = /*#__PURE__*/function () {
-  function SuperFeature() {
-    _classCallCheck(this, SuperFeature);
-  }
-
-  _createClass(SuperFeature, null, [{
-    key: "getKind",
-    value: function getKind() {
-      return undefined;
-    }
-  }, {
-    key: "getCaptionInfo",
-    value: function getCaptionInfo(info) {
-      return 'Суперкласс';
-    }
-  }, {
-    key: "getIcon",
-    value: function getIcon() {
-      var icon = 'images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
-      // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
-      // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
-      // '<rect x="7" y="1" width="10" height="2"/><polygon points="13 14 13 8 11 8 11 16 18 16 18 14 13 14"/>' +
-      // '</svg>'
-
-      return icon;
-    }
-  }, {
-    key: "getStyleFeature",
-    value: function getStyleFeature(feature, zoom) {
-      var style = new olStyle.Style({
-        image: new olStyle.Icon({
-          // anchor: [0, 0],
-          imgSize: [32, 32],
-          src: feature.get('info').icon,
-          //color: '#ff0000',
-          // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
-          scale: 1,
-          radius: 7,
-          opacity: 1
-        })
-      });
-      return [style];
-    }
-  }, {
-    key: "getPopupInfo",
-    value: function getPopupInfo(feature) {
-      return {
-        icon: feature.get('info').icon,
-        date: now(),
-        caption: 'Not implemented'
-      };
-    }
-  }, {
-    key: "getHtmlInfo",
-    value: function getHtmlInfo(feature) {
-      return 'Not implemented';
-    }
-  }]);
-
-  return SuperFeature;
-}();
-
-module.exports = SuperFeature;
-},{"ol/style":"TZKB"}],"IGBU":[function(require,module,exports) {
+},{}],"IGBU":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -82284,6 +81436,8 @@ var strHelper = require('../helper/strHelper');
 
 var moment = require('moment');
 
+var ROMAN_KEYS = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM", "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC", "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
+
 var DateHelper = /*#__PURE__*/function () {
   function DateHelper() {
     _classCallCheck(this, DateHelper);
@@ -82335,12 +81489,13 @@ var DateHelper = /*#__PURE__*/function () {
   }, {
     key: "dateToStr",
     value: function dateToStr(inputDate) {
+      var isWithoutYear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       if (!inputDate) return undefined;
       var date = new Date(inputDate);
       var day = ('0' + date.getDate()).slice(-2);
       var month = ('0' + (date.getMonth() + 1)).slice(-2);
       var year = date.getFullYear();
-      return day == '01' && month == '01' ? year : "".concat(day, ".").concat(month, ".").concat(year);
+      return isWithoutYear && day == '01' && month == '01' ? year : "".concat(day, ".").concat(month, ".").concat(year);
     }
   }, {
     key: "getYearStr",
@@ -82373,13 +81528,1038 @@ var DateHelper = /*#__PURE__*/function () {
       if (!isEndText) return diffYear;
       if (diffYear % 10 === 1 && diffYear !== 11) return diffYear + ' год';else return diffYear >= 5 && diffYear <= 19 || diffYear % 10 > 4 || diffYear % 10 === 0 ? diffYear + ' лет' : diffYear + ' года';
     }
+  }, {
+    key: "yearToCentury",
+    value: function yearToCentury(year) {
+      var century = 0;
+
+      if (year >= 0) {
+        century = year / 100 + 1;
+      } else {
+        century = year / 100 - 1;
+      }
+
+      return Number(century.toFixed(0));
+    }
+  }, {
+    key: "intCenturyToStr",
+    value: function intCenturyToStr(intCentury) {
+      var isMinus = intCentury < 0;
+      var romanize = DateHelper.arabicToRoman(intCentury);
+
+      if (isMinus) {
+        return "".concat(romanize, " \u0434\u043E \u043D.\u044D.");
+      }
+
+      return romanize;
+    }
+  }, {
+    key: "arabicToRoman",
+    value: function arabicToRoman(num) {
+      if (isNaN(num)) return NaN;
+      var digits = String(+num).split("");
+      var roman = "";
+      var i = 3;
+
+      while (i--) {
+        roman = (ROMAN_KEYS[+digits.pop() + i * 10] || "") + roman;
+      }
+
+      return Array(+digits.join("") + 1).join("M") + roman;
+    }
+  }, {
+    key: "romanToArabic",
+    value: function romanToArabic(roman) {
+      var reg = /^[IVXLCDM]+$/;
+      if (!reg.test(roman)) return undefined; //https://stackoverflow.com/questions/48946083/convert-roman-number-to-arabic-using-javascript
+
+      if (roman == null) return undefined;
+      var totalValue = 0;
+      var value = 0;
+      var prev = 0;
+
+      for (var i = 0; i < roman.length; i++) {
+        var current = DateHelper.romanToInt(roman.charAt(i));
+
+        if (current > prev) {
+          // Undo the addition that was done, turn it into subtraction
+          totalValue -= 2 * value;
+        }
+
+        if (current !== prev) {
+          // Different symbol?
+          value = 0; // reset the sum for the new symbol
+        }
+
+        value += current; // keep adding same symbols
+
+        totalValue += current;
+        prev = current;
+      }
+
+      return totalValue;
+    }
+  }, {
+    key: "romanToInt",
+    value: function romanToInt(character) {
+      switch (character) {
+        case 'I':
+          return 1;
+
+        case 'V':
+          return 5;
+
+        case 'X':
+          return 10;
+
+        case 'L':
+          return 50;
+
+        case 'C':
+          return 100;
+
+        case 'D':
+          return 500;
+
+        case 'M':
+          return 1000;
+
+        default:
+          return -1;
+      }
+    }
+  }, {
+    key: "getCenturyRange",
+    value: function getCenturyRange(century) {
+      if (century == 0) {
+        century = 1;
+      }
+
+      var isMinus = century < 0;
+      var startYear = 0;
+      var endYear = 0;
+
+      if (isMinus) {
+        century = Math.abs(century);
+      }
+
+      startYear = (century - 1) * 100;
+      endYear = century * 100 - 1;
+      if (isMinus) return [-endYear, -startYear];else return [startYear, endYear];
+    }
   }]);
 
   return DateHelper;
 }();
 
 module.exports = DateHelper;
-},{"../helper/strHelper":"IGBU","moment":"a2Bw"}],"iHtK":[function(require,module,exports) {
+},{"../helper/strHelper":"IGBU","moment":"a2Bw"}],"p4qv":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MapControl = void 0;
+
+var _ol = require("ol");
+
+var olStyle = _interopRequireWildcard(require("ol/style"));
+
+var olGeom = _interopRequireWildcard(require("ol/geom"));
+
+var _Feature = _interopRequireDefault(require("ol/Feature"));
+
+var _proj = require("ol/proj");
+
+var olControl = _interopRequireWildcard(require("ol/control"));
+
+var _Tile = _interopRequireDefault(require("ol/layer/Tile"));
+
+var _Vector = _interopRequireDefault(require("ol/layer/Vector"));
+
+var olSource = _interopRequireWildcard(require("ol/source"));
+
+var olTilegrid = _interopRequireWildcard(require("ol/tilegrid"));
+
+var olInteraction = _interopRequireWildcard(require("ol/interaction"));
+
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
+
+var _proj2 = _interopRequireDefault(require("proj4"));
+
+var _proj3 = require("ol/proj/proj4");
+
+var _AnimatedCluster = _interopRequireDefault(require("ol-ext/layer/AnimatedCluster"));
+
+var _Zoom = _interopRequireDefault(require("ol-ext/featureanimation/Zoom"));
+
+var _easing = require("ol/easing");
+
+var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
+
+var _dateHelper = _interopRequireDefault(require("../helper/dateHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var MAP_PARAMS = {
+  min_year: 1914,
+  max_year: 1965,
+  isEnableAnimate: true
+};
+
+var MapControl = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(MapControl, _EventEmitter);
+
+  var _super = _createSuper(MapControl);
+
+  function MapControl() {
+    var _this;
+
+    _classCallCheck(this, MapControl);
+
+    _this = _super.call(this); //first must
+
+    window.map = _assertThisInitialized(_this);
+    var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
+
+    _proj2.default.defs('EPSG:3395', '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+
+    (0, _proj3.register)(_proj2.default);
+    var projection = (0, _proj.get)('EPSG:3395');
+    projection.setExtent(yaex);
+    var rasterLayer = new _Tile.default({
+      preload: 5,
+      zIndex: 0,
+      // source: new olSource.OSM(),
+      source: new olSource.XYZ({
+        projection: 'EPSG:3395',
+        tileGrid: olTilegrid.createXYZ({
+          extent: yaex
+        }),
+        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
+      })
+    });
+    _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
+    _this.isDisableSavePermalink = true;
+    _this.isDisableMoveend = false;
+
+    _this.readViewFromPermalink();
+
+    var view = new _ol.View({
+      center: _this.center ? _this.center : new _proj.fromLonLat([56.004, 54.695]),
+      // ufa place
+      zoom: _this.zoom ? _this.zoom : 3 // projection: 'EPSG:4326',
+      // projection: 'EPSG:3857',
+      // projection: 'EPSG:3395',
+
+    });
+    /* temporarily disable-popup
+    this.popup = new olPopup({
+      popupClass: 'default shadow', //"default shadow", "tooltips", "warning" "black" "default", "tips", "shadow",
+      closeBox: true,
+      onshow: function () {
+        // console.log('You opened the box')
+      },
+      onclose: function () {
+        // console.log('You close the box')
+      },
+      positioning: 'auto',
+      autoPan: true,
+      autoPanAnimation: { duration: this.isEnableAnimate ? 250 : 0 },
+    })
+    */
+
+    var map = new _ol.Map({
+      interactions: olInteraction.defaults({
+        altShiftDragRotate: false,
+        pinchRotate: false
+      }),
+      controls: olControl.defaults({
+        attribution: false,
+        zoom: false
+      }).extend([//new olControl.FullScreen()
+      ]),
+      layers: [rasterLayer],
+      //disable-popup overlays: [this.popup],
+      target: 'map',
+      view: view
+    });
+
+    function getStyleSimple(feature, _) {
+      var classFeature = feature.get('classFeature');
+      var style = classFeature.getStyleFeature(feature, window.map.view.getZoom());
+      return style;
+    }
+
+    function getStyleCluster(feature, _) {
+      var size = feature.get('features').length;
+
+      if (size == 1) {
+        var oneFeature = feature.get('features')[0];
+        var classFeature = oneFeature.get('classFeature');
+
+        var _style = classFeature.getStyleFeature(oneFeature, window.map.view.getZoom());
+
+        return _style;
+      }
+
+      var redColor = '255,0,51';
+      var cyanColor = '0,162,232';
+      var greenColor = '34,177,76';
+      var color = size > 10 ? redColor : size > 5 ? greenColor : cyanColor;
+      var radius = Math.max(8, Math.min(size, 20)) + 5;
+      var dash = 2 * Math.PI * radius / 6;
+      dash = [0, dash, dash, dash, dash, dash, dash];
+      var style = new olStyle.Style({
+        image: new olStyle.Circle({
+          radius: radius,
+          stroke: new olStyle.Stroke({
+            color: 'rgba(' + color + ',0.6)',
+            width: 15,
+            lineDash: dash,
+            lineCap: 'butt'
+          }),
+          fill: new olStyle.Fill({
+            color: 'rgba(' + color + ',0.9)'
+          })
+        }),
+        text: new olStyle.Text({
+          text: size.toString(),
+          font: '14px Helvetica',
+          //textBaseline: 'top',
+          fill: new olStyle.Fill({
+            color: '#fff'
+          })
+        })
+      });
+      return style;
+    } // Simple Source
+
+
+    var simpleSource = new olSource.Vector();
+    var simpleLayer = new _Vector.default({
+      source: simpleSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: getStyleSimple
+    });
+    _this.simpleLayer = simpleLayer;
+    _this.simpleSource = simpleSource;
+    map.addLayer(simpleLayer); // Cluster Source
+
+    var clusterSource = new olSource.Cluster({
+      distance: 10,
+      source: new olSource.Vector()
+    });
+    var clusterLayer = new _AnimatedCluster.default({
+      name: 'Cluster',
+      source: clusterSource,
+      animationDuration: _this.isEnableAnimate ? 400 : 0,
+      style: getStyleCluster
+    });
+    _this.clusterLayer = clusterLayer;
+    map.addLayer(clusterLayer);
+    _this.clusterSource = clusterSource;
+    map.on('click', function (event) {
+      // disable-popup window.map.popup.hide()
+      _this.emit('mapclick', undefined);
+
+      var coordinates = event.coordinate;
+      var lonLatCoords = new _proj.toLonLat(coordinates);
+      console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords));
+      var featureEvent = undefined;
+      var isHit = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
+        featureEvent = feature;
+        return feature.get('kind');
+      }, {
+        hitTolerance: 5
+      });
+      if (!featureEvent) return; //simple feature
+
+      var features = featureEvent.get('features');
+
+      if (!features) {
+        features = [];
+        features[0] = featureEvent;
+      }
+
+      if (features.length > 0) {
+        _this.emit('selectFeatures', features);
+      }
+
+      var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
+      _this.currentFeatureCoord = featureCoord;
+
+      _this.showPulse();
+
+      return;
+    });
+    map.on('moveend', function () {
+      if (_this.isDisableMoveend) {
+        _this.isDisableMoveend = false;
+        return;
+      }
+
+      window.map.savePermalink.call(window.map);
+    });
+    map.on('pointermove', function (event) {
+      var feature = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
+        return feature;
+      }, {
+        hitTolerance: 5
+      });
+      var isHit = feature ? true : false;
+
+      if (isHit) {
+        map.getTargetElement().style.cursor = 'pointer';
+      } else {
+        map.getTargetElement().style.cursor = '';
+      }
+    });
+    _this.map = map;
+    _this.view = view;
+    setTimeout(function () {
+      _this.addYearLayer();
+    }, 10);
+    return _this;
+  }
+
+  _createClass(MapControl, [{
+    key: "createGeom",
+    value: function createGeom(mo) {
+      var geom;
+
+      switch (mo.kind) {
+        case 'Point':
+          geom = new olGeom.Point(mo.coords);
+          break;
+
+        case 'LineString':
+          geom = new olGeom.LineString(mo.coords);
+          break;
+
+        case 'Polygon':
+          geom = new olGeom.Polygon(mo.coords);
+          break;
+      }
+
+      return geom;
+    }
+  }, {
+    key: "showAdditionalInfo",
+    value: function showAdditionalInfo(info) {
+      this.emit('showAdditionalInfo', undefined);
+      this.hidePulse();
+      this.simpleLayer.setVisible(false);
+      this.clusterLayer.setVisible(false);
+
+      _classHelper.default.addClass(document.getElementById('year-control'), 'hide-element');
+    }
+  }, {
+    key: "returnNormalMode",
+    value: function returnNormalMode() {
+      this.emit('returnNormalMode', undefined);
+
+      _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
+
+      this.showPulse();
+      this.simpleLayer.setVisible(true);
+      this.clusterLayer.setVisible(true);
+    }
+  }, {
+    key: "pulseFeature",
+    value: function pulseFeature(coord) {
+      var f = new _Feature.default(new olGeom.Point(coord));
+      f.setStyle(new olStyle.Style({
+        image: new olStyle.Circle({
+          radius: 26,
+          stroke: new olStyle.Stroke({
+            color: 'red',
+            width: 3
+          })
+        }) // image: new olStyle.RegularShape({
+        //   fill: new olStyle.Fill({
+        //     color: '#fff',
+        //   }),
+        //   stroke: new olStyle.Stroke({ color: 'black', width: 3 }),
+        //   points: 4,
+        //   radius: 80,
+        //   radius2: 0,
+        //   angle: 0,
+        // }),
+
+      }));
+      this.map.animateFeature(f, new _Zoom.default({
+        fade: _easing.easeOut,
+        duration: 1500,
+        easing: _easing.easeOut
+      }));
+    }
+  }, {
+    key: "setCurrentYearFromServer",
+    value: function setCurrentYearFromServer(obj) {
+      this.changeYear(obj);
+      this.addYearControl();
+    }
+  }, {
+    key: "addYearControl",
+    value: function addYearControl() {
+      var _this2 = this;
+
+      this.map.addControl(new YearControl({
+        caption: 'Выбрать год событий',
+        year: this.currentYear,
+        century: this.currentCentury,
+        kind: this.currentKind,
+        handler: function handler(dateObj) {
+          _this2.changeYear({
+            'year': dateObj.year,
+            'century': dateObj.century,
+            'kind': dateObj.kind
+          });
+        }
+      }));
+    }
+  }, {
+    key: "addYearLayer",
+    value: function addYearLayer() {
+      var _this3 = this;
+
+      var yearLayer = new _Tile.default({
+        preload: 5,
+        opacity: 0.2,
+        zIndex: 2,
+        source: new olSource.XYZ({
+          tileUrlFunction: function tileUrlFunction(tileCoord, pixelRatio, projection) {
+            return _this3.getGeacronLayerUrl.call(_this3, tileCoord, pixelRatio, projection);
+          }
+        })
+      });
+      this.yearLayer = yearLayer;
+      this.map.addLayer(yearLayer);
+    }
+  }, {
+    key: "fixMapHeight",
+    value: function fixMapHeight() {
+      this.isDisableMoveend = true;
+      this.map.updateSize();
+    }
+  }, {
+    key: "updateView",
+    value: function updateView() {
+      if (this.isEnableAnimate) {
+        this.view.animate({
+          center: this.center,
+          zoom: this.zoom,
+          duration: 200
+        });
+      } else {
+        this.view.setCenter(this.center);
+        this.view.setZoom(this.zoom);
+      }
+    }
+  }, {
+    key: "readViewFromState",
+    value: function readViewFromState(state) {
+      this.center = state.center;
+      this.zoom = state.zoom;
+    }
+  }, {
+    key: "readViewFromPermalink",
+    value: function readViewFromPermalink() {
+      if (window.location.hash !== '') {
+        var hash = window.location.hash.replace('#map=', '');
+        var parts = hash.split('/');
+
+        if (parts.length === 3) {
+          this.zoom = parseInt(parts[0], 10);
+          this.center = [parseFloat(parts[1]), parseFloat(parts[2])];
+        }
+      }
+    }
+  }, {
+    key: "savePermalink",
+    value: function savePermalink() {
+      if (this.isDisableSavePermalink) {
+        this.isDisableSavePermalink = false;
+      }
+
+      var center = this.view.getCenter();
+      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
+      var state = {
+        zoom: this.view.getZoom(),
+        center: this.view.getCenter()
+      };
+      window.history.pushState(state, 'map', hash);
+    }
+  }, {
+    key: "getGeacronLayerUrl",
+    value: function getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
+      if (!this.currentYear) return;
+      var year = this.currentYear;
+
+      if (this.currentKind == 'century') {
+        var range = _dateHelper.default.getCenturyRange(this.currentCentury);
+
+        year = (range[0] + range[1]) / 2;
+        year = Math.round(year);
+        console.log(">>>>>>>> year by round century ".concat(year));
+      }
+
+      var ano = year;
+      var anow = '' + ano;
+      anow = anow.replace('-', 'B');
+      anow = anow == '1951' ? '1950' : anow == '1960' ? '1959' : anow;
+      var z = tileCoord[0];
+      var x = tileCoord[1];
+      var y = tileCoord[2];
+      if (z == 0 || z > 6) return;
+      var url = "http://cdn.geacron.com/tiles/area/".concat(anow, "/Z").concat(z, "/").concat(y, "/").concat(x, ".png");
+      return url;
+    }
+  }, {
+    key: "getYandexLayerUrl",
+    value: function getYandexLayerUrl(tileCoord, pixelRatio, projection) {
+      var z = tileCoord[0];
+      var x = tileCoord[1];
+      var y = -tileCoord[2] - 1;
+      var url = "http://vec01.maps.yandex.net/tiles?l=map&v=4.55.2&z=".concat(z, "&x=").concat(x, "&y=").concat(y, "&scale=2&lang=ru_RU");
+      return url;
+    }
+  }, {
+    key: "hidePopup",
+    value: function hidePopup() {
+      /* disable-popup
+      window.map.popup.hide()
+      */
+    }
+  }, {
+    key: "hidePulse",
+    value: function hidePulse() {
+      clearInterval(window.pulse);
+    }
+  }, {
+    key: "showPulse",
+    value: function showPulse() {
+      var _this4 = this;
+
+      clearInterval(window.pulse);
+      window.pulse = setInterval(function () {
+        _this4.pulseFeature(_this4.currentFeatureCoord);
+      }, 1000);
+    }
+  }, {
+    key: "changeYear",
+    value: function changeYear(obj) {
+      this.hidePopup();
+      this.hidePulse();
+      this.currentYear = obj.year;
+      this.currentCentury = obj.century;
+      this.currentKind = obj.kind;
+      this.yearLayer.getSource().refresh();
+      this.emit('changeYear', {
+        'year': obj.year,
+        'century': obj.century,
+        'kind': obj.kind
+      });
+    }
+  }, {
+    key: "addFeature",
+    value: function addFeature(item) {
+      var ft = new _Feature.default({
+        info: item,
+        classFeature: item.classFeature,
+        geometry: new olGeom.Point(item.point)
+      });
+      var source = item.simple ? this.simpleSource : this.clusterSource.getSource();
+      source.addFeature(ft);
+    }
+  }, {
+    key: "refreshInfo",
+    value: function refreshInfo(info) {
+      var _this5 = this;
+
+      this.simpleSource.clear();
+      this.clusterSource.getSource().clear();
+      info.forEach(function (item) {
+        return _this5.addFeature(item);
+      });
+    }
+  }], [{
+    key: "create",
+    value: function create() {
+      return new MapControl();
+    }
+  }]);
+
+  return MapControl;
+}(_eventEmitter.default);
+
+exports.MapControl = MapControl;
+
+window.onpopstate = function (event) {
+  var map = window.map;
+  map.isDisableSavePermalink = true;
+  map.isDisableMoveend = true;
+  event.state ? map.readViewFromState.call(map, event.state) : map.readViewFromPermalink.call(map);
+  map.updateView.call(map);
+};
+
+var SuperCustomControl = /*#__PURE__*/function (_olControl$Control) {
+  _inherits(SuperCustomControl, _olControl$Control);
+
+  var _super2 = _createSuper(SuperCustomControl);
+
+  function SuperCustomControl(inputParams) {
+    _classCallCheck(this, SuperCustomControl);
+
+    return _super2.call(this, inputParams);
+  }
+
+  _createClass(SuperCustomControl, [{
+    key: "getBSIconHTML",
+    value: function getBSIconHTML(name) {
+      return '<span class="' + name + '"></span>';
+    }
+  }]);
+
+  return SuperCustomControl;
+}(olControl.Control);
+
+var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
+  _inherits(YearControl, _SuperCustomControl);
+
+  var _super3 = _createSuper(YearControl);
+
+  function YearControl(inputParams) {
+    var _this6;
+
+    _classCallCheck(this, YearControl);
+
+    _this6 = _super3.call(this, inputParams);
+    var caption = inputParams.caption;
+    var hint = inputParams.hint || caption;
+    _this6.century = inputParams.century;
+    _this6.year = inputParams.year;
+    _this6.kind = inputParams.kind;
+    _this6.handler = inputParams.handler;
+    var yearInput = document.createElement('input');
+    yearInput.className = 'input-without-focus';
+    yearInput.title = hint;
+    yearInput.setAttribute('id', 'year-input');
+    yearInput.value = _this6.kind == 'year' ? _this6.year : _dateHelper.default.intCenturyToStr(_this6.century);
+    yearInput.addEventListener('keyup', function (event) {
+      if (event.keyCode == 13) {
+        _this6.inputKeyUp();
+
+        event.preventDefault();
+      }
+    });
+    var yearLabel = document.createElement('label');
+    yearLabel.setAttribute('id', 'year-label');
+    yearLabel.innerHTML = _this6.kind == 'year' ? 'год' : 'век';
+    yearLabel.addEventListener('click', function () {
+      _this6.yearCenturyClick();
+    }, false);
+    _this6.yearInput = yearInput;
+    _this6.yearLabel = yearLabel;
+    var yearLeftButton = document.createElement('button');
+    yearLeftButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-backward-2');
+    yearLeftButton.title = 'Предыдущий год/век';
+    yearLeftButton.setAttribute('id', 'year-left-button');
+    yearLeftButton.addEventListener('click', function () {
+      _this6.leftButtonClick();
+    }, false); // yearLeftButton.addEventListener('touchstart', () => { this.leftButtonClick(); }, false);
+
+    var yearRightButton = document.createElement('button');
+    yearRightButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-forward-2');
+    yearRightButton.title = 'Следующий год/век';
+    yearRightButton.setAttribute('id', 'year-right-button');
+    yearRightButton.addEventListener('click', function () {
+      _this6.rightButtonClick();
+    }, false); // yearRightButton.addEventListener('touchstart', () => { this.rightButtonClick(); }, false);
+
+    var parentDiv = document.createElement('div');
+    parentDiv.className = 'ol-control';
+    parentDiv.setAttribute('id', 'year-control');
+    parentDiv.appendChild(yearLeftButton);
+    parentDiv.appendChild(yearInput);
+    parentDiv.appendChild(yearLabel);
+    parentDiv.appendChild(yearRightButton);
+    _this6.element = parentDiv;
+    olControl.Control.call(_assertThisInitialized(_this6), {
+      label: 'test',
+      hint: 'test',
+      tipLabel: caption,
+      element: parentDiv // target: get(inputParams, "target")
+
+    });
+    return _this6;
+  }
+
+  _createClass(YearControl, [{
+    key: "changeKind",
+    value: function changeKind(kind, caption) {
+      this.kind = kind;
+      this.yearLabel.innerHTML = caption;
+
+      if (kind == 'century') {
+        this.century = _dateHelper.default.yearToCentury(this.year);
+        this.yearInput.value = _dateHelper.default.intCenturyToStr(this.century);
+      } else {
+        this.yearInput.value = this.year;
+      }
+    }
+  }, {
+    key: "yearCenturyClick",
+    value: function yearCenturyClick() {
+      if (this.kind == 'year') {
+        this.changeKind('century', 'век');
+      } else {
+        this.changeKind('year', 'год');
+      }
+    }
+  }, {
+    key: "leftButtonClick",
+    value: function leftButtonClick() {
+      var input = this.yearInput.value;
+
+      if (this.kind == 'century') {
+        input = this.century;
+      }
+
+      this.checkAndChangeYearCentury(input, -1);
+    }
+  }, {
+    key: "rightButtonClick",
+    value: function rightButtonClick() {
+      var input = this.yearInput.value;
+
+      if (this.kind == 'century') {
+        input = this.century;
+      }
+
+      this.checkAndChangeYearCentury(input, +1);
+    }
+  }, {
+    key: "inputKeyUp",
+    value: function inputKeyUp() {
+      var input = this.yearInput.value;
+      this.checkAndChangeYearCentury(input, 0);
+    }
+  }, {
+    key: "checkAndChangeYearCentury",
+    value: function checkAndChangeYearCentury(input, incr) {
+      var allowToChange = false; // предполагаем, что год и век вводится числом
+
+      var reg = /^\d+$/;
+      allowToChange = reg.test(input);
+      var newValue = parseInt(input) + incr;
+      var oldValue = 0;
+
+      if (allowToChange) {
+        if (this.kind == 'year') {
+          oldValue = this.year;
+          allowToChange = newValue < YearControl.max_year;
+          allowToChange = newValue > YearControl.min_year;
+        } else {
+          oldValue = this.century;
+
+          var dateRange = _dateHelper.default.getCenturyRange(newValue);
+
+          allowToChange = dateRange && dateRange.length == 2;
+          allowToChange = dateRange[0] < YearControl.max_year;
+          allowToChange = dateRange[1] > YearControl.min_year;
+        }
+      }
+
+      allowToChange = allowToChange && oldValue != newValue;
+
+      if (allowToChange) {
+        if (this.kind == 'year') {
+          this.year = newValue;
+          this.yearInput.value = this.year;
+        } else {
+          this.century = newValue;
+          this.yearInput.value = _dateHelper.default.intCenturyToStr(this.century);
+        }
+
+        this.handler({
+          'year': this.year,
+          'century': this.century,
+          'kind': this.kind
+        });
+      } else {
+        if (this.kind == 'year') this.yearInput.value = this.year;else this.yearInput.value = _dateHelper.default.intCenturyToStr(this.century);
+      }
+    }
+  }], [{
+    key: "min_year",
+    get: function get() {
+      return Number.MIN_SAFE_INTEGER;
+      return MAP_PARAMS.min_year;
+    }
+  }, {
+    key: "max_year",
+    get: function get() {
+      return Number.MAX_SAFE_INTEGER;
+      return MAP_PARAMS.max_year;
+    }
+  }]);
+
+  return YearControl;
+}(SuperCustomControl);
+},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq","../helper/dateHelper":"IrKG"}],"uf5M":[function(require,module,exports) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var JsHelper = /*#__PURE__*/function () {
+  function JsHelper() {
+    _classCallCheck(this, JsHelper);
+  }
+
+  _createClass(JsHelper, null, [{
+    key: "fillArray",
+    value: function fillArray(value, len) {
+      if (len == 0) return [];
+      var a = [value];
+
+      while (a.length * 2 <= len) {
+        a = a.concat(a);
+      }
+
+      if (a.length < len) a = a.concat(a.slice(0, len - a.length));
+      return a;
+    }
+  }, {
+    key: "getMapSize",
+    value: function getMapSize(x) {
+      var len = 0;
+
+      for (var count in x) {
+        len++;
+      }
+
+      return len;
+    }
+  }, {
+    key: "isNaN",
+    value: function isNaN(x) {}
+  }]);
+
+  return JsHelper;
+}();
+
+module.exports = JsHelper;
+},{}],"hPGt":[function(require,module,exports) {
+"use strict";
+
+var olStyle = _interopRequireWildcard(require("ol/style"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SuperFeature = /*#__PURE__*/function () {
+  function SuperFeature() {
+    _classCallCheck(this, SuperFeature);
+  }
+
+  _createClass(SuperFeature, null, [{
+    key: "getKind",
+    value: function getKind() {
+      return undefined;
+    }
+  }, {
+    key: "getCaptionInfo",
+    value: function getCaptionInfo(info) {
+      return 'Суперкласс';
+    }
+  }, {
+    key: "getIcon",
+    value: function getIcon() {
+      var icon = 'images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
+      // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+      // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
+      // '<rect x="7" y="1" width="10" height="2"/><polygon points="13 14 13 8 11 8 11 16 18 16 18 14 13 14"/>' +
+      // '</svg>'
+
+      return icon;
+    }
+  }, {
+    key: "getStyleFeature",
+    value: function getStyleFeature(feature, zoom) {
+      var style = new olStyle.Style({
+        image: new olStyle.Icon({
+          anchor: [0.5, 0.5],
+          imgSize: [26, 26],
+          src: feature.get('info').icon,
+          //color: '#ff0000',
+          // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
+          scale: 1,
+          radius: 7,
+          opacity: 1
+        })
+      });
+      return [style];
+    }
+  }, {
+    key: "getPopupInfo",
+    value: function getPopupInfo(feature) {
+      return {
+        icon: feature.get('info').icon,
+        date: now(),
+        caption: 'Not implemented'
+      };
+    }
+  }, {
+    key: "getHtmlInfo",
+    value: function getHtmlInfo(feature) {
+      return 'Not implemented';
+    }
+  }]);
+
+  return SuperFeature;
+}();
+
+module.exports = SuperFeature;
+},{"ol/style":"TZKB"}],"iHtK":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));
@@ -82475,6 +82655,102 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = ChronosFeature;
+},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"ewPj":[function(require,module,exports) {
+"use strict";
+
+var _superFeature = _interopRequireDefault(require("./superFeature"));
+
+var _strHelper = _interopRequireDefault(require("../../helper/strHelper"));
+
+var _dateHelper = _interopRequireDefault(require("../../helper/dateHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
+  _inherits(ChronosChurchFeature, _SuperFeature);
+
+  var _super = _createSuper(ChronosChurchFeature);
+
+  function ChronosChurchFeature() {
+    _classCallCheck(this, ChronosChurchFeature);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(ChronosChurchFeature, null, [{
+    key: "getIcon",
+    value: function getIcon() {
+      return 'images/eventChurch.png';
+    }
+  }, {
+    key: "getCaptionInfo",
+    value: function getCaptionInfo(info) {
+      return "".concat(info.kind, ". ").concat(info.place);
+    }
+  }, {
+    key: "getPopupInfo",
+    value: function getPopupInfo(feature) {
+      var info = feature.get('info');
+      return {
+        icon: this.getIcon(),
+        date: info.startDate,
+        caption: this.getCaptionInfo(info)
+      };
+    }
+  }, {
+    key: "getHtmlInfo",
+    value: function getHtmlInfo(info) {
+      window.CURRENT_ITEM = info;
+      var html = "<div class=\"chronos-info panel-info\">\n      <h1>".concat(info.place, "</h1>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.shortBrief, "</p>\n      ").concat(info.longBrief ? '<p>' + info.longBrief + '</p>' : '', "\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
+      return html;
+    }
+  }, {
+    key: "fillChronosChurchFeature",
+    value: function fillChronosChurchFeature(info) {
+      return info.chronosChurch.map(function (elem) {
+        return _objectSpread(_objectSpread({}, elem), {}, {
+          icon: ChronosChurchFeature.getIcon(),
+          popupFirst: _strHelper.default.ellipseLongString(elem.longBrief),
+          popupSecond: _dateHelper.default.twoDateToStr2(elem.startDateStr, elem.endDateStr),
+          popupThird: elem.place,
+          oneLine: _strHelper.default.ellipseLongString(elem.shortBrief)
+        });
+      });
+    }
+  }]);
+
+  return ChronosChurchFeature;
+}(_superFeature.default);
+
+module.exports = ChronosChurchFeature;
 },{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"WMTm":[function(require,module,exports) {
 "use strict";
 
@@ -82829,6 +83105,8 @@ var _jsHelper = _interopRequireDefault(require("../helper/jsHelper"));
 
 var _chronosFeature = _interopRequireDefault(require("./mapLayers/chronosFeature"));
 
+var _chronosChurchFeature = _interopRequireDefault(require("./mapLayers/chronosChurchFeature"));
+
 var _templesFeature = _interopRequireDefault(require("./mapLayers/templesFeature"));
 
 var _personFeature = _interopRequireDefault(require("./mapLayers/personFeature"));
@@ -82892,7 +83170,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.showHideLegend();
 
     _this.lines = _this.addLines();
-    _this.linesCount = 6;
+    _this.linesCount = 7;
 
     var isCheckArr = _cookieHelper.default.getCookie('isCheckArrLegend', undefined);
 
@@ -82937,19 +83215,26 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
       lines.push({
         id: 1,
+        caption: 'События Церкви',
+        classFeature: _chronosChurchFeature.default,
+        fillFunction: _chronosChurchFeature.default.fillChronosChurchFeature,
+        icon: _chronosChurchFeature.default.getIcon()
+      });
+      lines.push({
+        id: 2,
         caption: 'Храмы',
         classFeature: _templesFeature.default,
         fillFunction: _templesFeature.default.fillTemplesFeature,
         icon: _templesFeature.default.getIcon()
       });
       lines.push({
-        id: 2,
+        id: 3,
         caption: 'Лики',
         classFeature: _personFeature.default,
         fillFunction: this.fillPersonFeature,
         // icon: PersonFeature.getIcon(),
         childs: [{
-          id: 3,
+          id: 4,
           caption: 'Мученики',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -82957,7 +83242,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           icon: _personFeature.default.getMartyrsIcon(),
           isHide: false
         }, {
-          id: 4,
+          id: 5,
           caption: 'Преподобные',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -82965,7 +83250,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           icon: _personFeature.default.getReverendsIcon(),
           isHide: false
         }, {
-          id: 5,
+          id: 6,
           caption: 'Святые',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
@@ -83218,7 +83503,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
 }(_eventEmitter.default);
 
 exports.LegendControl = LegendControl;
-},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g","./cookieHelper":"WAuT"}],"imeZ":[function(require,module,exports) {
+},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/chronosChurchFeature":"ewPj","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g","./cookieHelper":"WAuT"}],"imeZ":[function(require,module,exports) {
 /**
  * Parses an URI
  *
@@ -83453,273 +83738,280 @@ function plural(ms, msAbs, n, name) {
 }
 
 },{}],"JUGK":[function(require,module,exports) {
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 /**
  * This is the common logic for both the Node.js and web browser
  * implementations of `debug()`.
  */
-
 function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
+  createDebug.debug = createDebug;
+  createDebug.default = createDebug;
+  createDebug.coerce = coerce;
+  createDebug.disable = disable;
+  createDebug.enable = enable;
+  createDebug.enabled = enabled;
+  createDebug.humanize = require('ms');
+  createDebug.destroy = destroy;
+  Object.keys(env).forEach(function (key) {
+    createDebug[key] = env[key];
+  });
+  /**
+  * The currently active debug mode names, and names to skip.
+  */
 
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
+  createDebug.names = [];
+  createDebug.skips = [];
+  /**
+  * Map of special "%n" handling functions, for the debug "format" argument.
+  *
+  * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+  */
 
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
+  createDebug.formatters = {};
+  /**
+  * Selects a color for a debug namespace
+  * @param {String} namespace The namespace string for the for the debug instance to be colored
+  * @return {Number|String} An ANSI color code for the given namespace
+  * @api private
+  */
 
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
+  function selectColor(namespace) {
+    var hash = 0;
 
-	createDebug.names = [];
-	createDebug.skips = [];
+    for (var i = 0; i < namespace.length; i++) {
+      hash = (hash << 5) - hash + namespace.charCodeAt(i);
+      hash |= 0; // Convert to 32bit integer
+    }
 
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
+    return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+  }
 
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
+  createDebug.selectColor = selectColor;
+  /**
+  * Create a debugger with the given `namespace`.
+  *
+  * @param {String} namespace
+  * @return {Function}
+  * @api public
+  */
 
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
+  function createDebug(namespace) {
+    var prevTime;
+    var enableOverride = null;
 
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
+    function debug() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
 
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
+      // Disabled?
+      if (!debug.enabled) {
+        return;
+      }
 
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
+      var self = debug; // Set `diff` timestamp
 
-			const self = debug;
+      var curr = Number(new Date());
+      var ms = curr - (prevTime || curr);
+      self.diff = ms;
+      self.prev = prevTime;
+      self.curr = curr;
+      prevTime = curr;
+      args[0] = createDebug.coerce(args[0]);
 
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
+      if (typeof args[0] !== 'string') {
+        // Anything else let's inspect with %O
+        args.unshift('%O');
+      } // Apply any `formatters` transformations
 
-			args[0] = createDebug.coerce(args[0]);
 
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
+      var index = 0;
+      args[0] = args[0].replace(/%([a-zA-Z%])/g, function (match, format) {
+        // If we encounter an escaped % then don't increase the array index
+        if (match === '%%') {
+          return '%';
+        }
 
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
+        index++;
+        var formatter = createDebug.formatters[format];
 
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
+        if (typeof formatter === 'function') {
+          var val = args[index];
+          match = formatter.call(self, val); // Now we need to remove `args[index]` since it's inlined in the `format`
 
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
+          args.splice(index, 1);
+          index--;
+        }
 
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
+        return match;
+      }); // Apply env-specific formatting (colors, etc.)
 
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
+      createDebug.formatArgs.call(self, args);
+      var logFn = self.log || createDebug.log;
+      logFn.apply(self, args);
+    }
 
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
+    debug.namespace = namespace;
+    debug.useColors = createDebug.useColors();
+    debug.color = createDebug.selectColor(namespace);
+    debug.extend = extend;
+    debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
 
-		createDebug.instances.push(debug);
+    Object.defineProperty(debug, 'enabled', {
+      enumerable: true,
+      configurable: false,
+      get: function () {
+        return enableOverride === null ? createDebug.enabled(namespace) : enableOverride;
+      },
+      set: function (v) {
+        enableOverride = v;
+      }
+    }); // Env-specific initialization logic for debug instances
 
-		return debug;
-	}
+    if (typeof createDebug.init === 'function') {
+      createDebug.init(debug);
+    }
 
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
+    return debug;
+  }
 
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
+  function extend(namespace, delimiter) {
+    var newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+    newDebug.log = this.log;
+    return newDebug;
+  }
+  /**
+  * Enables a debug mode by namespaces. This can include modes
+  * separated by a colon and wildcards.
+  *
+  * @param {String} namespaces
+  * @api public
+  */
 
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
 
-		createDebug.names = [];
-		createDebug.skips = [];
+  function enable(namespaces) {
+    createDebug.save(namespaces);
+    createDebug.names = [];
+    createDebug.skips = [];
+    var i;
+    var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+    var len = split.length;
 
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
+    for (i = 0; i < len; i++) {
+      if (!split[i]) {
+        // ignore empty strings
+        continue;
+      }
 
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
+      namespaces = split[i].replace(/\*/g, '.*?');
 
-			namespaces = split[i].replace(/\*/g, '.*?');
+      if (namespaces[0] === '-') {
+        createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+      } else {
+        createDebug.names.push(new RegExp('^' + namespaces + '$'));
+      }
+    }
+  }
+  /**
+  * Disable debug output.
+  *
+  * @return {String} namespaces
+  * @api public
+  */
 
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
 
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
+  function disable() {
+    var namespaces = [].concat(_toConsumableArray(createDebug.names.map(toNamespace)), _toConsumableArray(createDebug.skips.map(toNamespace).map(function (namespace) {
+      return '-' + namespace;
+    }))).join(',');
+    createDebug.enable('');
+    return namespaces;
+  }
+  /**
+  * Returns true if the given mode name is enabled, false otherwise.
+  *
+  * @param {String} name
+  * @return {Boolean}
+  * @api public
+  */
 
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
 
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
+  function enabled(name) {
+    if (name[name.length - 1] === '*') {
+      return true;
+    }
 
-		let i;
-		let len;
+    var i;
+    var len;
 
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
+    for (i = 0, len = createDebug.skips.length; i < len; i++) {
+      if (createDebug.skips[i].test(name)) {
+        return false;
+      }
+    }
 
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
+    for (i = 0, len = createDebug.names.length; i < len; i++) {
+      if (createDebug.names[i].test(name)) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
+  /**
+  * Convert regexp to namespace
+  *
+  * @param {RegExp} regxep
+  * @return {String} namespace
+  * @api private
+  */
 
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
 
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
+  function toNamespace(regexp) {
+    return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, '*');
+  }
+  /**
+  * Coerce `val`.
+  *
+  * @param {Mixed} val
+  * @return {Mixed}
+  * @api private
+  */
 
-	createDebug.enable(createDebug.load());
 
-	return createDebug;
+  function coerce(val) {
+    if (val instanceof Error) {
+      return val.stack || val.message;
+    }
+
+    return val;
+  }
+  /**
+  * XXX DO NOT USE. This is a temporary stub function.
+  * XXX It WILL be removed in the next major release.
+  */
+
+
+  function destroy() {
+    console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+  }
+
+  createDebug.enable(createDebug.load());
+  return createDebug;
 }
 
 module.exports = setup;
-
 },{"ms":"kIV0"}],"pBGv":[function(require,module,exports) {
 
 // shim for using process in browser
@@ -83936,15 +84228,25 @@ var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
  */
-exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
 exports.storage = localstorage();
+
+exports.destroy = function () {
+  var warned = false;
+  return function () {
+    if (!warned) {
+      warned = true;
+      console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+    }
+  };
+}();
 /**
  * Colors.
  */
+
 
 exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
 /**
@@ -83991,14 +84293,14 @@ function formatArgs(args) {
     return;
   }
 
-  const c = 'color: ' + this.color;
+  var c = 'color: ' + this.color;
   args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
   // arguments passed either before or after the %c, so we need to
   // figure out the correct index to insert the CSS into
 
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function (match) {
     if (match === '%%') {
       return;
     }
@@ -84014,18 +84316,16 @@ function formatArgs(args) {
   args.splice(lastC, 0, c);
 }
 /**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
  *
  * @api public
  */
 
 
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
+exports.log = console.debug || console.log || function () {};
 /**
  * Save `namespaces`.
  *
@@ -84054,7 +84354,7 @@ function save(namespaces) {
 
 
 function load() {
-  let r;
+  var r;
 
   try {
     r = exports.storage.getItem('debug');
@@ -84092,8 +84392,8 @@ function localstorage() {
 }
 
 module.exports = require('./common')(exports);
-const {
-  formatters
+var {
+  formatters: formatters
 } = module.exports;
 /**
  * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
@@ -84120,9 +84420,9 @@ var debug = require("debug")("socket.io-client:url");
 /**
  * URL parser.
  *
- * @param {String} uri - url
- * @param {Object} loc - An object meant to mimic window.location.
- *                 Defaults to window.location.
+ * @param uri - url
+ * @param loc - An object meant to mimic window.location.
+ *        Defaults to window.location.
  * @public
  */
 
@@ -84133,7 +84433,7 @@ function url(uri, loc) {
   loc = loc || typeof location !== "undefined" && location;
   if (null == uri) uri = loc.protocol + "//" + loc.host; // relative path support
 
-  if ("string" === typeof uri) {
+  if (typeof uri === "string") {
     if ("/" === uri.charAt(0)) {
       if ("/" === uri.charAt(1)) {
         uri = loc.protocol + uri;
@@ -84905,273 +85205,280 @@ yeast.decode = decode;
 module.exports = yeast;
 
 },{}],"Z73V":[function(require,module,exports) {
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 /**
  * This is the common logic for both the Node.js and web browser
  * implementations of `debug()`.
  */
-
 function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
+  createDebug.debug = createDebug;
+  createDebug.default = createDebug;
+  createDebug.coerce = coerce;
+  createDebug.disable = disable;
+  createDebug.enable = enable;
+  createDebug.enabled = enabled;
+  createDebug.humanize = require('ms');
+  createDebug.destroy = destroy;
+  Object.keys(env).forEach(function (key) {
+    createDebug[key] = env[key];
+  });
+  /**
+  * The currently active debug mode names, and names to skip.
+  */
 
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
+  createDebug.names = [];
+  createDebug.skips = [];
+  /**
+  * Map of special "%n" handling functions, for the debug "format" argument.
+  *
+  * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+  */
 
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
+  createDebug.formatters = {};
+  /**
+  * Selects a color for a debug namespace
+  * @param {String} namespace The namespace string for the for the debug instance to be colored
+  * @return {Number|String} An ANSI color code for the given namespace
+  * @api private
+  */
 
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
+  function selectColor(namespace) {
+    var hash = 0;
 
-	createDebug.names = [];
-	createDebug.skips = [];
+    for (var i = 0; i < namespace.length; i++) {
+      hash = (hash << 5) - hash + namespace.charCodeAt(i);
+      hash |= 0; // Convert to 32bit integer
+    }
 
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
+    return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+  }
 
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
+  createDebug.selectColor = selectColor;
+  /**
+  * Create a debugger with the given `namespace`.
+  *
+  * @param {String} namespace
+  * @return {Function}
+  * @api public
+  */
 
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
+  function createDebug(namespace) {
+    var prevTime;
+    var enableOverride = null;
 
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
+    function debug() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
 
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
+      // Disabled?
+      if (!debug.enabled) {
+        return;
+      }
 
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
+      var self = debug; // Set `diff` timestamp
 
-			const self = debug;
+      var curr = Number(new Date());
+      var ms = curr - (prevTime || curr);
+      self.diff = ms;
+      self.prev = prevTime;
+      self.curr = curr;
+      prevTime = curr;
+      args[0] = createDebug.coerce(args[0]);
 
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
+      if (typeof args[0] !== 'string') {
+        // Anything else let's inspect with %O
+        args.unshift('%O');
+      } // Apply any `formatters` transformations
 
-			args[0] = createDebug.coerce(args[0]);
 
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
+      var index = 0;
+      args[0] = args[0].replace(/%([a-zA-Z%])/g, function (match, format) {
+        // If we encounter an escaped % then don't increase the array index
+        if (match === '%%') {
+          return '%';
+        }
 
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
+        index++;
+        var formatter = createDebug.formatters[format];
 
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
+        if (typeof formatter === 'function') {
+          var val = args[index];
+          match = formatter.call(self, val); // Now we need to remove `args[index]` since it's inlined in the `format`
 
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
+          args.splice(index, 1);
+          index--;
+        }
 
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
+        return match;
+      }); // Apply env-specific formatting (colors, etc.)
 
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
+      createDebug.formatArgs.call(self, args);
+      var logFn = self.log || createDebug.log;
+      logFn.apply(self, args);
+    }
 
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
+    debug.namespace = namespace;
+    debug.useColors = createDebug.useColors();
+    debug.color = createDebug.selectColor(namespace);
+    debug.extend = extend;
+    debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
 
-		createDebug.instances.push(debug);
+    Object.defineProperty(debug, 'enabled', {
+      enumerable: true,
+      configurable: false,
+      get: function () {
+        return enableOverride === null ? createDebug.enabled(namespace) : enableOverride;
+      },
+      set: function (v) {
+        enableOverride = v;
+      }
+    }); // Env-specific initialization logic for debug instances
 
-		return debug;
-	}
+    if (typeof createDebug.init === 'function') {
+      createDebug.init(debug);
+    }
 
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
+    return debug;
+  }
 
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
+  function extend(namespace, delimiter) {
+    var newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+    newDebug.log = this.log;
+    return newDebug;
+  }
+  /**
+  * Enables a debug mode by namespaces. This can include modes
+  * separated by a colon and wildcards.
+  *
+  * @param {String} namespaces
+  * @api public
+  */
 
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
 
-		createDebug.names = [];
-		createDebug.skips = [];
+  function enable(namespaces) {
+    createDebug.save(namespaces);
+    createDebug.names = [];
+    createDebug.skips = [];
+    var i;
+    var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+    var len = split.length;
 
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
+    for (i = 0; i < len; i++) {
+      if (!split[i]) {
+        // ignore empty strings
+        continue;
+      }
 
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
+      namespaces = split[i].replace(/\*/g, '.*?');
 
-			namespaces = split[i].replace(/\*/g, '.*?');
+      if (namespaces[0] === '-') {
+        createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+      } else {
+        createDebug.names.push(new RegExp('^' + namespaces + '$'));
+      }
+    }
+  }
+  /**
+  * Disable debug output.
+  *
+  * @return {String} namespaces
+  * @api public
+  */
 
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
 
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
+  function disable() {
+    var namespaces = [].concat(_toConsumableArray(createDebug.names.map(toNamespace)), _toConsumableArray(createDebug.skips.map(toNamespace).map(function (namespace) {
+      return '-' + namespace;
+    }))).join(',');
+    createDebug.enable('');
+    return namespaces;
+  }
+  /**
+  * Returns true if the given mode name is enabled, false otherwise.
+  *
+  * @param {String} name
+  * @return {Boolean}
+  * @api public
+  */
 
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
 
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
+  function enabled(name) {
+    if (name[name.length - 1] === '*') {
+      return true;
+    }
 
-		let i;
-		let len;
+    var i;
+    var len;
 
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
+    for (i = 0, len = createDebug.skips.length; i < len; i++) {
+      if (createDebug.skips[i].test(name)) {
+        return false;
+      }
+    }
 
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
+    for (i = 0, len = createDebug.names.length; i < len; i++) {
+      if (createDebug.names[i].test(name)) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
+  /**
+  * Convert regexp to namespace
+  *
+  * @param {RegExp} regxep
+  * @return {String} namespace
+  * @api private
+  */
 
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
 
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
+  function toNamespace(regexp) {
+    return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, '*');
+  }
+  /**
+  * Coerce `val`.
+  *
+  * @param {Mixed} val
+  * @return {Mixed}
+  * @api private
+  */
 
-	createDebug.enable(createDebug.load());
 
-	return createDebug;
+  function coerce(val) {
+    if (val instanceof Error) {
+      return val.stack || val.message;
+    }
+
+    return val;
+  }
+  /**
+  * XXX DO NOT USE. This is a temporary stub function.
+  * XXX It WILL be removed in the next major release.
+  */
+
+
+  function destroy() {
+    console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+  }
+
+  createDebug.enable(createDebug.load());
+  return createDebug;
 }
 
 module.exports = setup;
-
 },{"ms":"kIV0"}],"Rs26":[function(require,module,exports) {
 var process = require("process");
 /* eslint-env browser */
@@ -85179,15 +85486,25 @@ var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
  */
-exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
 exports.storage = localstorage();
+
+exports.destroy = function () {
+  var warned = false;
+  return function () {
+    if (!warned) {
+      warned = true;
+      console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+    }
+  };
+}();
 /**
  * Colors.
  */
+
 
 exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
 /**
@@ -85234,14 +85551,14 @@ function formatArgs(args) {
     return;
   }
 
-  const c = 'color: ' + this.color;
+  var c = 'color: ' + this.color;
   args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
   // arguments passed either before or after the %c, so we need to
   // figure out the correct index to insert the CSS into
 
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function (match) {
     if (match === '%%') {
       return;
     }
@@ -85257,18 +85574,16 @@ function formatArgs(args) {
   args.splice(lastC, 0, c);
 }
 /**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
  *
  * @api public
  */
 
 
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
+exports.log = console.debug || console.log || function () {};
 /**
  * Save `namespaces`.
  *
@@ -85297,7 +85612,7 @@ function save(namespaces) {
 
 
 function load() {
-  let r;
+  var r;
 
   try {
     r = exports.storage.getItem('debug');
@@ -85335,8 +85650,8 @@ function localstorage() {
 }
 
 module.exports = require('./common')(exports);
-const {
-  formatters
+var {
+  formatters: formatters
 } = module.exports;
 /**
  * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
@@ -85439,7 +85754,7 @@ class Polling extends Transport {
     debug("polling got data %s", data);
     const callback = function(packet, index, total) {
       // if its the first message we consider the transport open
-      if ("opening" === self.readyState) {
+      if ("opening" === self.readyState && packet.type === "open") {
         self.onOpen();
       }
 
@@ -85564,7 +85879,9 @@ module.exports = Polling;
 },{"../transport":"HBl9","parseqs":"vs2a","engine.io-parser":"fAXJ","yeast":"t9Jt","debug":"Rs26"}],"k9hq":[function(require,module,exports) {
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
-    acc[k] = obj[k];
+    if (obj.hasOwnProperty(k)) {
+      acc[k] = obj[k];
+    }
     return acc;
   }, {});
 };
@@ -85587,7 +85904,6 @@ const debug = require("debug")("engine.io-client:polling-xhr");
 function empty() {}
 
 const hasXHR2 = (function() {
-  const XMLHttpRequest = require("xmlhttprequest-ssl");
   const xhr = new XMLHttpRequest({ xdomain: false });
   return null != xhr.responseType;
 })();
@@ -85631,11 +85947,7 @@ class XHR extends Polling {
    * @api private
    */
   request(opts = {}) {
-    Object.assign(
-      opts,
-      { supportsBinary: this.supportsBinary, xd: this.xd, xs: this.xs },
-      this.opts
-    );
+    Object.assign(opts, { xd: this.xd, xs: this.xs }, this.opts);
     return new Request(this.uri(), opts);
   }
 
@@ -85647,11 +85959,9 @@ class XHR extends Polling {
    * @api private
    */
   doWrite(data, fn) {
-    const isBinary = typeof data !== "string" && data !== undefined;
     const req = this.request({
       method: "POST",
-      data: data,
-      isBinary: isBinary
+      data: data
     });
     const self = this;
     req.on("success", fn);
@@ -85694,8 +86004,6 @@ class Request extends Emitter {
     this.uri = uri;
     this.async = false !== opts.async;
     this.data = undefined !== opts.data ? opts.data : null;
-    this.isBinary = opts.isBinary;
-    this.supportsBinary = opts.supportsBinary;
 
     this.create();
   }
@@ -85736,17 +86044,11 @@ class Request extends Emitter {
             }
           }
         }
-      } catch (e) {
-        console.log(e);
-      }
+      } catch (e) {}
 
       if ("POST" === this.method) {
         try {
-          if (this.isBinary) {
-            xhr.setRequestHeader("Content-type", "application/octet-stream");
-          } else {
-            xhr.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
-          }
+          xhr.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
         } catch (e) {}
       }
 
@@ -85772,18 +86074,6 @@ class Request extends Emitter {
         };
       } else {
         xhr.onreadystatechange = function() {
-          if (xhr.readyState === 2) {
-            try {
-              const contentType = xhr.getResponseHeader("Content-Type");
-              if (
-                (self.supportsBinary &&
-                  contentType === "application/octet-stream") ||
-                contentType === "application/octet-stream; charset=UTF-8"
-              ) {
-                xhr.responseType = "arraybuffer";
-              }
-            } catch (e) {}
-          }
           if (4 !== xhr.readyState) return;
           if (200 === xhr.status || 1223 === xhr.status) {
             self.onLoad();
@@ -88230,12 +88520,7 @@ class WS extends Transport {
   constructor(opts) {
     super(opts);
 
-    const forceBase64 = opts && opts.forceBase64;
-    if (forceBase64) {
-      this.supportsBinary = false;
-    }
-    // WebSockets support binary
-    this.supportsBinary = true;
+    this.supportsBinary = !opts.forceBase64;
   }
 
   /**
@@ -88261,24 +88546,27 @@ class WS extends Transport {
     const uri = this.uri();
     const protocols = this.opts.protocols;
 
-    let opts;
-    if (isReactNative) {
-      opts = pick(this.opts, "localAddress");
-    } else {
-      opts = pick(
-        this.opts,
-        "agent",
-        "perMessageDeflate",
-        "pfx",
-        "key",
-        "passphrase",
-        "cert",
-        "ca",
-        "ciphers",
-        "rejectUnauthorized",
-        "localAddress"
-      );
-    }
+    // React Native only supports the 'headers' option, and will print a warning if anything else is passed
+    const opts = isReactNative
+      ? {}
+      : pick(
+          this.opts,
+          "agent",
+          "perMessageDeflate",
+          "pfx",
+          "key",
+          "passphrase",
+          "cert",
+          "ca",
+          "ciphers",
+          "rejectUnauthorized",
+          "localAddress",
+          "protocolVersion",
+          "origin",
+          "maxPayload",
+          "family",
+          "checkServerIdentity"
+        );
 
     if (this.opts.extraHeaders) {
       opts.headers = this.opts.extraHeaders;
@@ -88583,10 +88871,10 @@ class Socket extends Emitter {
       {
         path: "/engine.io",
         agent: false,
+        withCredentials: false,
         upgrade: true,
         jsonp: true,
         timestampParam: "t",
-        policyPort: 843,
         rememberUpgrade: false,
         rejectUnauthorized: true,
         perMessageDeflate: {
@@ -89203,7 +89491,7 @@ module.exports.Transport = require("./transport");
 module.exports.transports = require("./transports/index");
 module.exports.parser = require("engine.io-parser");
 
-},{"./socket":"APvO","./transport":"HBl9","./transports/index":"xQDS","engine.io-parser":"fAXJ"}],"UYfZ":[function(require,module,exports) {
+},{"./socket":"APvO","./transport":"HBl9","./transports/index":"xQDS","engine.io-parser":"fAXJ"}],"da1M":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -89266,7 +89554,7 @@ function hasBinary(obj, toJSON) {
 }
 
 exports.hasBinary = hasBinary;
-},{}],"zHTC":[function(require,module,exports) {
+},{}],"DX4Z":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -89371,452 +89659,7 @@ function _reconstructPacket(data, buffers) {
 
   return data;
 }
-},{"./is-binary":"UYfZ"}],"hmbV":[function(require,module,exports) {
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- */
-
-function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
-
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
-
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
-
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
-
-	createDebug.names = [];
-	createDebug.skips = [];
-
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
-
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
-
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
-
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
-
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
-
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
-
-			const self = debug;
-
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
-
-			args[0] = createDebug.coerce(args[0]);
-
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
-
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
-
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
-
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
-
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
-
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
-
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
-
-		createDebug.instances.push(debug);
-
-		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
-
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
-
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
-
-		createDebug.names = [];
-		createDebug.skips = [];
-
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
-
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
-
-			namespaces = split[i].replace(/\*/g, '.*?');
-
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
-
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
-
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
-
-		let i;
-		let len;
-
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
-
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
-
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
-
-	createDebug.enable(createDebug.load());
-
-	return createDebug;
-}
-
-module.exports = setup;
-
-},{"ms":"kIV0"}],"bCvK":[function(require,module,exports) {
-var process = require("process");
-/* eslint-env browser */
-
-/**
- * This is the web browser implementation of `debug()`.
- */
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = localstorage();
-/**
- * Colors.
- */
-
-exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-// eslint-disable-next-line complexity
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
-    return true;
-  } // Internet Explorer and Edge do not support colors.
-
-
-  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-    return false;
-  } // Is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-
-
-  return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-  typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
-  // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
-}
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-
-function formatArgs(args) {
-  args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
-
-  if (!this.useColors) {
-    return;
-  }
-
-  const c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
-    if (match === '%%') {
-      return;
-    }
-
-    index++;
-
-    if (match === '%c') {
-      // We only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-  args.splice(lastC, 0, c);
-}
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-
-function save(namespaces) {
-  try {
-    if (namespaces) {
-      exports.storage.setItem('debug', namespaces);
-    } else {
-      exports.storage.removeItem('debug');
-    }
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-
-function load() {
-  let r;
-
-  try {
-    r = exports.storage.getItem('debug');
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-
-
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = undefined;
-  }
-
-  return r;
-}
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-
-function localstorage() {
-  try {
-    // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
-    // The Browser also has localStorage in the global context.
-    return localStorage;
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-
-module.exports = require('./common')(exports);
-const {
-  formatters
-} = module.exports;
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-formatters.j = function (v) {
-  try {
-    return JSON.stringify(v);
-  } catch (error) {
-    return '[UnexpectedJSONParseError]: ' + error.message;
-  }
-};
-},{"./common":"hmbV","process":"pBGv"}],"GVVZ":[function(require,module,exports) {
+},{"./is-binary":"da1M"}],"uyp6":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -89888,14 +89731,14 @@ var Encoder = /*#__PURE__*/function () {
 
   _createClass(Encoder, [{
     key: "encode",
-
+    value:
     /**
      * Encode a packet as a single string if non-binary, or as a
      * buffer sequence, depending on packet type.
      *
      * @param {Object} obj - packet object
      */
-    value: function encode(obj) {
+    function encode(obj) {
       debug("encoding packet %j", obj);
 
       if (obj.type === PacketType.EVENT || obj.type === PacketType.ACK) {
@@ -90108,11 +89951,11 @@ var Decoder = /*#__PURE__*/function (_Emitter) {
     }
   }, {
     key: "destroy",
-
+    value:
     /**
      * Deallocates a parser's resources
      */
-    value: function destroy() {
+    function destroy() {
       if (this.reconstructor) {
         this.reconstructor.finishedReconstruction();
       }
@@ -90132,7 +89975,7 @@ var Decoder = /*#__PURE__*/function (_Emitter) {
 
         case PacketType.EVENT:
         case PacketType.BINARY_EVENT:
-          return Array.isArray(payload) && typeof payload[0] === "string";
+          return Array.isArray(payload) && payload.length > 0;
 
         case PacketType.ACK:
         case PacketType.BINARY_ACK:
@@ -90209,7 +90052,7 @@ var BinaryReconstructor = /*#__PURE__*/function () {
 
   return BinaryReconstructor;
 }();
-},{"component-emitter":"Wr69","./binary":"zHTC","./is-binary":"UYfZ","debug":"bCvK"}],"N9LN":[function(require,module,exports) {
+},{"component-emitter":"Wr69","./binary":"DX4Z","./is-binary":"da1M","debug":"g98s"}],"N9LN":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -90219,39 +90062,12 @@ exports.on = void 0;
 
 function on(obj, ev, fn) {
   obj.on(ev, fn);
-  return {
-    destroy: function destroy() {
-      obj.removeListener(ev, fn);
-    }
+  return function subDestroy() {
+    obj.off(ev, fn);
   };
 }
 
 exports.on = on;
-},{}],"NpfF":[function(require,module,exports) {
-/**
- * Slice reference.
- */
-
-var slice = [].slice;
-
-/**
- * Bind `obj` to `fn`.
- *
- * @param {Object} obj
- * @param {Function|String} fn or string
- * @return {Function}
- * @api public
- */
-
-module.exports = function(obj, fn){
-  if ('string' == typeof fn) fn = obj[fn];
-  if ('function' != typeof fn) throw new Error('bind() requires a function');
-  var args = slice.call(arguments, 2);
-  return function(){
-    return fn.apply(obj, args.concat(slice.call(arguments)));
-  }
-};
-
 },{}],"t1Qm":[function(require,module,exports) {
 "use strict";
 
@@ -90298,8 +90114,6 @@ var Emitter = require("component-emitter");
 
 var on_1 = require("./on");
 
-var bind = require("component-bind");
-
 var debug = require("debug")("socket.io-client:socket");
 /**
  * Internal events.
@@ -90307,7 +90121,7 @@ var debug = require("debug")("socket.io-client:socket");
  */
 
 
-var RESERVED_EVENTS = {
+var RESERVED_EVENTS = Object.freeze({
   connect: 1,
   connect_error: 1,
   disconnect: 1,
@@ -90315,7 +90129,7 @@ var RESERVED_EVENTS = {
   // EventEmitter reserved events: https://nodejs.org/api/events.html#events_event_newlistener
   newListener: 1,
   removeListener: 1
-};
+});
 
 var Socket = /*#__PURE__*/function (_Emitter) {
   _inherits(Socket, _Emitter);
@@ -90333,10 +90147,10 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     _classCallCheck(this, Socket);
 
     _this = _super.call(this);
-    _this.ids = 0;
-    _this.acks = {};
     _this.receiveBuffer = [];
     _this.sendBuffer = [];
+    _this.ids = 0;
+    _this.acks = {};
     _this.flags = {};
     _this.io = io;
     _this.nsp = nsp;
@@ -90367,7 +90181,16 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     value: function subEvents() {
       if (this.subs) return;
       var io = this.io;
-      this.subs = [on_1.on(io, "open", bind(this, "onopen")), on_1.on(io, "packet", bind(this, "onpacket")), on_1.on(io, "close", bind(this, "onclose"))];
+      this.subs = [on_1.on(io, "open", this.onopen.bind(this)), on_1.on(io, "packet", this.onpacket.bind(this)), on_1.on(io, "error", this.onerror.bind(this)), on_1.on(io, "close", this.onclose.bind(this))];
+    }
+    /**
+     * Whether the Socket will try to reconnect when its Manager connects or reconnects
+     */
+
+  }, {
+    key: "active",
+    get: function get() {
+      return !!this.subs;
     }
     /**
      * "Opens" the socket.
@@ -90380,7 +90203,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     value: function connect() {
       if (this.connected) return this;
       this.subEvents();
-      if (!this.io._reconnecting) this.io.open(); // ensure open
+      if (!this.io["_reconnecting"]) this.io.open(); // ensure open
 
       if ("open" === this.io._readyState) this.onopen();
       return this;
@@ -90397,7 +90220,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Sends a `message` event.
      *
-     * @return {Socket} self
+     * @return self
      * @public
      */
 
@@ -90416,8 +90239,8 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      * Override `emit`.
      * If the event is in `events`, it's emitted normally.
      *
-     * @param {String} ev - event name
-     * @return {Socket} self
+     * @param ev - event name
+     * @return self
      * @public
      */
 
@@ -90463,7 +90286,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Sends a packet.
      *
-     * @param {Object} packet
+     * @param packet
      * @private
      */
 
@@ -90502,9 +90325,23 @@ var Socket = /*#__PURE__*/function (_Emitter) {
       }
     }
     /**
+     * Called upon engine or manager `error`.
+     *
+     * @param err
+     * @private
+     */
+
+  }, {
+    key: "onerror",
+    value: function onerror(err) {
+      if (!this.connected) {
+        _get(_getPrototypeOf(Socket.prototype), "emit", this).call(this, "connect_error", err);
+      }
+    }
+    /**
      * Called upon engine `close`.
      *
-     * @param {String} reason
+     * @param reason
      * @private
      */
 
@@ -90521,7 +90358,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Called with socket packet.
      *
-     * @param {Object} packet
+     * @param packet
      * @private
      */
 
@@ -90533,8 +90370,13 @@ var Socket = /*#__PURE__*/function (_Emitter) {
 
       switch (packet.type) {
         case socket_io_parser_1.PacketType.CONNECT:
-          var id = packet.data.sid;
-          this.onconnect(id);
+          if (packet.data && packet.data.sid) {
+            var id = packet.data.sid;
+            this.onconnect(id);
+          } else {
+            _get(_getPrototypeOf(Socket.prototype), "emit", this).call(this, "connect_error", new Error("It seems you are trying to reach a Socket.IO server in v2.x with a v3.x client, but they are not compatible (more information here: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/)"));
+          }
+
           break;
 
         case socket_io_parser_1.PacketType.EVENT:
@@ -90570,7 +90412,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Called upon a server event.
      *
-     * @param {Object} packet
+     * @param packet
      * @private
      */
 
@@ -90588,7 +90430,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
       if (this.connected) {
         this.emitEvent(args);
       } else {
-        this.receiveBuffer.push(args);
+        this.receiveBuffer.push(Object.freeze(args));
       }
     }
   }, {
@@ -90645,7 +90487,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Called upon a server acknowlegement.
      *
-     * @param {Object} packet
+     * @param packet
      * @private
      */
 
@@ -90671,6 +90513,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
   }, {
     key: "onconnect",
     value: function onconnect(id) {
+      debug("socket connected with id %s", id);
       this.id = id;
       this.connected = true;
       this.disconnected = false;
@@ -90688,16 +90531,15 @@ var Socket = /*#__PURE__*/function (_Emitter) {
   }, {
     key: "emitBuffered",
     value: function emitBuffered() {
-      for (var i = 0; i < this.receiveBuffer.length; i++) {
-        this.emitEvent(this.receiveBuffer[i]);
-      }
+      var _this3 = this;
 
+      this.receiveBuffer.forEach(function (args) {
+        return _this3.emitEvent(args);
+      });
       this.receiveBuffer = [];
-
-      for (var _i = 0; _i < this.sendBuffer.length; _i++) {
-        this.packet(this.sendBuffer[_i]);
-      }
-
+      this.sendBuffer.forEach(function (packet) {
+        return _this3.packet(packet);
+      });
       this.sendBuffer = [];
     }
     /**
@@ -90726,19 +90568,18 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     value: function destroy() {
       if (this.subs) {
         // clean subscriptions to avoid reconnections
-        for (var i = 0; i < this.subs.length; i++) {
-          this.subs[i].destroy();
-        }
-
-        this.subs = null;
+        this.subs.forEach(function (subDestroy) {
+          return subDestroy();
+        });
+        this.subs = undefined;
       }
 
-      this.io._destroy(this);
+      this.io["_destroy"](this);
     }
     /**
      * Disconnects the socket manually.
      *
-     * @return {Socket} self
+     * @return self
      * @public
      */
 
@@ -90765,7 +90606,7 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Alias for disconnect()
      *
-     * @return {Socket} self
+     * @return self
      * @public
      */
 
@@ -90777,8 +90618,8 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     /**
      * Sets the compress flag.
      *
-     * @param {Boolean} compress - if `true`, compresses the sending data
-     * @return {Socket} self
+     * @param compress - if `true`, compresses the sending data
+     * @return self
      * @public
      */
 
@@ -90792,13 +90633,16 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      * Sets a modifier for a subsequent event emission that the event message will be dropped when this socket is not
      * ready to send messages.
      *
-     * @returns {Socket} self
+     * @returns self
      * @public
      */
 
   }, {
-    key: "onAny",
-
+    key: "volatile",
+    get: function get() {
+      this.flags.volatile = true;
+      return this;
+    }
     /**
      * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
      * callback.
@@ -90806,6 +90650,9 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      * @param listener
      * @public
      */
+
+  }, {
+    key: "onAny",
     value: function onAny(listener) {
       this._anyListeners = this._anyListeners || [];
 
@@ -90871,19 +90718,13 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     value: function listenersAny() {
       return this._anyListeners || [];
     }
-  }, {
-    key: "volatile",
-    get: function get() {
-      this.flags.volatile = true;
-      return this;
-    }
   }]);
 
   return Socket;
 }(Emitter);
 
 exports.Socket = Socket;
-},{"socket.io-parser":"GVVZ","component-emitter":"Wr69","./on":"N9LN","component-bind":"NpfF","debug":"g98s"}],"pAuI":[function(require,module,exports) {
+},{"socket.io-parser":"uyp6","component-emitter":"Wr69","./on":"N9LN","debug":"g98s"}],"pAuI":[function(require,module,exports) {
 
 /**
  * Expose `Backoff`.
@@ -91014,8 +90855,6 @@ var parser = require("socket.io-parser");
 
 var on_1 = require("./on");
 
-var bind = require("component-bind");
-
 var Backoff = require("backo2");
 
 var debug = require("debug")("socket.io-client:manager");
@@ -91033,7 +90872,6 @@ var Manager = /*#__PURE__*/function (_Emitter) {
     _this = _super.call(this);
     _this.nsps = {};
     _this.subs = [];
-    _this.connecting = [];
 
     if (uri && "object" === _typeof(uri)) {
       opts = uri;
@@ -91091,25 +90929,31 @@ var Manager = /*#__PURE__*/function (_Emitter) {
   }, {
     key: "reconnectionDelay",
     value: function reconnectionDelay(v) {
+      var _a;
+
       if (v === undefined) return this._reconnectionDelay;
       this._reconnectionDelay = v;
-      this.backoff && this.backoff.setMin(v);
+      (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMin(v);
       return this;
     }
   }, {
     key: "randomizationFactor",
     value: function randomizationFactor(v) {
+      var _a;
+
       if (v === undefined) return this._randomizationFactor;
       this._randomizationFactor = v;
-      this.backoff && this.backoff.setJitter(v);
+      (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setJitter(v);
       return this;
     }
   }, {
     key: "reconnectionDelayMax",
     value: function reconnectionDelayMax(v) {
+      var _a;
+
       if (v === undefined) return this._reconnectionDelayMax;
       this._reconnectionDelayMax = v;
-      this.backoff && this.backoff.setMax(v);
+      (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMax(v);
       return this;
     }
   }, {
@@ -91139,7 +90983,7 @@ var Manager = /*#__PURE__*/function (_Emitter) {
      * Sets the current transport `socket`.
      *
      * @param {Function} fn - optional, callback
-     * @return {Manager} self
+     * @return self
      * @public
      */
 
@@ -91157,7 +91001,7 @@ var Manager = /*#__PURE__*/function (_Emitter) {
       this._readyState = "opening";
       this.skipReconnect = false; // emit `open`
 
-      var openSub = on_1.on(socket, "open", function () {
+      var openSubDestroy = on_1.on(socket, "open", function () {
         self.onopen();
         fn && fn();
       }); // emit `error`
@@ -91182,31 +91026,29 @@ var Manager = /*#__PURE__*/function (_Emitter) {
         debug("connect attempt will timeout after %d", timeout);
 
         if (timeout === 0) {
-          openSub.destroy(); // prevents a race condition with the 'open' event
+          openSubDestroy(); // prevents a race condition with the 'open' event
         } // set timer
 
 
         var timer = setTimeout(function () {
           debug("connect attempt timed out after %d", timeout);
-          openSub.destroy();
+          openSubDestroy();
           socket.close();
           socket.emit("error", new Error("timeout"));
         }, timeout);
-        this.subs.push({
-          destroy: function destroy() {
-            clearTimeout(timer);
-          }
+        this.subs.push(function subDestroy() {
+          clearTimeout(timer);
         });
       }
 
-      this.subs.push(openSub);
+      this.subs.push(openSubDestroy);
       this.subs.push(errorSub);
       return this;
     }
     /**
      * Alias for open()
      *
-     * @return {Manager} self
+     * @return self
      * @public
      */
 
@@ -91234,11 +91076,7 @@ var Manager = /*#__PURE__*/function (_Emitter) {
 
 
       var socket = this.engine;
-      this.subs.push(on_1.on(socket, "data", bind(this, "ondata")));
-      this.subs.push(on_1.on(socket, "ping", bind(this, "onping")));
-      this.subs.push(on_1.on(socket, "error", bind(this, "onerror")));
-      this.subs.push(on_1.on(socket, "close", bind(this, "onclose")));
-      this.subs.push(on_1.on(this.decoder, "decoded", bind(this, "ondecoded")));
+      this.subs.push(on_1.on(socket, "ping", this.onping.bind(this)), on_1.on(socket, "data", this.ondata.bind(this)), on_1.on(socket, "error", this.onerror.bind(this)), on_1.on(socket, "close", this.onclose.bind(this)), on_1.on(this.decoder, "decoded", this.ondecoded.bind(this)));
     }
     /**
      * Called upon a ping.
@@ -91301,19 +91139,6 @@ var Manager = /*#__PURE__*/function (_Emitter) {
       if (!socket) {
         socket = new socket_1.Socket(this, nsp, opts);
         this.nsps[nsp] = socket;
-        var self = this;
-        socket.on("connecting", onConnecting);
-
-        if (this._autoConnect) {
-          // manually call here since connecting event is fired before listening
-          onConnecting();
-        }
-      }
-
-      function onConnecting() {
-        if (!~self.connecting.indexOf(socket)) {
-          self.connecting.push(socket);
-        }
       }
 
       return socket;
@@ -91321,23 +91146,31 @@ var Manager = /*#__PURE__*/function (_Emitter) {
     /**
      * Called upon a socket close.
      *
-     * @param {Socket} socket
+     * @param socket
      * @private
      */
 
   }, {
     key: "_destroy",
     value: function _destroy(socket) {
-      var index = this.connecting.indexOf(socket);
-      if (~index) this.connecting.splice(index, 1);
-      if (this.connecting.length) return;
+      var nsps = Object.keys(this.nsps);
+
+      for (var _i = 0, _nsps = nsps; _i < _nsps.length; _i++) {
+        var nsp = _nsps[_i];
+        var _socket = this.nsps[nsp];
+
+        if (_socket.active) {
+          debug("socket %s is still active, skipping close", nsp);
+          return;
+        }
+      }
 
       this._close();
     }
     /**
      * Writes a packet.
      *
-     * @param {Object} packet
+     * @param packet
      * @private
      */
 
@@ -91362,13 +91195,10 @@ var Manager = /*#__PURE__*/function (_Emitter) {
     key: "cleanup",
     value: function cleanup() {
       debug("cleanup");
-      var subsLength = this.subs.length;
-
-      for (var i = 0; i < subsLength; i++) {
-        var sub = this.subs.shift();
-        sub.destroy();
-      }
-
+      this.subs.forEach(function (subDestroy) {
+        return subDestroy();
+      });
+      this.subs.length = 0;
       this.decoder.destroy();
     }
     /**
@@ -91471,10 +91301,8 @@ var Manager = /*#__PURE__*/function (_Emitter) {
             }
           });
         }, delay);
-        this.subs.push({
-          destroy: function destroy() {
-            clearTimeout(timer);
-          }
+        this.subs.push(function subDestroy() {
+          clearTimeout(timer);
         });
       }
     }
@@ -91499,7 +91327,7 @@ var Manager = /*#__PURE__*/function (_Emitter) {
 }(Emitter);
 
 exports.Manager = Manager;
-},{"engine.io-client":"h0uD","./socket":"t1Qm","component-emitter":"Wr69","socket.io-parser":"GVVZ","./on":"N9LN","component-bind":"NpfF","backo2":"pAuI","debug":"g98s"}],"pPpY":[function(require,module,exports) {
+},{"engine.io-client":"h0uD","./socket":"t1Qm","component-emitter":"Wr69","socket.io-parser":"uyp6","./on":"N9LN","backo2":"pAuI","debug":"g98s"}],"pPpY":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -91546,7 +91374,7 @@ function lookup(uri, opts) {
   var source = parsed.source;
   var id = parsed.id;
   var path = parsed.path;
-  var sameNamespace = cache[id] && path in cache[id].nsps;
+  var sameNamespace = cache[id] && path in cache[id]["nsps"];
   var newConnection = opts.forceNew || opts["force new connection"] || false === opts.multiplex || sameNamespace;
   var io;
 
@@ -91606,7 +91434,7 @@ Object.defineProperty(exports, "Manager", {
     return manager_2.Manager;
   }
 });
-},{"./url":"NC0g","./manager":"eK1u","./socket":"t1Qm","debug":"g98s","socket.io-parser":"GVVZ"}],"VmvZ":[function(require,module,exports) {
+},{"./url":"NC0g","./manager":"eK1u","./socket":"t1Qm","debug":"g98s","socket.io-parser":"uyp6"}],"VmvZ":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91619,6 +91447,8 @@ var _socket = _interopRequireDefault(require("socket.io-client"));
 var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
 
 var _cookieHelper = _interopRequireDefault(require("./cookieHelper"));
+
+var _dateHelper = _interopRequireDefault(require("../helper/dateHelper"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -91660,12 +91490,18 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
     _this.dict = new Map(); //key - hash (tobject), value {объект}
 
     socket.emit('clGetCurrentYear', '', function (msg) {
-      var data = JSON.parse(msg);
-      var serverYear = data.year;
+      var server = JSON.parse(msg);
+      var client = {
+        'year': _cookieHelper.default.getCookie('year'),
+        'century': _cookieHelper.default.getCookie('century'),
+        'kind': _cookieHelper.default.getCookie('kind')
+      };
 
-      var cookieYear = _cookieHelper.default.getCookie('year');
-
-      _this.emit('setCurrentYear', serverYear ? serverYear : cookieYear ? cookieYear : '1945');
+      _this.emit('setCurrentYear', {
+        'year': server.year ? server.year : client.year ? client.year : 1945,
+        'century': server.century ? server.century : client.century ? client.century : 20,
+        'kind': server.kind ? server.kind : client.kind ? client.kind : 'year'
+      });
     });
     socket.on('error', function (message) {
       console.error(message);
@@ -91713,17 +91549,33 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "getDataByYear",
-    value: function getDataByYear(year) {
+    value: function getDataByYear(dateObject) {
       var _this3 = this;
 
-      if (undefined === year) {
+      if (undefined === dateObject.year) {
         return;
       }
 
+      var year = dateObject.year;
+      var century = dateObject.century;
+      var kind = dateObject.kind;
+
       _cookieHelper.default.setCookie('year', year);
 
+      _cookieHelper.default.setCookie('century', century);
+
+      _cookieHelper.default.setCookie('kind', kind);
+
+      var dateRange = [];
+
+      if (kind == 'year') {
+        dateRange = [year, year];
+      } else {
+        dateRange = _dateHelper.default.getCenturyRange(century);
+      }
+
       this.socket.emit('clQueryDataByYear', JSON.stringify({
-        year: year
+        range: dateRange
       }), function (msg) {
         _this3.emit('refreshInfo', JSON.parse(msg));
       });
@@ -91739,7 +91591,7 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
 }(_eventEmitter.default);
 
 exports.default = ClientProtocol;
-},{"socket.io-client":"pPpY","./eventEmitter":"STwH","./cookieHelper":"WAuT"}],"s1dy":[function(require,module,exports) {
+},{"socket.io-client":"pPpY","./eventEmitter":"STwH","./cookieHelper":"WAuT","../helper/dateHelper":"IrKG"}],"s1dy":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -102803,9 +102655,8 @@ function startApp() {
 
   var infoControl = _infoControl.InfoControl.create();
 
-  protocol.subscribe('setCurrentYear', function (year) {
-    console.log("year from the server ".concat(year));
-    mapControl.setCurrentYearFromServer(year);
+  protocol.subscribe('setCurrentYear', function (obj) {
+    mapControl.setCurrentYearFromServer(obj);
   });
   protocol.subscribe('refreshInfo', function (info) {
     //сначала данные проходят через одноименный фильтр контрола легенды
@@ -102819,8 +102670,8 @@ function startApp() {
     mapControl.hidePopup();
     infoControl.hide();
   });
-  mapControl.subscribe('changeYear', function (year) {
-    protocol.getDataByYear(year);
+  mapControl.subscribe('changeYear', function (dateObject) {
+    protocol.getDataByYear(dateObject);
     infoControl.hide();
   });
   infoControl.subscribe('hide', function () {

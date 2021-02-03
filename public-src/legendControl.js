@@ -2,6 +2,7 @@ import EventEmitter from './eventEmitter'
 import ClassHelper from '../helper/classHelper'
 import JsHelper from '../helper/jsHelper'
 import ChronosFeature from './mapLayers/chronosFeature'
+import ChronosChurchFeature from './mapLayers/chronosChurchFeature'
 import TemplesFeature from './mapLayers/templesFeature'
 import PersonFeature from './mapLayers/personFeature'
 import CookieHelper from './cookieHelper'
@@ -21,7 +22,7 @@ export class LegendControl extends EventEmitter {
     this.showHideLegend()
 
     this.lines = this.addLines()
-    this.linesCount = 6
+    this.linesCount = 7
     const isCheckArr = CookieHelper.getCookie('isCheckArrLegend', undefined)
     this.isCheckArr = isCheckArr
       ? JSON.parse(isCheckArr)
@@ -67,6 +68,14 @@ export class LegendControl extends EventEmitter {
 
     lines.push({
       id: 1,
+      caption: 'События Церкви',
+      classFeature: ChronosChurchFeature,
+      fillFunction: ChronosChurchFeature.fillChronosChurchFeature,
+      icon: ChronosChurchFeature.getIcon(),
+    })
+
+    lines.push({
+      id: 2,
       caption: 'Храмы',
       classFeature: TemplesFeature,
       fillFunction: TemplesFeature.fillTemplesFeature,
@@ -74,14 +83,14 @@ export class LegendControl extends EventEmitter {
     })
 
     lines.push({
-      id: 2,
+      id: 3,
       caption: 'Лики',
       classFeature: PersonFeature,
       fillFunction: this.fillPersonFeature,
       // icon: PersonFeature.getIcon(),
       childs: [
         {
-          id: 3,
+          id: 4,
           caption: 'Мученики',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
@@ -90,7 +99,7 @@ export class LegendControl extends EventEmitter {
           isHide: false,
         },
         {
-          id: 4,
+          id: 5,
           caption: 'Преподобные',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
@@ -99,7 +108,7 @@ export class LegendControl extends EventEmitter {
           isHide: false,
         },
         {
-          id: 5,
+          id: 6,
           caption: 'Святые',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,

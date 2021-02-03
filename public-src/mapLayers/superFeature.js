@@ -22,8 +22,8 @@ class SuperFeature {
   static getStyleFeature(feature, zoom) {
     const style = new olStyle.Style({
       image: new olStyle.Icon({
-        // anchor: [0, 0],
-        imgSize: [32, 32],
+        anchor: [0.5, 0.5],
+        imgSize: [26, 26],
         src: feature.get('info').icon,
         //color: '#ff0000',
         // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),

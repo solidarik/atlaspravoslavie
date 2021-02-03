@@ -22,6 +22,7 @@ import { default as olAnimatedCluster } from 'ol-ext/layer/AnimatedCluster'
 import { default as olFeatureAnimationZoom } from 'ol-ext/featureanimation/Zoom'
 import { easeOut } from 'ol/easing'
 import ClassHelper from '../helper/classHelper'
+import DateHelper from '../helper/dateHelper'
 
 const MAP_PARAMS = {
   min_year: 1914,
@@ -306,7 +307,7 @@ export class MapControl extends EventEmitter {
     f.setStyle(
       new olStyle.Style({
         image: new olStyle.Circle({
-          radius: 30,
+          radius: 26,
           stroke: new olStyle.Stroke({ color: 'red', width: 3 }),
         }),
         // image: new olStyle.RegularShape({
@@ -331,8 +332,8 @@ export class MapControl extends EventEmitter {
     )
   }
 
-  setCurrentYearFromServer(year) {
-    this.changeYear(year)
+  setCurrentYearFromServer(obj) {
+    this.changeYear(obj)
     this.addYearControl()
   }
 
@@ -341,8 +342,14 @@ export class MapControl extends EventEmitter {
       new YearControl({
         caption: 'Выбрать год событий',
         year: this.currentYear,
-        handler: (year) => {
-          this.changeYear(year)
+        century: this.currentCentury,
+        kind: this.currentKind,
+        handler: (dateObj) => {
+          this.changeYear({
+            'year': dateObj.year,
+            'century': dateObj.century,
+            'kind': dateObj.kind
+          })
         },
       })
     )
@@ -427,7 +434,15 @@ export class MapControl extends EventEmitter {
   getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
     if (!this.currentYear) return
 
-    let ano = this.currentYear
+    let year = this.currentYear
+    if (this.currentKind == 'century') {
+      const range = DateHelper.getCenturyRange(this.currentCentury)
+      year = (range[0] + range[1]) / 2
+      year = Math.round(year)
+      console.log(`>>>>>>>> year by round century ${year}`)
+    }
+
+    let ano = year
     let anow = '' + ano
     anow = anow.replace('-', 'B')
 
@@ -469,12 +484,19 @@ export class MapControl extends EventEmitter {
     }, 1000)
   }
 
-  changeYear(year) {
+  changeYear(obj) {
     this.hidePopup()
     this.hidePulse()
-    this.currentYear = year
+
+    this.currentYear = obj.year
+    this.currentCentury = obj.century
+    this.currentKind = obj.kind
     this.yearLayer.getSource().refresh()
-    this.emit('changeYear', year)
+    this.emit('changeYear', {
+      'year': obj.year,
+      'century': obj.century,
+      'kind': obj.kind
+    })
   }
 
   createGeom(mo) {
@@ -535,60 +557,76 @@ class SuperCustomControl extends olControl.Control {
 
 class YearControl extends SuperCustomControl {
   static get min_year() {
+    return Number.MIN_SAFE_INTEGER
     return MAP_PARAMS.min_year
   }
 
   static get max_year() {
+    return Number.MAX_SAFE_INTEGER
     return MAP_PARAMS.max_year
   }
 
   constructor(inputParams) {
+
     super(inputParams)
 
     const caption = inputParams.caption
     const hint = inputParams.hint || caption
+
+    this.century = inputParams.century
     this.year = inputParams.year
+    this.kind = inputParams.kind
+
     this.handler = inputParams.handler
+
 
     let yearInput = document.createElement('input')
     yearInput.className = 'input-without-focus'
     yearInput.title = hint
     yearInput.setAttribute('id', 'year-input')
-    yearInput.value = this.year
+    yearInput.value = (this.kind == 'year') ? this.year : DateHelper.intCenturyToStr(this.century)
     yearInput.addEventListener('keyup', (event) => {
       if (event.keyCode == 13) {
-        this._inputKeyUp()
+        this.inputKeyUp()
         event.preventDefault()
       }
     })
 
+    let yearLabel = document.createElement('label')
+    yearLabel.setAttribute('id', 'year-label')
+    yearLabel.innerHTML = this.kind == 'year' ? 'год' : 'век'
+    yearLabel.addEventListener('click', () => {
+      this.yearCenturyClick()
+    }, false)
+
     this.yearInput = yearInput
+    this.yearLabel = yearLabel
 
     let yearLeftButton = document.createElement('button')
     yearLeftButton.innerHTML = this.getBSIconHTML('mdi mdi-step-backward-2')
-    yearLeftButton.title = 'Предыдущий год'
+    yearLeftButton.title = 'Предыдущий год/век'
     yearLeftButton.setAttribute('id', 'year-left-button')
     yearLeftButton.addEventListener(
       'click',
       () => {
-        this._leftButtonClick()
+        this.leftButtonClick()
       },
       false
     )
-    // yearLeftButton.addEventListener('touchstart', () => { this._leftButtonClick(); }, false);
+    // yearLeftButton.addEventListener('touchstart', () => { this.leftButtonClick(); }, false);
 
     let yearRightButton = document.createElement('button')
     yearRightButton.innerHTML = this.getBSIconHTML('mdi mdi-step-forward-2')
-    yearRightButton.title = 'Следующий год'
+    yearRightButton.title = 'Следующий год/век'
     yearRightButton.setAttribute('id', 'year-right-button')
     yearRightButton.addEventListener(
       'click',
       () => {
-        this._rightButtonClick()
+        this.rightButtonClick()
       },
       false
     )
-    // yearRightButton.addEventListener('touchstart', () => { this._rightButtonClick(); }, false);
+    // yearRightButton.addEventListener('touchstart', () => { this.rightButtonClick(); }, false);
 
     let parentDiv = document.createElement('div')
     parentDiv.className = 'ol-control'
@@ -596,6 +634,7 @@ class YearControl extends SuperCustomControl {
 
     parentDiv.appendChild(yearLeftButton)
     parentDiv.appendChild(yearInput)
+    parentDiv.appendChild(yearLabel)
     parentDiv.appendChild(yearRightButton)
 
     this.element = parentDiv
@@ -609,48 +648,93 @@ class YearControl extends SuperCustomControl {
     })
   }
 
-  _leftButtonClick() {
-    if (!this._checkYear(this.year, -1)) return
+  changeKind(kind, caption) {
+    this.kind = kind
+    this.yearLabel.innerHTML = caption
 
-    this.year = parseInt(this.year) - 1
-    this._setNewYear(this.year)
-  }
-
-  _rightButtonClick() {
-    if (!this._checkYear(this.year, +1)) return
-
-    this.year = parseInt(this.year) + 1
-    this._setNewYear(this.year)
-  }
-
-  _inputKeyUp() {
-    let year = this.yearInput.value
-
-    if (!this._checkYear(year, 0, this.year)) {
+    if (kind == 'century') {
+      this.century = DateHelper.yearToCentury(this.year)
+      this.yearInput.value = DateHelper.intCenturyToStr(this.century)
+    } else {
       this.yearInput.value = this.year
-      return
+    }
+  }
+
+  yearCenturyClick() {
+    if (this.kind == 'year') {
+      this.changeKind('century', 'век')
+    } else {
+      this.changeKind('year', 'год')
+    }
+  }
+
+  leftButtonClick() {
+    let input = this.yearInput.value
+    if (this.kind == 'century') {
+      input = this.century
+    }
+    this.checkAndChangeYearCentury(input, -1)
+  }
+
+  rightButtonClick() {
+    let input = this.yearInput.value
+    if (this.kind == 'century') {
+      input = this.century
+    }
+    this.checkAndChangeYearCentury(input, +1)
+  }
+
+  inputKeyUp() {
+    const input = this.yearInput.value
+    this.checkAndChangeYearCentury(input, 0)
+  }
+
+  checkAndChangeYearCentury(input, incr) {
+
+    let allowToChange = false
+
+    // предполагаем, что год и век вводится числом
+    const reg = /^\d+$/
+    allowToChange = reg.test(input)
+
+    let newValue = parseInt(input) + incr
+    let oldValue = 0
+
+    if (allowToChange) {
+      if (this.kind == 'year') {
+        oldValue = this.year
+
+        allowToChange = newValue < YearControl.max_year
+        allowToChange = newValue > YearControl.min_year
+
+      } else {
+        oldValue = this.century
+        const dateRange = DateHelper.getCenturyRange(newValue)
+        allowToChange = (dateRange) && (dateRange.length == 2)
+        allowToChange = dateRange[0] < YearControl.max_year
+        allowToChange=  dateRange[1] > YearControl.min_year
+
+      }
     }
 
-    this.year = parseInt(year)
-    this._setNewYear(this.year)
-  }
-
-  _checkYear(year, incr, oldValue = undefined) {
-    //var reg = /^[1,2][8,9,0]\d{2}$/
-    var reg = /^\d+$/
-    if (!reg.test(year)) return false
-
-    let intYear = parseInt(year) + incr
-    if (intYear < YearControl.min_year) return true //temporarily
-    if (intYear > YearControl.max_year) return true //temporarily
-
-    if (oldValue == intYear) return false
-
-    return true
-  }
-
-  _setNewYear(year) {
-    this.yearInput.value = this.year
-    this.handler(this.year)
+    allowToChange = allowToChange && (oldValue != newValue)
+    if (allowToChange) {
+      if (this.kind == 'year') {
+        this.year = newValue
+        this.yearInput.value = this.year
+      } else {
+        this.century = newValue
+        this.yearInput.value = DateHelper.intCenturyToStr(this.century)
+      }
+      this.handler({
+        'year': this.year,
+        'century': this.century,
+        'kind': this.kind})
+    } else {
+      if (this.kind == 'year')
+        this.yearInput.value = this.year
+      else
+        this.yearInput.value = DateHelper.intCenturyToStr(this.century)
+    }
   }
 }

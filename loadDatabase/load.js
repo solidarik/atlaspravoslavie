@@ -4,6 +4,7 @@ const log = require('../helper/logHelper')
 const DbHelper = require('../loadDatabase/dbHelper')
 const inetHelper = require('../helper/inetHelper')
 const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
+const chronosChurchJsonMediator = require('../loadDatabase/chronosChurchJsonMediator')
 const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
@@ -36,27 +37,38 @@ Promise.resolve(true)
     })
   })
   .then(() => {
-     return dbHelper.clearDb('temples')
-   })
-   .then(() => {
-     return dbHelper.saveFilesFrom({
-       source: 'python/out_temples',
-       procdir: 'out/out_temples_process',
-       errdir: 'out/out_temples_errors',
-       mediator: templesJsonMediator,
-     })
-   })
-  .then(() => {
-    return dbHelper.clearDb('persons')
+    return dbHelper.clearDb('chronosChurch')
   })
   .then(() => {
     return dbHelper.saveFilesFrom({
-      source: 'python/out_persons',
-      procdir: 'out/out_person_process',
-      errdir: 'out/out_person_errors',
-      mediator: personsJsonMediator,
+      source: 'python/out_chronos_church',
+      procdir: 'out/out_chronos_church_process',
+      errdir: 'out/out_chronos_church_errors',
+      mediator: chronosChurchJsonMediator,
     })
   })
+  // .then(() => {
+  //    return dbHelper.clearDb('temples')
+  //  })
+  //  .then(() => {
+  //    return dbHelper.saveFilesFrom({
+  //      source: 'python/out_temples',
+  //      procdir: 'out/out_temples_process',
+  //      errdir: 'out/out_temples_errors',
+  //      mediator: templesJsonMediator,
+  //    })
+  //  })
+  // .then(() => {
+  //   return dbHelper.clearDb('persons')
+  // })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_persons',
+  //     procdir: 'out/out_person_process',
+  //     errdir: 'out/out_person_errors',
+  //     mediator: personsJsonMediator,
+  //   })
+  // })
   .then(() => {
     log.success(chalk.cyan(`окончание процесса загрузки`))
     dbHelper.free()

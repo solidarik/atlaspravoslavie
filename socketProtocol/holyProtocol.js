@@ -1,5 +1,6 @@
 const ServerProtocol = require('../libs/serverProtocol')
 const ChronosModel = require('../models/chronosReligionModel')
+const ChronosChurchModel = require('../models/chronosChurchModel')
 const PersonsModel = require('../models/personsModel')
 const TemplesModel = require('../models/templesModel')
 
@@ -43,12 +44,10 @@ class HolyProtocol extends ServerProtocol {
 
     try {
       let data = JSON.parse(msg)
-      let startDate = new Date(data.year, 0, 1).toISOString()
-      let endDate = new Date(data.year, 11, 31).toISOString()
 
       const searchDates = {
-        $gte: parseInt(data.year),
-        $lt: parseInt(data.year) + 1,
+        $gte: parseInt(data.range[0]),
+        $lt: parseInt(data.range[1]),
       }
 
       const defaultSearchParam = {
@@ -57,13 +56,14 @@ class HolyProtocol extends ServerProtocol {
 
       const overDateParam = {
         $or: [
-          { startYear: { $lt: parseInt(data.year) } },
+          { startYear: { $lt: parseInt(data.range[1]) } },
           { startYear: { $exists: false } }
         ]
       }
 
       const promices = [
         ChronosModel.find(defaultSearchParam),
+        ChronosChurchModel.find(defaultSearchParam),
         TemplesModel.find(overDateParam),
         PersonsModel.find({"groupStatus": "мученик", "birth.place": {$exists: true} }),
         PersonsModel.find({"groupStatus": "преподобный", "birth.place": {$exists: true}}),
@@ -85,10 +85,11 @@ class HolyProtocol extends ServerProtocol {
           cb(
             JSON.stringify({
               chronos: res[0],
-              temples: res[1],
-              personsMartyrs: res[2],
-              personsReverends: res[3],
-              personsHoly: res[4],
+              chronosChurch: res[1],
+              temples: res[2],
+              personsMartyrs: res[3],
+              personsReverends: res[4],
+              personsHoly: res[5],
             })
           )
         })
