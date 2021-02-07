@@ -77,18 +77,18 @@ describe('5 century = V century ', () => {
   })
 })
 
-describe('-5 century = V до н.э. century ', () => {
-  const v = ['-5', 'V до н.э.']
+describe('-5 century = -V century ', () => {
+  const v = ['-5', '-V']
   it(it_name(v), () => {
     check_equal(v, dateHelper.intCenturyToStr)
   })
 })
 
-describe('-1933 year = XX до н.э. ', () => {
+describe('-1933 year = -XX', () => {
   it('check double function', () => {
     const century = dateHelper.yearToCentury('-1933')
     const centuryStr = dateHelper.intCenturyToStr(century)
-    assert.deepStrictEqual(centuryStr, 'XX до н.э.')
+    assert.deepStrictEqual(centuryStr, '-XX')
   })
 })
 
@@ -107,6 +107,15 @@ describe('check roman to arabic', () =>{
 
   it('check 1571 year to 16 century', () => {
     assert.deepStrictEqual(dateHelper.yearToCentury('1571'), 16)
+  })
+
+  it('check negative century', () => {
+    assert.deepStrictEqual(dateHelper.getCenturyRange(-1), [-99, -0])
+    assert.deepStrictEqual(dateHelper.getCenturyRange(-2), [-199, -100])
+  })
+
+  it('check zero century', () => {
+    assert.deepStrictEqual(dateHelper.intCenturyToStr(0), 'I')
   })
 })
 

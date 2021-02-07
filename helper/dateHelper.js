@@ -117,9 +117,12 @@ class DateHelper {
 
   static intCenturyToStr(intCentury) {
     const isMinus = intCentury < 0
+    if (intCentury == 0) {
+      intCentury = 1
+    }
     const romanize = DateHelper.arabicToRoman(intCentury)
     if (isMinus) {
-      return `${romanize} до н.э.`
+      return `-${romanize}`
     }
     return romanize
   }

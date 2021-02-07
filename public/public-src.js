@@ -81545,10 +81545,15 @@ var DateHelper = /*#__PURE__*/function () {
     key: "intCenturyToStr",
     value: function intCenturyToStr(intCentury) {
       var isMinus = intCentury < 0;
+
+      if (intCentury == 0) {
+        intCentury = 1;
+      }
+
       var romanize = DateHelper.arabicToRoman(intCentury);
 
       if (isMinus) {
-        return "".concat(romanize, " \u0434\u043E \u043D.\u044D.");
+        return "-".concat(romanize);
       }
 
       return romanize;
@@ -82385,7 +82390,7 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
     value: function checkAndChangeYearCentury(input, incr) {
       var allowToChange = false; // предполагаем, что год и век вводится числом
 
-      var reg = /^\d+$/;
+      var reg = /^[-]*\d+$/;
       allowToChange = reg.test(input);
       var newValue = parseInt(input) + incr;
       var oldValue = 0;

@@ -1,5 +1,5 @@
 const DateHelper = require('../helper/dateHelper')
 
 
-let res = DateHelper.yearToCentury('1571')
+let res = DateHelper.intCenturyToStr(0)
 console.log(`>>>>>>>>  ${res}`)

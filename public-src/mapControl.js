@@ -701,7 +701,7 @@ class YearControl extends SuperCustomControl {
     let allowToChange = false
 
     // предполагаем, что год и век вводится числом
-    const reg = /^\d+$/
+    const reg = /^[-]*\d+$/
     allowToChange = reg.test(input)
 
     let newValue = parseInt(input) + incr
