@@ -81534,12 +81534,12 @@ var DateHelper = /*#__PURE__*/function () {
       var century = 0;
 
       if (year >= 0) {
-        century = year / 100 + 1;
+        century = Math.floor(year / 100) + 1;
       } else {
-        century = year / 100 - 1;
+        century = Math.trunc(year / 100) - 1;
       }
 
-      return Number(century.toFixed(0));
+      return Number(century);
     }
   }, {
     key: "intCenturyToStr",

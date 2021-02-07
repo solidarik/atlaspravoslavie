@@ -104,5 +104,9 @@ describe('check roman to arabic', () =>{
     assert.deepStrictEqual(dateHelper.getCenturyRange(1), [0, 99])
     assert.deepStrictEqual(dateHelper.getCenturyRange(0), [0, 99])
   })
+
+  it('check 1571 year to 16 century', () => {
+    assert.deepStrictEqual(dateHelper.yearToCentury('1571'), 16)
+  })
 })
 
