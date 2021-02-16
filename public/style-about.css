@@ -176,3 +176,10 @@ body::-webkit-scrollbar-thumb {
 .quote-card.yellow-card:after {
   color: #fbc02d;
 }
+
+a {
+  color: #99ccff;
+}
+a:hover {
+  color: #6699ff;
+}
