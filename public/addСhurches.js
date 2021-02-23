@@ -173,7 +173,7 @@ export default class addСhurches {
           var headerCell = $('<th />')
           headerCell.html('Название')
           row.append(headerCell)
-        } else if (columns[i] == 'startDateStr') {
+        } else if (columns[i] == 'startYear') {
           var headerCell = $('<th />')
           headerCell.html('Основание')
           row.append(headerCell)
@@ -194,9 +194,15 @@ export default class addСhurches {
       row.attr('id', i)
       for (var j = 0; j < columnCount; j++) {
         //if (j == 5 || j == 7 || j == 8)
-        if (columns[j] == 'name' || columns[j] == 'startDateStr' || columns[j] == 'place') {
+        if (columns[j] == 'name' || columns[j] == 'startYear' || columns[j] == 'place') {
           var cell = $('<td />')
-          cell.html(obj[i][columns[j]])
+          if(columns[j] == 'startYear'&&obj[i][columns[j]]==-999)
+          {
+            cell.html(obj[i]['startCentury']*100-100)
+          }
+          else{
+            cell.html(obj[i][columns[j]])
+          }
           row.append(cell)
         }
       }
