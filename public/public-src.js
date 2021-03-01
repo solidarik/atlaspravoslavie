@@ -82874,6 +82874,12 @@ var _dateHelper = _interopRequireDefault(require("../../helper/dateHelper"));
 
 var _strHelper = _interopRequireDefault(require("../../helper/strHelper"));
 
+var olStyle = _interopRequireWildcard(require("ol/style"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -82936,6 +82942,23 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
       };
     }
   }, {
+    key: "getStyleFeature",
+    value: function getStyleFeature(feature, zoom) {
+      var style = new olStyle.Style({
+        image: new olStyle.Icon({
+          anchor: [0.5, 0.5],
+          imgSize: [34, 34],
+          src: feature.get('info').icon,
+          //color: '#ff0000',
+          // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
+          scale: 1,
+          radius: 7,
+          opacity: 1
+        })
+      });
+      return [style];
+    }
+  }, {
     key: "getHtmlInfo",
     value: function getHtmlInfo(outerInfo) {
       var info = outerInfo.info;
@@ -82983,7 +83006,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = PersonFeature;
-},{"./superFeature":"hPGt","../../helper/dateHelper":"IrKG","../../helper/strHelper":"IGBU"}],"WAuT":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/dateHelper":"IrKG","../../helper/strHelper":"IGBU","ol/style":"TZKB"}],"WAuT":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

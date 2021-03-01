@@ -1,6 +1,7 @@
 import SuperFeature from './superFeature'
 import DateHelper from '../../helper/dateHelper'
 import StrHelper from '../../helper/strHelper'
+import * as olStyle from 'ol/style'
 
 class PersonFeature extends SuperFeature {
   static getIcon(kind) {
@@ -18,6 +19,22 @@ class PersonFeature extends SuperFeature {
       date: info.startDate,
       caption: this.getCaptionInfo(info),
     }
+  }
+
+  static getStyleFeature(feature, zoom) {
+    const style = new olStyle.Style({
+      image: new olStyle.Icon({
+        anchor: [0.5, 0.5],
+        imgSize: [34, 34],
+        src: feature.get('info').icon,
+        //color: '#ff0000',
+        // fill: new olStyle.Fill({ color: 'rgba(153,51,255,1)' }),
+        scale: 1,
+        radius: 7,
+        opacity: 1,
+      }),
+    })
+    return [style]
   }
 
   static getHtmlInfo(outerInfo) {
