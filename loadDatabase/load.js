@@ -2,16 +2,19 @@ const chalk = require('chalk')
 const log = require('../helper/logHelper')
 
 const DbHelper = require('../loadDatabase/dbHelper')
+const PersonsAggr = require('../loadDatabase/personsAggr')
 const inetHelper = require('../helper/inetHelper')
 const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
 const chronosChurchJsonMediator = require('../loadDatabase/chronosChurchJsonMediator')
 const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
+const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 inetHelper.loadCoords(checkedCoordsPath)
 
-dbHelper = new DbHelper()
+const dbHelper = new DbHelper()
+const personsAggr = new PersonsAggr()
 
 Promise.resolve(true)
   // .then(() => {
@@ -47,17 +50,17 @@ Promise.resolve(true)
   //     mediator: chronosChurchJsonMediator,
   //   })
   // })
-  .then(() => {
-     return dbHelper.clearDb('temples')
-   })
-   .then(() => {
-     return dbHelper.saveFilesFrom({
-       source: 'python/out_temples',
-       procdir: 'out/out_temples_process',
-       errdir: 'out/out_temples_errors',
-       mediator: templesJsonMediator,
-     })
-   })
+  // .then(() => {
+  //    return dbHelper.clearDb('temples')
+  //  })
+  //  .then(() => {
+  //    return dbHelper.saveFilesFrom({
+  //      source: 'python/out_temples',
+  //      procdir: 'out/out_temples_process',
+  //      errdir: 'out/out_temples_errors',
+  //      mediator: templesJsonMediator,
+  //    })
+  //  })
   .then(() => {
     return dbHelper.clearDb('persons')
   })
@@ -70,11 +73,20 @@ Promise.resolve(true)
     })
   })
   .then(() => {
+    return dbHelper.clearDb('personsAggr')
+  })
+  .then(() => {
+    log.info('аггрегация данных по персоналиям')
+    return personsAggr.start()
+  })
+  .then(() => {
     log.success(chalk.cyan(`окончание процесса загрузки`))
+    personsAggr.free()
     dbHelper.free()
     inetHelper.saveCoords(checkedCoordsPath)
   })
   .catch((err) => {
+    personsAggr.free()
     dbHelper.free()
     inetHelper.saveCoords(checkedCoordsPath)
     log.error(`ошибка загрузки данных: ${err}`)

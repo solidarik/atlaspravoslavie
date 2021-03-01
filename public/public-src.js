@@ -82917,23 +82917,8 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
 
   _createClass(PersonFeature, null, [{
     key: "getIcon",
-    value: function getIcon() {
-      return 'images/faces.png';
-    }
-  }, {
-    key: "getMartyrsIcon",
-    value: function getMartyrsIcon() {
-      return 'images/persons_martyrs.png';
-    }
-  }, {
-    key: "getReverendsIcon",
-    value: function getReverendsIcon() {
-      return 'images/persons_reverends.png';
-    }
-  }, {
-    key: "getHolyIcon",
-    value: function getHolyIcon() {
-      return 'images/persons_holy.png';
+    value: function getIcon(kind) {
+      return "images/persons_".concat(kind, ".png");
     }
   }, {
     key: "getCaptionInfo",
@@ -82943,7 +82928,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
   }, {
     key: "getPopupInfo",
     value: function getPopupInfo(feature) {
-      var info = feature.get('info');
+      var info = feature.get('info').info;
       return {
         icon: this.getIcon(),
         date: info.startDate,
@@ -82952,7 +82937,8 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     }
   }, {
     key: "getHtmlInfo",
-    value: function getHtmlInfo(info) {
+    value: function getHtmlInfo(outerInfo) {
+      var info = outerInfo.info;
       window.CURRENT_ITEM = info;
       var worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания';
       worshipStr += ': ' + info.worshipDays.map(function (item) {
@@ -82980,45 +82966,13 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "fillPersonItems",
     value: function fillPersonItems(info, kind) {
       var res = [];
-
-      switch (kind) {
-        case 'martyrs':
-          if (!info.personsMartyrs) return res;
-          res = info.personsMartyrs.map(function (elem) {
-            return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.birth.placeCoord[0],
-              icon: PersonFeature.getMartyrsIcon()
-            });
-          });
-          break;
-
-        case 'reverends':
-          if (!info.personsReverends) return res;
-          res = info.personsReverends.map(function (elem) {
-            return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.birth.placeCoord[0],
-              icon: PersonFeature.getReverendsIcon()
-            });
-          });
-          break;
-
-        case 'holy':
-          if (!info.personsHoly) return res;
-          res = info.personsHoly.map(function (elem) {
-            return _objectSpread(_objectSpread({}, elem), {}, {
-              point: elem.birth.placeCoord[0],
-              icon: PersonFeature.getHolyIcon()
-            });
-          });
-          break;
-
-        default:
-          throw console.error("fillPersonItems, \u043D\u0435\u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u044B\u0439 kind ".concat(kind));
-      }
-
+      if (!info.persons) return res;
+      res = info.persons.filter(function (item) {
+        return item.kindAndStatus == kind;
+      });
       res = res.map(function (elem) {
         return _objectSpread(_objectSpread({}, elem), {}, {
-          oneLine: "".concat(PersonFeature.getFio(elem))
+          icon: PersonFeature.getIcon(kind)
         });
       });
       return res;
@@ -83181,7 +83135,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.showHideLegend();
 
     _this.lines = _this.addLines();
-    _this.linesCount = 7;
+    _this.linesCount = 15;
 
     var isCheckArr = _cookieHelper.default.getCookie('isCheckArrLegend', undefined);
 
@@ -83205,12 +83159,31 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
     }
   }, {
-    key: "fillPersonFeature",
-    value: function fillPersonFeature(info) {
+    key: "fillPersonBirthFeature",
+    value: function fillPersonBirthFeature(info) {
       var res = [];
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'martyrs'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'reverends'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_holy'));
+      console.log('birts', res);
+      return res;
+    }
+  }, {
+    key: "fillPersonAchievFeature",
+    value: function fillPersonAchievFeature(info) {
+      var res = [];
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_holy'));
+      return res;
+    }
+  }, {
+    key: "fillPersonDeathFeature",
+    value: function fillPersonDeathFeature(info) {
+      var res = [];
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_holy'));
       return res;
     }
   }, {
@@ -83240,33 +83213,95 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
       lines.push({
         id: 3,
-        caption: 'Лики',
+        caption: 'Лики. Рождения',
         classFeature: _personFeature.default,
-        fillFunction: this.fillPersonFeature,
+        fillFunction: this.fillPersonBirthFeature,
         // icon: PersonFeature.getIcon(),
         childs: [{
           id: 4,
           caption: 'Мученики',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'martyrs',
-          icon: _personFeature.default.getMartyrsIcon(),
+          fillFunctionKind: 'birth_martyrs',
+          icon: _personFeature.default.getIcon('birth_martyrs'),
           isHide: false
         }, {
           id: 5,
           caption: 'Преподобные',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'reverends',
-          icon: _personFeature.default.getReverendsIcon(),
+          fillFunctionKind: 'birth_reverends',
+          icon: _personFeature.default.getIcon('birth_reverends'),
           isHide: false
         }, {
           id: 6,
           caption: 'Святые',
           classFeature: _personFeature.default,
           fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'holy',
-          icon: _personFeature.default.getHolyIcon(),
+          fillFunctionKind: 'birth_holy',
+          icon: _personFeature.default.getIcon('birth_holy'),
+          isHide: false
+        }]
+      });
+      lines.push({
+        id: 7,
+        caption: 'Лики. Достижения',
+        classFeature: _personFeature.default,
+        fillFunction: this.fillPersonAchievFeature,
+        childs: [{
+          id: 8,
+          caption: 'Мученики',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'achiev_martyrs',
+          icon: _personFeature.default.getIcon('achiev_martyrs'),
+          isHide: false
+        }, {
+          id: 9,
+          caption: 'Преподобные',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'achiev_reverends',
+          icon: _personFeature.default.getIcon('achiev_reverends'),
+          isHide: false
+        }, {
+          id: 10,
+          caption: 'Святые',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'achiev_holy',
+          icon: _personFeature.default.getIcon('achiev_holy'),
+          isHide: false
+        }]
+      });
+      lines.push({
+        id: 11,
+        caption: 'Лики. Смерти',
+        classFeature: _personFeature.default,
+        fillFunction: this.fillPersonDeathFeature,
+        childs: [{
+          id: 12,
+          caption: 'Мученики',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'death_martyrs',
+          icon: _personFeature.default.getIcon('death_martyrs'),
+          isHide: false
+        }, {
+          id: 13,
+          caption: 'Преподобные',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'death_reverends',
+          icon: _personFeature.default.getIcon('death_reverends'),
+          isHide: false
+        }, {
+          id: 14,
+          caption: 'Святые',
+          classFeature: _personFeature.default,
+          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunctionKind: 'death_holy',
+          icon: _personFeature.default.getIcon('death_holy'),
           isHide: false
         }]
       });
@@ -91577,17 +91612,21 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
 
       _cookieHelper.default.setCookie('kind', kind);
 
-      var dateRange = [];
+      var searchData = {};
 
       if (kind == 'year') {
-        dateRange = [year, year];
+        searchData = {
+          isYearMode: true,
+          value: year
+        };
       } else {
-        dateRange = _dateHelper.default.getCenturyRange(century);
+        searchData = {
+          isYearMode: false,
+          value: century
+        };
       }
 
-      this.socket.emit('clQueryDataByYear', JSON.stringify({
-        range: dateRange
-      }), function (msg) {
+      this.socket.emit('clQueryDataByYear', JSON.stringify(searchData), function (msg) {
         _this3.emit('refreshInfo', JSON.parse(msg));
       });
     }

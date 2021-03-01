@@ -66,7 +66,7 @@ class InetHelper {
     if (!input)
       return input
 
-      const promises = input.split(';').map((local) => {
+    const promises = input.split(';').map((local) => {
       return this.getLocalCoordsForName(local.trim())
     })
 

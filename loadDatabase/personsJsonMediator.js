@@ -21,20 +21,20 @@ class PersonsJsonMediator extends SuperJsonMediator {
 
     place = place.replace(',', '').replace('"', '')
     //по сути это контекст return place.replace(/^\S{1,2}[.]+\s/g, '')
-    return place
+    return `${place}`
   }
 
   processJson(json) {
     return new Promise((resolve, reject) => {
 
       let promises = [
-        InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.birth.place)),
-        InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.death.place))
+        InetHelper.getLocalCoordsForName(this.deleteAbbrev(json.birth.place)),
+        InetHelper.getLocalCoordsForName(this.deleteAbbrev(json.death.place))
       ]
 
       json.achievements.forEach((achiev) => {
         promises.push(
-          InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(achiev.place))
+          InetHelper.getLocalCoordsForName(this.deleteAbbrev(achiev.place))
         )
       })
 
@@ -43,18 +43,18 @@ class PersonsJsonMediator extends SuperJsonMediator {
           const birthCoords = coords[0]
           const deathCoords = coords[1]
 
-          if (birthCoords && birthCoords.length == 0)
+          if (birthCoords && birthCoords.length < 2)
               resolve({
-                error: `не удалось определить координаты рождения`,
+                error: `не удалось определить координаты рождения ${json.birth.place}`,
                 errorPlace: json.birth.place })
 
-          if (deathCoords && deathCoords.length == 0)
+          if (deathCoords && deathCoords.length < 2)
               resolve({
-                error: `не удалось определить координаты смерти`,
+                error: `не удалось определить координаты смерти ${json.death.place}`,
                 errorPlace: json.death.place })
 
           for (let i = 2; i < json.achievements.length + 2; i++) {
-            if (coords[i] && coords[i].length == 0) {
+            if (coords[i] && coords[i].length < 2) {
               errorPlace = json.achievemnts[i - 2].place
               resolve({
                 error: `не удалось определить координаты достижения для ${errorPlace}`,

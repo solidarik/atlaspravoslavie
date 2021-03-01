@@ -30,7 +30,7 @@ class DbHelper {
                 if (err) reject(err)
 
                 resolve(true)
-                info(`removed collection: ${modelFilePath}`)
+                log.info(`removed collection: ${modelFilePath}`)
               })
             })
           )
@@ -52,7 +52,7 @@ class DbHelper {
     if (this.isOuter) return
     setTimeout(() => {
       this.db.disconnect()
-      info(chalk.yellow('db disconnected'))
+      log.info(chalk.yellow('db disconnected'))
     }, 100)
   }
 
@@ -77,7 +77,7 @@ class DbHelper {
         files.push(source)
       }
 
-      info(`начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
+      log.info(`начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
 
       let promises = []
 
@@ -114,9 +114,9 @@ class DbHelper {
                   resolve(true)
                 })
                 .catch((err) => {
-                  let msg = `ошибка при обработке файла ${filename} элемент ${JSON.stringify(
+                  let msg = `ошибка при обработке файла ${filename}: ${err} элемент ${JSON.stringify(
                     jsonItem
-                  )}: ${err}`
+                  )}`
                   fileHelper.saveJsonToFileSync(newJsonItem, errpath)
                   log.error(msg)
                   resolve({ error: new Error(msg) })
@@ -163,7 +163,7 @@ class DbHelper {
     let obj = fileHelper.getJsonFromFile(filePath)
     obj.forEach((item, i, arr) => {
       if (i == 0) {
-        info(fromLonLat([56.004, 54.695]))
+        log.info(fromLonLat([56.004, 54.695]))
         let country = {
           iso: item['ISO3'],
           eng: item['NAME'],
@@ -174,7 +174,7 @@ class DbHelper {
         log.info(JSON.stringify(item))
       }
     })
-    info(obj.length)
+    log.info(obj.length)
   }
 
   getSamaraSource() {

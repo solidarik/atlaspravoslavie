@@ -160,6 +160,7 @@ for row in range(START_ROW, END_ROW):
         worshipArr = []
         worships = GetSheetValue(row, col_worshipDays)
         if worships:
+            print(worships)
             worships = helper.remove_spaces(worships)
             worships = worships.replace('.', '').replace(';', '/')
             worships = worships.split('/')

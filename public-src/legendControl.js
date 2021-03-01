@@ -22,7 +22,7 @@ export class LegendControl extends EventEmitter {
     this.showHideLegend()
 
     this.lines = this.addLines()
-    this.linesCount = 7
+    this.linesCount = 15
     const isCheckArr = CookieHelper.getCookie('isCheckArrLegend', undefined)
     this.isCheckArr = isCheckArr
       ? JSON.parse(isCheckArr)
@@ -47,11 +47,28 @@ export class LegendControl extends EventEmitter {
     )
   }
 
-  fillPersonFeature(info) {
+  fillPersonBirthFeature(info) {
     let res = []
-    res = res.concat(PersonFeature.fillPersonItems(info, 'martyrs'))
-    res = res.concat(PersonFeature.fillPersonItems(info, 'reverends'))
-    res = res.concat(PersonFeature.fillPersonItems(info, 'holy'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'birth_martyrs'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'birth_reverends'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'birth_holy'))
+    console.log('birts', res)
+    return res
+  }
+
+  fillPersonAchievFeature(info) {
+    let res = []
+    res = res.concat(PersonFeature.fillPersonItems(info, 'achiev_martyrs'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'achiev_reverends'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'achiev_holy'))
+    return res
+  }
+
+  fillPersonDeathFeature(info) {
+    let res = []
+    res = res.concat(PersonFeature.fillPersonItems(info, 'death_martyrs'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'death_reverends'))
+    res = res.concat(PersonFeature.fillPersonItems(info, 'death_holy'))
     return res
   }
 
@@ -84,9 +101,9 @@ export class LegendControl extends EventEmitter {
 
     lines.push({
       id: 3,
-      caption: 'Лики',
+      caption: 'Лики. Рождения',
       classFeature: PersonFeature,
-      fillFunction: this.fillPersonFeature,
+      fillFunction: this.fillPersonBirthFeature,
       // icon: PersonFeature.getIcon(),
       childs: [
         {
@@ -94,8 +111,8 @@ export class LegendControl extends EventEmitter {
           caption: 'Мученики',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'martyrs',
-          icon: PersonFeature.getMartyrsIcon(),
+          fillFunctionKind: 'birth_martyrs',
+          icon: PersonFeature.getIcon('birth_martyrs'),
           isHide: false,
         },
         {
@@ -103,8 +120,8 @@ export class LegendControl extends EventEmitter {
           caption: 'Преподобные',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'reverends',
-          icon: PersonFeature.getReverendsIcon(),
+          fillFunctionKind: 'birth_reverends',
+          icon: PersonFeature.getIcon('birth_reverends'),
           isHide: false,
         },
         {
@@ -112,8 +129,80 @@ export class LegendControl extends EventEmitter {
           caption: 'Святые',
           classFeature: PersonFeature,
           fillFunction: PersonFeature.fillPersonItems,
-          fillFunctionKind: 'holy',
-          icon: PersonFeature.getHolyIcon(),
+          fillFunctionKind: 'birth_holy',
+          icon: PersonFeature.getIcon('birth_holy'),
+          isHide: false,
+        },
+      ],
+    })
+
+    lines.push({
+      id: 7,
+      caption: 'Лики. Достижения',
+      classFeature: PersonFeature,
+      fillFunction: this.fillPersonAchievFeature,
+      childs: [
+        {
+          id: 8,
+          caption: 'Мученики',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'achiev_martyrs',
+          icon: PersonFeature.getIcon('achiev_martyrs'),
+          isHide: false,
+        },
+        {
+          id: 9,
+          caption: 'Преподобные',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'achiev_reverends',
+          icon: PersonFeature.getIcon('achiev_reverends'),
+          isHide: false,
+        },
+        {
+          id: 10,
+          caption: 'Святые',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'achiev_holy',
+          icon: PersonFeature.getIcon('achiev_holy'),
+          isHide: false,
+        },
+      ],
+    })
+
+    lines.push({
+      id: 11,
+      caption: 'Лики. Смерти',
+      classFeature: PersonFeature,
+      fillFunction: this.fillPersonDeathFeature,
+      childs: [
+        {
+          id: 12,
+          caption: 'Мученики',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'death_martyrs',
+          icon: PersonFeature.getIcon('death_martyrs'),
+          isHide: false,
+        },
+        {
+          id: 13,
+          caption: 'Преподобные',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'death_reverends',
+          icon: PersonFeature.getIcon('death_reverends'),
+          isHide: false,
+        },
+        {
+          id: 14,
+          caption: 'Святые',
+          classFeature: PersonFeature,
+          fillFunction: PersonFeature.fillPersonItems,
+          fillFunctionKind: 'death_holy',
+          icon: PersonFeature.getIcon('death_holy'),
           isHide: false,
         },
       ],

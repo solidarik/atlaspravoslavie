@@ -89,17 +89,16 @@ export default class ClientProtocol extends EventEmitter {
     CookieHelper.setCookie('century', century)
     CookieHelper.setCookie('kind', kind)
 
-    let dateRange = []
+    let searchData = {}
     if (kind == 'year') {
-      dateRange = [year, year]
+      searchData = {isYearMode: true, value: year}
     } else {
-      dateRange = DateHelper.getCenturyRange(century)
+      searchData = {isYearMode: false, value: century}
     }
 
     this.socket.emit(
       'clQueryDataByYear',
-
-      JSON.stringify({ range: dateRange }),
+      JSON.stringify(searchData),
       (msg) => {
         this.emit('refreshInfo', JSON.parse(msg))
       }

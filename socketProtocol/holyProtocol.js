@@ -2,6 +2,7 @@ const ServerProtocol = require('../libs/serverProtocol')
 const ChronosModel = require('../models/chronosReligionModel')
 const ChronosChurchModel = require('../models/chronosChurchModel')
 const PersonsModel = require('../models/personsModel')
+const PersonsAggrModel = require('../models/personsAggrModel')
 const TemplesModel = require('../models/templesModel')
 
 function trycatch(func, cb){
@@ -45,41 +46,39 @@ class HolyProtocol extends ServerProtocol {
     try {
       let data = JSON.parse(msg)
 
+      let defaultSearchParam = {}
       const searchDates = {
-        $gte: parseInt(data.range[0]),
-        $lt: parseInt(data.range[1]) + 1,
+        $gte: parseInt(data.value),
+        $lt: parseInt(data.value) + 1,
       }
 
-      const defaultSearchParam = {
-        startYear: searchDates,
+      if (data.isYearMode) {
+        defaultSearchParam = {
+          startYear: searchDates
+        }
+      } else {
+        defaultSearchParam = {
+          startCentury: searchDates
+        }
       }
 
-      const overDateParam = {
-        $or: [
-          { startYear: { $lt: parseInt(data.range[1]) } },
-          { startYear: { $exists: false } }
-        ]
-      }
+      // const overDateParam = {
+      //   $or: [
+      //     { startYear: { $lt: parseInt(data.range[1]) } },
+      //     { startYear: { $exists: false } }
+      //   ]
+      // }
 
       // db.getCollection('personsreligions').find({"achievements": {"$elemMatch": {"start.century": 19}}})
 
       const promices = [
         ChronosModel.find(defaultSearchParam),
         ChronosChurchModel.find(defaultSearchParam),
-        TemplesModel.find(overDateParam),
-        PersonsModel.find({"groupStatus": "мученик", "birth.place": {$exists: true} }),
-        PersonsModel.find({"groupStatus": "преподобный", "birth.place": {$exists: true}}),
-        PersonsModel.find({"groupStatus": "святой", "birth.place": {$exists: true}})
-        /*PersonsModel.find({
-          dateBirth: searchDates,
-        }),
-        PersonsModel.find({
-          dateAchievement: searchDates,
-        }),
-        PersonsModel.find({
-          dateDeath: searchDates,
-        }),
-        /**/
+        TemplesModel.find(defaultSearchParam),
+        PersonsAggrModel.find(defaultSearchParam),
+        // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
+        // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
+        // PersonsAggrModel.find({...defaultSearchParam, "kind": "achiev"})
       ]
 
       Promise.all(promices)
@@ -89,9 +88,7 @@ class HolyProtocol extends ServerProtocol {
               chronos: res[0],
               chronosChurch: res[1],
               temples: res[2],
-              personsMartyrs: res[3],
-              personsReverends: res[4],
-              personsHoly: res[5],
+              persons: res[3]
             })
           )
         })

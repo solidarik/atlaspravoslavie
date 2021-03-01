@@ -3,20 +3,8 @@ import DateHelper from '../../helper/dateHelper'
 import StrHelper from '../../helper/strHelper'
 
 class PersonFeature extends SuperFeature {
-  static getIcon() {
-    return 'images/faces.png'
-  }
-
-  static getMartyrsIcon() {
-    return 'images/persons_martyrs.png'
-  }
-
-  static getReverendsIcon() {
-    return 'images/persons_reverends.png'
-  }
-
-  static getHolyIcon() {
-    return 'images/persons_holy.png'
+  static getIcon(kind) {
+    return `images/persons_${kind}.png`
   }
 
   static getCaptionInfo(info) {
@@ -24,7 +12,7 @@ class PersonFeature extends SuperFeature {
   }
 
   static getPopupInfo(feature) {
-    const info = feature.get('info')
+    const info = feature.get('info').info
     return {
       icon: this.getIcon(),
       date: info.startDate,
@@ -32,7 +20,8 @@ class PersonFeature extends SuperFeature {
     }
   }
 
-  static getHtmlInfo(info) {
+  static getHtmlInfo(outerInfo) {
+    let info = outerInfo.info
     window.CURRENT_ITEM = info
 
     let worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания'
@@ -72,43 +61,16 @@ class PersonFeature extends SuperFeature {
 
   static fillPersonItems(info, kind) {
     let res = []
-    switch (kind) {
-      case 'martyrs':
-        if (!info.personsMartyrs) return res
-        res = info.personsMartyrs.map((elem) => {
-          return {
-            ...elem,
-            point: elem.birth.placeCoord[0],
-            icon: PersonFeature.getMartyrsIcon()
-          }
-        })
-        break
-      case 'reverends':
-        if (!info.personsReverends) return res
-        res = info.personsReverends.map((elem) => {
-          return {
-            ...elem,
-            point: elem.birth.placeCoord[0],
-            icon: PersonFeature.getReverendsIcon()
-          }
-        })
-        break
-      case 'holy':
-        if (!info.personsHoly) return res
-        res = info.personsHoly.map((elem) => {
-          return {
-            ...elem,
-            point: elem.birth.placeCoord[0],
-            icon: PersonFeature.getHolyIcon()
-          }
-        })
-        break
-      default:
-        throw console.error(`fillPersonItems, некорректный kind ${kind}`)
-    }
+    if (!info.persons) return res
+
+    res = info.persons.filter( item => { return item.kindAndStatus == kind })
     res = res.map((elem) => {
-      return { ...elem, oneLine: `${PersonFeature.getFio(elem)}` }
+      return {
+        ...elem,
+        icon: PersonFeature.getIcon(kind)
+      }
     })
+
     return res
   }
 }
