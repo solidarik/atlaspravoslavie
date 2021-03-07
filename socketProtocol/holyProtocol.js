@@ -46,19 +46,32 @@ class HolyProtocol extends ServerProtocol {
     try {
       let data = JSON.parse(msg)
 
+      const intValue = parseInt(data.value)
+
       let defaultSearchParam = {}
+      let gteSearchParam = {}
+
       const searchDates = {
-        $gte: parseInt(data.value),
-        $lt: parseInt(data.value) + 1,
+        $gte: intValue,
+        $lt: intValue + 1,
+      }
+      const lteDates = {
+        $lte: intValue
       }
 
       if (data.isYearMode) {
         defaultSearchParam = {
           startYear: searchDates
         }
+        gteSearchParam = {
+          startYear: lteDates
+        }
       } else {
         defaultSearchParam = {
           startCentury: searchDates
+        }
+        gteSearchParam = {
+          startCentury: lteDates
         }
       }
 
@@ -74,7 +87,7 @@ class HolyProtocol extends ServerProtocol {
       const promices = [
         ChronosModel.find(defaultSearchParam),
         ChronosChurchModel.find(defaultSearchParam),
-        TemplesModel.find(defaultSearchParam),
+        TemplesModel.find(gteSearchParam),
         PersonsAggrModel.find(defaultSearchParam),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),

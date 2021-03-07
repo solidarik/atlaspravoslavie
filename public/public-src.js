@@ -82928,8 +82928,8 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
     }
   }, {
     key: "getCaptionInfo",
-    value: function getCaptionInfo(info) {
-      return "".concat(info.kind, ". ").concat(info.place);
+    value: function getCaptionInfo(outerInfo) {
+      return "".concat(outerInfo.info.kind, ". ").concat(outerInfo.info.place);
     }
   }, {
     key: "getPopupInfo",
@@ -82994,8 +82994,10 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
         return item.kindAndStatus == kind;
       });
       res = res.map(function (elem) {
+        var info = elem.info;
         return _objectSpread(_objectSpread({}, elem), {}, {
-          icon: PersonFeature.getIcon(kind)
+          icon: PersonFeature.getIcon(kind),
+          oneLine: "".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename)
         });
       });
       return res;

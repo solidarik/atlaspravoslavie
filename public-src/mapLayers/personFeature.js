@@ -8,8 +8,8 @@ class PersonFeature extends SuperFeature {
     return `images/persons_${kind}.png`
   }
 
-  static getCaptionInfo(info) {
-    return `${info.kind}. ${info.place}`
+  static getCaptionInfo(outerInfo) {
+    return `${outerInfo.info.kind}. ${outerInfo.info.place}`
   }
 
   static getPopupInfo(feature) {
@@ -82,9 +82,11 @@ class PersonFeature extends SuperFeature {
 
     res = info.persons.filter( item => { return item.kindAndStatus == kind })
     res = res.map((elem) => {
+      const info = elem.info
       return {
         ...elem,
-        icon: PersonFeature.getIcon(kind)
+        icon: PersonFeature.getIcon(kind),
+        oneLine: `${info.surname} ${info.name} ${info.middlename}`
       }
     })
 
