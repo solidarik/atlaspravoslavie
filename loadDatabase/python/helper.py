@@ -96,10 +96,11 @@ def get_month_num(input):
 def get_text_of_month_parent_case(num):
     assert (1 <= num and num <= 12)
     months = [
-        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа',
-        'сентября', 'октября', 'ноября', 'декабря'
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
+        'августа', 'сентября', 'октября', 'ноября', 'декабря'
     ]
     return months[num - 1]
+
 
 def get_text_of_month(num):
 
@@ -208,24 +209,36 @@ def get_date_from_input(inputText):
     try:
 
         outputStr = ''
-        if type(inputText) == str:
-            inputText = str(inputText).strip()
-            outputStr = inputText
+
         isUserText = False
         isOnlyYear = False
         isOnlyCentury = False
         isFound = False
         d, m, y, century = -1, -1, -999, -1
 
-        if not inputText:
-            raise ValueError('Empry input str')
+        # если ячейка в Excel представлена как "дата"
+        if not isFound:
+            if type(inputText) in [int, float]:
+                inputText = int(inputText)
+                if inputText > 2100:
+                    dt = datetime.datetime.fromordinal(
+                        datetime.datetime(1900, 1, 1).toordinal() + inputText -
+                        2)
+                    d, m, y = dt.day, dt.month, dt.year
+                    isFound = True
+            else:  # type(inputText) == str:
+                inputText = str(inputText).strip()
+                outputStr = inputText
+
+        if not inputText or inputText == '':
+            return None
 
         if not isFound:
             if (type(inputText) == str) and ('в' in inputText):
                 inputText = remove_spaces(str(inputText))
                 # если век
                 date_groups = get_search_groups_in_regexp(
-                    r'(\d*)[в]', inputText)
+                    r'(\d+)[в]', inputText)
                 if date_groups:
                     century = int(date_groups[0])
                     isOnlyCentury = True
@@ -236,17 +249,6 @@ def get_date_from_input(inputText):
                         r'(\d*).*до н.*', inputText)
                     if date_groups:
                         century = -century
-
-        # если ячейка в Excel представлена как "дата"
-        if not isFound:
-            if type(inputText) == float:
-                inputText = int(inputText)
-                if inputText > 2100:
-                    dt = datetime.datetime.fromordinal(
-                        datetime.datetime(1900, 1, 1).toordinal() + inputText -
-                        2)
-                    d, m, y = dt.day, dt.month, dt.year
-                    isFound = True
 
         if not isFound and type(inputText) == str:
             inputText = remove_spaces(inputText)
@@ -266,7 +268,7 @@ def get_date_from_input(inputText):
             except:
                 pass
 
-        # если дата до н.э.
+        # если год до н.э.
         if not isFound:
             date_groups = get_search_groups_in_regexp(r'(\d*).*дон.*',
                                                       inputText)
@@ -280,7 +282,7 @@ def get_date_from_input(inputText):
         # если даты формата dd.mm.yyyy или dd/mm/yyyy
         if not isFound:
             date_groups = get_search_groups_in_regexp(
-                r'(\d{1,2})\S(\d{1,2})\S(\d{1,4})', inputText)
+                r'(\d{1,2})\D(\d{1,2})\D(\d{1,4})', inputText)
             if date_groups:
                 d = int(date_groups[0])
                 m = int(date_groups[1])

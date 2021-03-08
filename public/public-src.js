@@ -83160,7 +83160,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.showHideLegend();
 
     _this.lines = _this.addLines();
-    _this.linesCount = 15;
+    _this.linesCount = 7;
 
     var isCheckArr = _cookieHelper.default.getCookie('isCheckArrLegend', undefined);
 
@@ -83184,31 +83184,51 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
     }
   }, {
-    key: "fillPersonBirthFeature",
-    value: function fillPersonBirthFeature(info) {
+    key: "fillPersonsFeature",
+    value: function fillPersonsFeature(info) {
       var res = [];
       res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_martyrs'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_martyrs'));
       res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_holy'));
-      console.log('birts', res);
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_reverends'));
       return res;
     }
   }, {
-    key: "fillPersonAchievFeature",
-    value: function fillPersonAchievFeature(info) {
+    key: "fillPersonMartyrsFeature",
+    value: function fillPersonMartyrsFeature(info) {
       var res = [];
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_martyrs'));
       res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_martyrs'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_reverends'));
+      return res;
+    }
+  }, {
+    key: "fillPersonHolyFeature",
+    value: function fillPersonHolyFeature(info) {
+      var res = [];
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_holy'));
       res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_holy'));
       return res;
     }
   }, {
-    key: "fillPersonDeathFeature",
-    value: function fillPersonDeathFeature(info) {
+    key: "fillPersonReverendsFeature",
+    value: function fillPersonReverendsFeature(info) {
       var res = [];
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_martyrs'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'birth_reverends'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'live_reverends'));
       res = res.concat(_personFeature.default.fillPersonItems(info, 'death_reverends'));
-      res = res.concat(_personFeature.default.fillPersonItems(info, 'death_holy'));
+      res = res.concat(_personFeature.default.fillPersonItems(info, 'achiev_reverends'));
       return res;
     }
   }, {
@@ -83238,15 +83258,15 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       });
       lines.push({
         id: 3,
-        caption: 'Лики. Рождения',
+        caption: 'Лики',
         classFeature: _personFeature.default,
-        fillFunction: this.fillPersonBirthFeature,
+        fillFunction: this.fillPersonsFeature,
         // icon: PersonFeature.getIcon(),
         childs: [{
           id: 4,
           caption: 'Мученики',
           classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunction: this.fillPersonMartyrsFeature,
           fillFunctionKind: 'birth_martyrs',
           icon: _personFeature.default.getIcon('birth_martyrs'),
           isHide: false
@@ -83254,7 +83274,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           id: 5,
           caption: 'Преподобные',
           classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunction: this.fillPersonReverendsFeature,
           fillFunctionKind: 'birth_reverends',
           icon: _personFeature.default.getIcon('birth_reverends'),
           isHide: false
@@ -83262,71 +83282,9 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
           id: 6,
           caption: 'Святые',
           classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
+          fillFunction: this.fillPersonHolyFeature,
           fillFunctionKind: 'birth_holy',
           icon: _personFeature.default.getIcon('birth_holy'),
-          isHide: false
-        }]
-      });
-      lines.push({
-        id: 7,
-        caption: 'Лики. Достижения',
-        classFeature: _personFeature.default,
-        fillFunction: this.fillPersonAchievFeature,
-        childs: [{
-          id: 8,
-          caption: 'Мученики',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'achiev_martyrs',
-          icon: _personFeature.default.getIcon('achiev_martyrs'),
-          isHide: false
-        }, {
-          id: 9,
-          caption: 'Преподобные',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'achiev_reverends',
-          icon: _personFeature.default.getIcon('achiev_reverends'),
-          isHide: false
-        }, {
-          id: 10,
-          caption: 'Святые',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'achiev_holy',
-          icon: _personFeature.default.getIcon('achiev_holy'),
-          isHide: false
-        }]
-      });
-      lines.push({
-        id: 11,
-        caption: 'Лики. Смерти',
-        classFeature: _personFeature.default,
-        fillFunction: this.fillPersonDeathFeature,
-        childs: [{
-          id: 12,
-          caption: 'Мученики',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'death_martyrs',
-          icon: _personFeature.default.getIcon('death_martyrs'),
-          isHide: false
-        }, {
-          id: 13,
-          caption: 'Преподобные',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'death_reverends',
-          icon: _personFeature.default.getIcon('death_reverends'),
-          isHide: false
-        }, {
-          id: 14,
-          caption: 'Святые',
-          classFeature: _personFeature.default,
-          fillFunction: _personFeature.default.fillPersonItems,
-          fillFunctionKind: 'death_holy',
-          icon: _personFeature.default.getIcon('death_holy'),
           isHide: false
         }]
       });

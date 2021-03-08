@@ -16,6 +16,8 @@ class TestHelper:
         """Тест получения даты из различных форматов"""
         func = helper.get_date_from_input
 
+        print('soli test')
+
         res = func('17.04.1636')
         assert res["ymd"][0] == 1636
         assert res["ymd"][1] == 4
@@ -89,6 +91,9 @@ class TestHelper:
         assert res["ymd"][2] == -1
         assert res["isOnlyCentury"] == False
         assert res["century"] == 2
+
+        res = func('')
+        assert res['ymd']
 
         # assert  ==
         # assert func(10, '123') == '123       '

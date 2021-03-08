@@ -3,9 +3,25 @@ import helper
 import typing
 import sys
 
+
+def GetSheetValueDateRange(sheetValue):
+    if not sheetValue:
+        return {}, {}
+
+    if '-' in str(sheetValue):
+        dateArr = sheetValue.split('-')
+        start = helper.get_date_from_input(dateArr[0])
+        end = helper.get_date_from_input(dateArr[1])
+        return start, end
+    else:
+        start = helper.get_date_from_input(sheetValue)
+        return start, {}
+
+
 if __name__ == "__main__":
-    func = helper.get_date_from_input
-    res = func('17в')
+    func = GetSheetValueDateRange
+    #func = helper.get_date_from_input
+    res = func(1937)
     print(res)
     # res = func(float(2116))
     # print(res)

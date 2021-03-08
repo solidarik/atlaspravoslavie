@@ -9,6 +9,8 @@ function deleteAbbrev(place) {
     return place
 }
 
+
+
 InetHelper.getLocalCoordsForName(deleteAbbrev('Фессалия'))
 .then(res => {
     console.log(`result  ${res}`)

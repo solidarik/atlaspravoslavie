@@ -50,13 +50,18 @@ class HolyProtocol extends ServerProtocol {
 
       let defaultSearchParam = {}
       let gteSearchParam = {}
+      let personSearchParam = {}
 
       const searchDates = {
         $gte: intValue,
         $lt: intValue + 1,
       }
       const lteDates = {
-        $lte: intValue
+        $lte: intValue // field <= value
+      }
+
+      const gteDates = {
+        $gte: intValue // field >= value
       }
 
       if (data.isYearMode) {
@@ -66,12 +71,19 @@ class HolyProtocol extends ServerProtocol {
         gteSearchParam = {
           startYear: lteDates
         }
+        personSearchParam = {
+          startYear: lteDates,
+          endYear: gteDates
+        }
       } else {
         defaultSearchParam = {
           startCentury: searchDates
         }
         gteSearchParam = {
           startCentury: lteDates
+        }
+        personSearchParam = {
+          startCentury: searchDates
         }
       }
 
@@ -88,7 +100,7 @@ class HolyProtocol extends ServerProtocol {
         ChronosModel.find(defaultSearchParam),
         ChronosChurchModel.find(defaultSearchParam),
         TemplesModel.find(gteSearchParam),
-        PersonsAggrModel.find(defaultSearchParam),
+        PersonsAggrModel.find(personSearchParam),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "achiev"})

@@ -36,6 +36,10 @@ def IsEmptyValue(row, col):
     return (v == '')
 
 
+def GetSheetValue2(row, col):
+    return scheet.cell(row, col).value
+
+
 def GetSheetValue(row, col, isSimple=False):
     cell_value = scheet.cell(row, col).value
     if (isSimple and isinstance(cell_value, float)):
@@ -46,18 +50,18 @@ def GetSheetValue(row, col, isSimple=False):
 
 
 def GetSheetValueDateRange(row: int, col: int) -> Tuple[dict, dict]:
-    sheetValue = GetSheetValue(row, col)
+    sheetValue = GetSheetValue2(row, col)
     if not sheetValue:
         return {}, {}
 
-    if '-' in sheetValue:
-        dateArr = sheetValue.split('-')
+    if '-' in str(sheetValue):
+        dateArr = str(sheetValue).split('-')
         start = helper.get_date_from_input(dateArr[0])
         end = helper.get_date_from_input(dateArr[1])
         return start, end
     else:
         start = helper.get_date_from_input(sheetValue)
-        return start, {}
+        return start, start
 
 
 def GetSheetValueDate(row, col):
@@ -115,6 +119,10 @@ for row in range(START_ROW, END_ROW):
             birthObj["dateStr"] = birthDate["outputStr"]
             birthObj["isOnlyYear"] = birthDate["isOnlyYear"]
             birthObj["isOnlyCentury"] = birthDate["isOnlyCentury"]
+
+        if row == 7:
+            print('debug')
+
         birthPlace = GetSheetValue(row, col_birthPlace)
         if birthPlace and 'неизвест' not in birthPlace.lower():
             birthPlace = birthPlace.replace('\\"', '')
@@ -153,6 +161,16 @@ for row in range(START_ROW, END_ROW):
                 achievObj["place"] = capitalizeFirst(achievString)
                 achievObj["start"], achievObj["end"] = GetSheetValueDateRange(
                     row, col_achiev + 1)
+                if persons['surname'] == 'Остальский':
+                    print(achievObj["start"], achievObj["end"])
+                if 'ymd' in achievObj['start']:
+                    achievObj["start"]["year"] = achievObj["start"]["ymd"][0]
+                    achievObj["start"]["month"] = achievObj["start"]["ymd"][1]
+                    achievObj["start"]["day"] = achievObj["start"]["ymd"][2]
+                if 'ymd' in achievObj['end']:
+                    achievObj["end"]["year"] = achievObj["end"]["ymd"][0]
+                    achievObj["end"]["month"] = achievObj["end"]["ymd"][1]
+                    achievObj["end"]["day"] = achievObj["end"]["ymd"][2]
                 achievs.append(achievObj)
             col_achiev += 2
         persons["achievements"] = achievs
