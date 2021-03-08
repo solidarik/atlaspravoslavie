@@ -42,10 +42,10 @@ async function download(url, fileName, url2, name) {
 }
 
 function loadImages(collName, imgUrlFieldName) {
-    MongoClient.connect(urldb, function (err, db) {
+    MongoClient.connect(urldb, { useUnifiedTopology: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("app");
-        dbo.collection(collName).find({}).toArray(function (err, result) {
+        dbo.collection(collName).find().toArray(function (err, result) {
             if (err) throw err;
             result.forEach(function (item) {
 
@@ -69,15 +69,15 @@ function loadImages(collName, imgUrlFieldName) {
                             }else{
                                 pu = item.pageUrl;
                             }
-                            download(encodeURI(item[iUFN]), '.\\public\\images\\' + collName + '\\' + pu + '.jpg', item[iUFN].trim(), item.name);
+                            download(encodeURI(item[iUFN]), `.\\public\\images\\${collName}\\${pu}.jpg`, item[iUFN].trim(), item.name);
                         }
                         else {
-                            console.log('Not image url to ' + item.name);
+                            console.log(`Not image url for ${item.name}`);
                         }
                     }
-                    {
-                        console.log('Not item.hasOwnProperty(iUFN) - ' + item.name);
-                    }
+                    // else {
+                    //     console.log('Not item.hasOwnProperty(iUFN) - ' + item.name);
+                    // }
                 }
             })
             db.close();

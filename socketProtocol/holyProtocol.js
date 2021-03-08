@@ -72,8 +72,11 @@ class HolyProtocol extends ServerProtocol {
           startYear: lteDates
         }
         personSearchParam = {
-          startYear: lteDates,
-          endYear: gteDates
+          $and: [
+            {"startYear": {"$ne": -999}},
+            {"startYear": lteDates},
+            {"endYear": gteDates}
+          ]
         }
       } else {
         defaultSearchParam = {

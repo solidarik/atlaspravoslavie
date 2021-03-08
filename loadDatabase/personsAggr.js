@@ -6,7 +6,7 @@ class PersonsAggr {
 
   start() {
     return new Promise((resolve, reject) => {
-      PersonsModel.find({'surname': 'Садзаглишвили'})
+      PersonsModel.find({}) //'surname': 'Садзаглишвили'})
       .then( persons => {
         let promises = []
         let jsons = []
@@ -49,7 +49,6 @@ class PersonsAggr {
                 json.startCentury = person.birth.century
                 birthJson = json
                 birthJsonToParse = JSON.stringify(json)
-                log.info('in birth json')
                 onePersonsJsons.push(json)
             }
             person.achievements.forEach(achiev => {
@@ -95,9 +94,7 @@ class PersonsAggr {
                     if (!prevJson.endYear) {
                         prevJson.endYear = json.startYear - 1
                     } else {
-                        log.info(`prevEndYear: ${prevJson.startYear} startYear ${json.startYear}`)
                         if (json.startYear - prevJson.endYear > 1) {
-                            log.info('in inject json')
                             injectJson = JSON.parse(birthJsonToParse)
                             injectJson.startYear = prevJson.endYear
                             injectJson.endYear = json.startYear - 1
@@ -118,10 +115,10 @@ class PersonsAggr {
         log.info(`Количество святых после аггрегации: ${jsons.length}`)
 
         jsons.forEach(json => {
-            if (json.info.surname == 'Садзаглишвили') {
-                const printJson = {'kindAndStatus': json.kindAndStatus, 'startYear': json.startYear, 'endYear': json.endYear}
-                log.info(JSON.stringify(printJson))
-            }
+            // if (json.info.surname == 'Садзаглишвили') {
+            //     const printJson = {'kindAndStatus': json.kindAndStatus, 'startYear': json.startYear, 'endYear': json.endYear}
+            //     log.info(JSON.stringify(printJson))
+            // }
             promises.push(aggrJsonMediator.addObjectToBase(json))
         })
 
