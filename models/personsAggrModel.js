@@ -29,7 +29,8 @@ var personsAggrSchema = new mongoose.Schema(
         required: 'Начальный век обязателен'
     },
     endCentury: Number,
-    info: {}
+    info: {},
+    shortDescription: String
   },
   {
     timestamps: false,

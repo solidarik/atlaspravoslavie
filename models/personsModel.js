@@ -35,6 +35,7 @@ var personsSchema = new mongoose.Schema(
     achievements: [{
       place: String,
       placeCoord: [],
+      dateStr: String,
       start: {
         year: Number,
         month: Number,

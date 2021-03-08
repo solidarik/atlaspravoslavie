@@ -1,6 +1,7 @@
 const log = require('../helper/logHelper')
 const PersonsModel = require('../models/personsModel')
 const aggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
+const StrHelper = require('../helper/strHelper')
 
 class PersonsAggr {
 
@@ -18,6 +19,7 @@ class PersonsAggr {
                 'info': person,
                 'caption': `${person.surname} ${person.name} ${person.middlename}`.trim(),
                 'groupStatus': person.groupStatus,
+                'shortDescription': StrHelper.ellipseLongString(person.fullDescription, 400)
             }
 
             let engStatus = person.groupStatus

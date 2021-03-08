@@ -159,6 +159,7 @@ for row in range(START_ROW, END_ROW):
             if achievString and 'неизвест' not in achievString.lower():
                 achievObj = {}
                 achievObj["place"] = capitalizeFirst(achievString)
+                achievObj["dateStr"] = GetSheetValue(row, col_achiev + 1)
                 achievObj["start"], achievObj["end"] = GetSheetValueDateRange(
                     row, col_achiev + 1)
                 if persons['surname'] == 'Остальский':

@@ -557,6 +557,15 @@ table {
   font-size: 18px;
 }
 
+.person-info table th,
+.person-info table td {
+  padding: 0.25rem;
+}
+
+.worship-days {
+  margin-top: 20px;
+}
+
 .slider-selection {
   background: rgb(206, 212, 218);
   color: yellow;

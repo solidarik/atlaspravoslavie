@@ -49,15 +49,48 @@ class PersonFeature extends SuperFeature {
       monkname = `<h1>Имя в монашестве: ${info.monkname}</h1>`
     }
 
-
-    const html = `<div class="person-info panel-info">
+    let html = `<div class="person-info panel-info">
       <h1>${info.surname} ${info.name} ${info.middlename}</h1>
       ${monkname}
       <h2>${info.status}</h2>
-      <h2>Место рождения: ${info.birth.place}</h2>
-      <h2>Дата рождения: ${info.birth.dateStr}</h2>
-      <h2>${worshipStr}</h2>
-      <p>${info.fullDescription}</p>
+      <table id='person-table' class='table table-borderless'>
+        <thead>
+          <tr>
+            <th scope='col'></th>
+            <th scope='col'>Место</th>
+            <th scope='col'>Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope='row'>Рождение</th>
+            <td>${info.birth.place}</td>
+            <td>${info.birth.dateStr}</td>
+          </tr>`
+
+    info.achievements.forEach(achiev => {
+      html += `
+        <tr><th scope='row'>Подвиг</th>
+          <td>${achiev.place}</td>
+          <td>${achiev.dateStr}</td>
+        </tr>
+      `
+    });
+
+    if (info.death.dateStr) {
+      html += `
+        <tr><th scope='row'>Смерть</th>
+          <td>${info.death.place}</td>
+          <td>${info.death.dateStr}</td>
+        </tr>
+      `
+    }
+
+    html += '</tbody></table>'
+
+    html += `
+      <h2 class='worship-days'>${worshipStr}</h2>
+      <p>${outerInfo.shortDescription}</p>
       <div class="source-info">
         <a target='_blank' rel='noopener noreferrer' href=${
           info.pageUrl
@@ -86,7 +119,7 @@ class PersonFeature extends SuperFeature {
       return {
         ...elem,
         icon: PersonFeature.getIcon(kind),
-        oneLine: `${info.surname} ${info.name} ${info.middlename}`
+        oneLine: `${info.surname} ${info.name} ${info.middlename}`,
       }
     })
 
