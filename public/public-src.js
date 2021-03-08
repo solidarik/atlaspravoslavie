@@ -82975,7 +82975,9 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
 
       var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, "</h1>\n      ").concat(monkname, "\n      <h2>").concat(info.status, "</h2>\n      <table id='person-table' class='table table-borderless'>\n        <thead>\n          <tr>\n            <th scope='col'></th>\n            <th scope='col'>\u041C\u0435\u0441\u0442\u043E</th>\n            <th scope='col'>\u0414\u0430\u0442\u0430</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th scope='row'>\u0420\u043E\u0436\u0434\u0435\u043D\u0438\u0435</th>\n            <td>").concat(info.birth.place, "</td>\n            <td>").concat(info.birth.dateStr, "</td>\n          </tr>");
       info.achievements.forEach(function (achiev) {
-        html += "\n        <tr><th scope='row'>\u041F\u043E\u0434\u0432\u0438\u0433</th>\n          <td>".concat(achiev.place, "</td>\n          <td>").concat(achiev.dateStr, "</td>\n        </tr>\n      ");
+        if (achiev.dateStr) {
+          html += "\n          <tr><th scope='row'>\u041F\u043E\u0434\u0432\u0438\u0433</th>\n            <td>".concat(achiev.place, "</td>\n            <td>").concat(achiev.dateStr, "</td>\n          </tr>\n        ");
+        }
       });
 
       if (info.death.dateStr) {

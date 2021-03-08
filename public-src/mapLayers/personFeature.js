@@ -69,12 +69,14 @@ class PersonFeature extends SuperFeature {
           </tr>`
 
     info.achievements.forEach(achiev => {
-      html += `
-        <tr><th scope='row'>Подвиг</th>
-          <td>${achiev.place}</td>
-          <td>${achiev.dateStr}</td>
-        </tr>
-      `
+      if (achiev.dateStr) {
+        html += `
+          <tr><th scope='row'>Подвиг</th>
+            <td>${achiev.place}</td>
+            <td>${achiev.dateStr}</td>
+          </tr>
+        `
+      }
     });
 
     if (info.death.dateStr) {
