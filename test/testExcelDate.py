@@ -93,7 +93,7 @@ class TestHelper:
         assert res["century"] == 2
 
         res = func('')
-        assert res['ymd']
+        assert res == None
 
         # assert  ==
         # assert func(10, '123') == '123       '

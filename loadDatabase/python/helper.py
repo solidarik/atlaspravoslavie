@@ -218,14 +218,12 @@ def get_date_from_input(inputText):
 
         # если ячейка в Excel представлена как "дата"
         if not isFound:
-            if type(inputText) in [int, float]:
-                inputText = int(inputText)
-                if inputText > 2100:
-                    dt = datetime.datetime.fromordinal(
-                        datetime.datetime(1900, 1, 1).toordinal() + inputText -
-                        2)
-                    d, m, y = dt.day, dt.month, dt.year
-                    isFound = True
+            if re.match(r'.*[.]0$', str(inputText)):  # проверка на float
+                dt = datetime.datetime.fromordinal(
+                    datetime.datetime(1900, 1, 1).toordinal() +
+                    int(round(float(inputText))) - 2)
+                d, m, y = dt.day, dt.month, dt.year
+                isFound = True
             else:  # type(inputText) == str:
                 inputText = str(inputText).strip()
                 outputStr = inputText

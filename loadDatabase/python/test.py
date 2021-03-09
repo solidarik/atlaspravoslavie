@@ -21,7 +21,17 @@ def GetSheetValueDateRange(sheetValue):
 if __name__ == "__main__":
     func = GetSheetValueDateRange
     #func = helper.get_date_from_input
-    res = func(1937)
+    res = func('07.08.0626')
+    print(res)
+    res = func('15 августа 1219 года')
+    print(res)
+    res = func('24 июля 1330')
+    print(res)
+    res = func(7723.0)
+    print(res)
+    res = func('100')
+    print(res)
+    res = func('')
     print(res)
     # res = func(float(2116))
     # print(res)

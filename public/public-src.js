@@ -81487,6 +81487,36 @@ var DateHelper = /*#__PURE__*/function () {
       return moment.utc("".concat(d, ".").concat(m, ".").concat(y), 'DD.MM.YYYY');
     }
   }, {
+    key: "rangeYmdToStr",
+    value: function rangeYmdToStr(firstDate, secondDate) {
+      var ymdFirst = this.ymdToStr(firstDate);
+      var ymdSecond = this.ymdToStr(secondDate);
+      if (ymdFirst == ymdSecond) return ymdFirst;
+      if (!ymdFirst && !ymdSecond) return '';
+      if (ymdFirst && !ymdSecond) return ymdFirst;
+      return ymdFirst + ' – ' + ymdSecond;
+    }
+  }, {
+    key: "ymdToStr",
+    value: function ymdToStr(inputDate) {
+      var delim = '.';
+      if (!inputDate) return '';
+      if (inputDate.isOnlyYear) return inputDate.year + '';
+      if (inputDate.isOnlyCentury) return inputDate.century + ' в.';
+      if (inputDate.year == -999) return '';
+      res = '' + inputDate.year;
+
+      if (inputDate.month != -1) {
+        res = ('0' + inputDate.month).slice(-2) + delim + res;
+      }
+
+      if (inputDate.day != -1) {
+        res = ('0' + inputDate.day).slice(-2) + delim + res;
+      }
+
+      return res;
+    }
+  }, {
     key: "dateToStr",
     value: function dateToStr(inputDate) {
       var isWithoutYear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -82973,19 +83003,25 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
         monkname = "<h1>\u0418\u043C\u044F \u0432 \u043C\u043E\u043D\u0430\u0448\u0435\u0441\u0442\u0432\u0435: ".concat(info.monkname, "</h1>");
       }
 
-      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, "</h1>\n      ").concat(monkname, "\n      <h2>").concat(info.status, "</h2>\n      <table id='person-table' class='table table-borderless'>\n        <thead>\n          <tr>\n            <th scope='col'></th>\n            <th scope='col'>\u041C\u0435\u0441\u0442\u043E</th>\n            <th scope='col'>\u0414\u0430\u0442\u0430</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th scope='row'>\u0420\u043E\u0436\u0434\u0435\u043D\u0438\u0435</th>\n            <td>").concat(info.birth.place, "</td>\n            <td>").concat(info.birth.dateStr, "</td>\n          </tr>");
+      var html = "<div class=\"person-info panel-info\">\n      <h1>".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename, "</h1>\n      ").concat(monkname, "\n      <h2>").concat(info.status, "</h2>\n      <table id='person-table' class='table table-borderless'>\n        <thead>\n          <tr>\n            <th scope='col'></th>\n            <th scope='col'>\u041C\u0435\u0441\u0442\u043E</th>\n            <th scope='col'>\u0414\u0430\u0442\u0430</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <th scope='row'>\u0420\u043E\u0436\u0434\u0435\u043D\u0438\u0435</th>\n            <td>").concat(info.birth.place, "</td>\n            <td>").concat(_dateHelper.default.ymdToStr(info.birth), "</td>\n          </tr>");
       info.achievements.forEach(function (achiev) {
         if (achiev.dateStr) {
-          html += "\n          <tr><th scope='row'>\u041F\u043E\u0434\u0432\u0438\u0433</th>\n            <td>".concat(achiev.place, "</td>\n            <td>").concat(achiev.dateStr, "</td>\n          </tr>\n        ");
+          html += "\n          <tr><th scope='row'>\u041F\u043E\u0434\u0432\u0438\u0433</th>\n            <td>".concat(achiev.place ? achiev.place : '—', "</td>\n            <td>").concat(_dateHelper.default.rangeYmdToStr(achiev.start, achiev.end), "</td>\n          </tr>\n        ");
         }
       });
 
       if (info.death.dateStr) {
-        html += "\n        <tr><th scope='row'>\u0421\u043C\u0435\u0440\u0442\u044C</th>\n          <td>".concat(info.death.place, "</td>\n          <td>").concat(info.death.dateStr, "</td>\n        </tr>\n      ");
+        html += "\n        <tr><th scope='row'>\u0421\u043C\u0435\u0440\u0442\u044C</th>\n          <td>".concat(info.death.place ? info.death.place : '—', "</td>\n          <td>").concat(_dateHelper.default.ymdToStr(info.death), "</td>\n        </tr>\n      ");
       }
 
       html += '</tbody></table>';
-      html += "\n      <h2 class='worship-days'>".concat(worshipStr, "</h2>\n      <p>").concat(outerInfo.shortDescription, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
+      html += "<h2 class='worship-days'>".concat(worshipStr, "</h2>");
+
+      if (info.canonizationDate.dateStr) {
+        html += "<h2>\u0414\u0430\u0442\u0430 \u043A\u0430\u043D\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u0438: ".concat(_dateHelper.default.ymdToStr(info.canonizationDate), "</h2>");
+      }
+
+      html += "\n      <p>".concat(outerInfo.shortDescription, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.pageUrl, ">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {

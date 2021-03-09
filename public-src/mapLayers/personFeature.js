@@ -65,15 +65,15 @@ class PersonFeature extends SuperFeature {
           <tr>
             <th scope='row'>Рождение</th>
             <td>${info.birth.place}</td>
-            <td>${info.birth.dateStr}</td>
+            <td>${DateHelper.ymdToStr(info.birth)}</td>
           </tr>`
 
     info.achievements.forEach(achiev => {
       if (achiev.dateStr) {
         html += `
           <tr><th scope='row'>Подвиг</th>
-            <td>${achiev.place}</td>
-            <td>${achiev.dateStr}</td>
+            <td>${achiev.place ? achiev.place : '—'}</td>
+            <td>${DateHelper.rangeYmdToStr(achiev.start, achiev.end)}</td>
           </tr>
         `
       }
@@ -82,16 +82,21 @@ class PersonFeature extends SuperFeature {
     if (info.death.dateStr) {
       html += `
         <tr><th scope='row'>Смерть</th>
-          <td>${info.death.place}</td>
-          <td>${info.death.dateStr}</td>
+          <td>${info.death.place ? info.death.place : '—'}</td>
+          <td>${DateHelper.ymdToStr(info.death)}</td>
         </tr>
       `
     }
 
     html += '</tbody></table>'
 
+    html += `<h2 class='worship-days'>${worshipStr}</h2>`
+
+    if (info.canonizationDate.dateStr) {
+      html += `<h2>Дата канонизации: ${DateHelper.ymdToStr(info.canonizationDate)}</h2>`
+    }
+
     html += `
-      <h2 class='worship-days'>${worshipStr}</h2>
       <p>${outerInfo.shortDescription}</p>
       <div class="source-info">
         <a target='_blank' rel='noopener noreferrer' href=${

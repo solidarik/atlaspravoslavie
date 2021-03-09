@@ -54,6 +54,32 @@ class DateHelper {
     return moment.utc(`${d}.${m}.${y}`, 'DD.MM.YYYY')
   }
 
+  static rangeYmdToStr(firstDate, secondDate) {
+    const ymdFirst = this.ymdToStr(firstDate)
+    const ymdSecond = this.ymdToStr(secondDate)
+    if (ymdFirst == ymdSecond) return ymdFirst
+    if (!ymdFirst && !ymdSecond) return ''
+    if (ymdFirst && !ymdSecond) return ymdFirst
+    return ymdFirst + ' – ' + ymdSecond
+  }
+
+  static ymdToStr(inputDate) {
+    const delim = '.'
+    if (!inputDate) return ''
+    if (inputDate.isOnlyYear) return inputDate.year + ''
+    if (inputDate.isOnlyCentury) return inputDate.century + ' в.'
+    if (inputDate.year == -999) return ''
+
+    res = '' + inputDate.year
+    if (inputDate.month != -1) {
+      res = ('0' + inputDate.month).slice(-2) + delim + res
+    }
+    if (inputDate.day != -1) {
+      res = ('0' + inputDate.day).slice(-2) + delim + res
+    }
+    return res
+  }
+
   static dateToStr(inputDate, isWithoutYear = true) {
     if (!inputDate) return undefined
     let date = new Date(inputDate)
