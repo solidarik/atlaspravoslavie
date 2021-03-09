@@ -1,6 +1,5 @@
 import SuperFeature from './superFeature'
 import DateHelper from '../../helper/dateHelper'
-import StrHelper from '../../helper/strHelper'
 import * as olStyle from 'ol/style'
 
 class PersonFeature extends SuperFeature {
@@ -92,7 +91,7 @@ class PersonFeature extends SuperFeature {
 
     html += `<h2 class='worship-days'>${worshipStr}</h2>`
 
-    if (info.canonizationDate.dateStr) {
+    if (info.canonizationDate && info.canonizationDate.dateStr) {
       html += `<h2>Дата канонизации: ${DateHelper.ymdToStr(info.canonizationDate)}</h2>`
     }
 

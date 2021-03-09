@@ -82165,7 +82165,6 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
 
         year = (range[0] + range[1]) / 2;
         year = Math.round(year);
-        console.log(">>>>>>>> year by round century ".concat(year));
       }
 
       var ano = year;
@@ -82666,7 +82665,6 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
       var info = feature.get('info');
       return {
         icon: this.getIcon(),
-        date: info.startDate,
         caption: this.getCaptionInfo(info)
       };
     }
@@ -82674,7 +82672,7 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "getHtmlInfo",
     value: function getHtmlInfo(info) {
       window.CURRENT_ITEM = info;
-      var html = "<div class=\"chronos-info panel-info\">\n      <h1>".concat(info.place, "</h1>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.shortBrief, "</p>\n      ").concat(info.longBrief ? '<p>' + info.longBrief + '</p>' : '', "\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"chronos-info panel-info\">\n      <h1>".concat(info.place, "</h1>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(info.shortBrief, "</p>\n      ").concat(info.longBrief ? '<p>' + info.longBrief + '</p>' : '', "\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {
@@ -82683,9 +82681,6 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
       return info.chronos.map(function (elem) {
         return _objectSpread(_objectSpread({}, elem), {}, {
           icon: ChronosFeature.getIcon(),
-          popupFirst: _strHelper.default.ellipseLongString(elem.longBrief),
-          popupSecond: _dateHelper.default.twoDateToStr2(elem.startDateStr, elem.endDateStr),
-          popupThird: elem.place,
           oneLine: _strHelper.default.ellipseLongString(elem.shortBrief)
         });
       });
@@ -82762,7 +82757,6 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
       var info = feature.get('info');
       return {
         icon: this.getIcon(),
-        date: info.startDate,
         caption: this.getCaptionInfo(info)
       };
     }
@@ -82770,7 +82764,7 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
     key: "getHtmlInfo",
     value: function getHtmlInfo(info) {
       window.CURRENT_ITEM = info;
-      var html = "<div class=\"chronos-info panel-info\">\n      <h1>".concat(info.place, "</h1>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.shortBrief, "</p>\n      ").concat(info.longBrief ? '<p>' + info.longBrief + '</p>' : '', "\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"chronos-info panel-info\">\n      <h1>".concat(info.place, "</h1>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(info.shortBrief, "</p>\n      ").concat(info.longBrief ? '<p>' + info.longBrief + '</p>' : '', "\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {
@@ -82779,9 +82773,6 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
       return info.chronosChurch.map(function (elem) {
         return _objectSpread(_objectSpread({}, elem), {}, {
           icon: ChronosChurchFeature.getIcon(),
-          popupFirst: _strHelper.default.ellipseLongString(elem.longBrief),
-          popupSecond: _dateHelper.default.twoDateToStr2(elem.startDateStr, elem.endDateStr),
-          popupThird: elem.place,
           oneLine: _strHelper.default.ellipseLongString(elem.shortBrief)
         });
       });
@@ -82864,16 +82855,12 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
   }, {
     key: "getHtmlInfo",
     value: function getHtmlInfo(info) {
-      if (!info.startDateStr) {
-        info.startDateStr = '';
-      }
-
       if (!info.longBrief) {
         info.longBrief = '';
       }
 
       window.CURRENT_ITEM = info;
-      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(info.startDateStr, "</h2>\n      <p>").concat(info.longBrief, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.eparchyUrl, ">\u041C\u0438\u0442\u0440\u043E\u043F\u043E\u043B\u0438\u044F/\u042D\u043F\u0430\u0440\u0445\u0438\u044F</a>\n      </div>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(info.longBrief, "</p>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.eparchyUrl, ">\u041C\u0438\u0442\u0440\u043E\u043F\u043E\u043B\u0438\u044F/\u0415\u043F\u0430\u0440\u0445\u0438\u044F</a>\n      </div>\n      <div class=\"source-info\">\n        <a target='_blank' rel='noopener noreferrer' href=").concat(info.srcUrl, ">\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {
@@ -82882,9 +82869,6 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
       return info.temples.map(function (elem) {
         return _objectSpread(_objectSpread({}, elem), {}, {
           icon: TemplesFeature.getIcon(),
-          popupFirst: _strHelper.default.ellipseLongString(elem.longBrief),
-          popupSecond: _dateHelper.default.twoDateToStr2(elem.startDateStr, elem.endDateStr),
-          popupThird: elem.place,
           oneLine: _strHelper.default.ellipseLongString(elem.name)
         });
       });
@@ -82901,8 +82885,6 @@ module.exports = TemplesFeature;
 var _superFeature = _interopRequireDefault(require("./superFeature"));
 
 var _dateHelper = _interopRequireDefault(require("../../helper/dateHelper"));
-
-var _strHelper = _interopRequireDefault(require("../../helper/strHelper"));
 
 var olStyle = _interopRequireWildcard(require("ol/style"));
 
@@ -83017,7 +82999,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
       html += '</tbody></table>';
       html += "<h2 class='worship-days'>".concat(worshipStr, "</h2>");
 
-      if (info.canonizationDate.dateStr) {
+      if (info.canonizationDate && info.canonizationDate.dateStr) {
         html += "<h2>\u0414\u0430\u0442\u0430 \u043A\u0430\u043D\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u0438: ".concat(_dateHelper.default.ymdToStr(info.canonizationDate), "</h2>");
       }
 
@@ -83056,7 +83038,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = PersonFeature;
-},{"./superFeature":"hPGt","../../helper/dateHelper":"IrKG","../../helper/strHelper":"IGBU","ol/style":"TZKB"}],"WAuT":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/dateHelper":"IrKG","ol/style":"TZKB"}],"WAuT":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

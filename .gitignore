@@ -6,6 +6,7 @@ Thubms.db
 *.py[co]
 
 default.js
+config/default.js
 secret*
 
 *.class

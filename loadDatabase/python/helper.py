@@ -52,7 +52,7 @@ __all__ = [
     'leave_fresh_files', 'remove_items_from_tuples', 'add_prefix_to_array',
     'merge_tuples', 'check_exist_english', 'remove_spaces',
     'get_date_from_input', 'remove_substring', 'load_json', 'save_json',
-    'read_json'
+    'read_json', 'capitalize_first'
 ]
 
 # region CONFIG FUNCTIONS
@@ -217,16 +217,16 @@ def get_date_from_input(inputText):
         d, m, y, century = -1, -1, -999, -1
 
         # если ячейка в Excel представлена как "дата"
-        if not isFound:
-            if re.match(r'.*[.]0$', str(inputText)):  # проверка на float
-                dt = datetime.datetime.fromordinal(
-                    datetime.datetime(1900, 1, 1).toordinal() +
-                    int(round(float(inputText))) - 2)
-                d, m, y = dt.day, dt.month, dt.year
-                isFound = True
-            else:  # type(inputText) == str:
-                inputText = str(inputText).strip()
-                outputStr = inputText
+        # if not isFound:
+        #     if re.match(r'.*[.]0$', str(inputText)):  # проверка на float
+        #         dt = datetime.datetime.fromordinal(
+        #             datetime.datetime(1900, 1, 1).toordinal() +
+        #             int(round(float(inputText))) - 2)
+        #         d, m, y = dt.day, dt.month, dt.year
+        #         isFound = True
+        #     else:  # type(inputText) == str:
+        #         inputText = str(inputText).strip()
+        #         outputStr = inputText
 
         if not inputText or inputText == '':
             return None
@@ -688,6 +688,12 @@ def save_json(json_obj, file_name, encoding='utf8'):
     """Сохранение (сериализация) JSON данных"""
     with open(get_full_path(file_name), 'w', encoding=encoding) as json_file:
         json_file.write(json.dumps(json_obj, indent=4, ensure_ascii=False))
+
+
+def capitalize_first(input):
+    if (len(input) < 1 or input[0].isupper()):
+        return input
+    return input[0].upper() + input[1:]
 
 
 # endregion

@@ -66,10 +66,10 @@ class HolyProtocol extends ServerProtocol {
 
       if (data.isYearMode) {
         defaultSearchParam = {
-          startYear: searchDates
+          "start.year": searchDates
         }
         gteSearchParam = {
-          startYear: lteDates
+          "start.year": lteDates
         }
         personSearchParam = {
           $and: [
@@ -80,13 +80,16 @@ class HolyProtocol extends ServerProtocol {
         }
       } else {
         defaultSearchParam = {
-          startCentury: searchDates
+          "start.century": searchDates
         }
         gteSearchParam = {
-          startCentury: lteDates
+          "start.century": lteDates
         }
         personSearchParam = {
-          startCentury: searchDates
+          $and: [
+            {"startCentury": searchDates},
+            {"kind": {$ne: "live"}}
+          ]
         }
       }
 

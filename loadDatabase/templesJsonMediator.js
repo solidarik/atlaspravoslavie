@@ -2,7 +2,6 @@ const inetHelper = require('../helper/inetHelper')
 const StrHelper = require('../helper/strHelper')
 const SuperJsonMediator = require('./superJsonMediator')
 const TemplesModel = require('../models/templesModel');
-const moment = require('moment')
 
 class TemplesJsonMediator extends SuperJsonMediator {
   constructor() {
@@ -29,10 +28,6 @@ class TemplesJsonMediator extends SuperJsonMediator {
           const newJson = {
             ...json,
             point: placeCoords[0],
-            startIsOnlyYear: json.startIsOnlyYear == 'True' ? true : false,
-            endIsOnlyYear: json.endIsOnlyYear == 'True' ? true : false,
-            startIsOnlyCentury: json.startIsOnlyCentury == 'True' ? true : false,
-            endIsOnlyCentury: json.endIsOnlyCentury == 'True' ? true : false,
             pageUrl: StrHelper.generatePageUrl([
               json.name,
               json.place

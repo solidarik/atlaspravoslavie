@@ -4,21 +4,24 @@ var templesSchema = new mongoose.Schema(
   {
     pageId: Number,
 
-    startYear: {type: Number, index: true},
-    startMonth: Number,
-    startDay: Number,
-    startDateStr: String,
-    startIsOnlyYear: Boolean,
-    startIsOnlyCentury: Boolean,
-    startCentury: Number,
-
-    endYear: Number,
-    endMonth: Number,
-    endDay: Number,
-    endDateStr: String,
-    endIsOnlyYear: Boolean,
-    endIsOnlyCentury: Boolean,
-    endCentury: Number,
+    start: {
+      year: Number,
+      month: Number,
+      day: Number,
+      dateStr: String,
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number
+    },
+    end: {
+      year: Number,
+      month: Number,
+      day: Number,
+      dateStr: String,
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number
+    },
 
     name: String,
     place: String,

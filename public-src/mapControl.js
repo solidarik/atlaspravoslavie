@@ -439,7 +439,6 @@ export class MapControl extends EventEmitter {
       const range = DateHelper.getCenturyRange(this.currentCentury)
       year = (range[0] + range[1]) / 2
       year = Math.round(year)
-      console.log(`>>>>>>>> year by round century ${year}`)
     }
 
     let ano = year

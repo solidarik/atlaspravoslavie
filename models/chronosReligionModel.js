@@ -4,20 +4,24 @@ var chronosReligionSchema = new mongoose.Schema(
   {
     pageId: Number,
 
-    startYear: {
-      type: Number,
-      required: 'Не задан начальный год события'
+    start: {
+      year: Number,
+      month: Number,
+      day: Number,
+      dateStr: String,
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number
     },
-    startMonth: Number,
-    startDay: Number,
-    startDateStr: String,
-    startIsOnlyYear: Boolean,
-
-    endYear: Number,
-    endMonth: Number,
-    endDay: Number,
-    endDateStr: String,
-    endIsOnlyYear: Boolean,
+    end: {
+      year: Number,
+      month: Number,
+      day: Number,
+      dateStr: String,
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      century: Number
+    },
 
     place: String,
     point: [],
@@ -41,6 +45,6 @@ var chronosReligionSchema = new mongoose.Schema(
   }
 )
 
-chronosReligionSchema.statics.publicFields = ['place', 'startDateStr', 'endDateStr']
+chronosReligionSchema.statics.publicFields = ['place', 'start.dateStr', 'end.dateStr']
 
 module.exports = mongoose.model('chronosReligion', chronosReligionSchema)

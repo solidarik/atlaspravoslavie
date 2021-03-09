@@ -1,6 +1,6 @@
 import SuperFeature from './superFeature'
-import strHelper from '../../helper/strHelper'
-import dateHelper from '../../helper/dateHelper'
+import StrHelper from '../../helper/strHelper'
+import DateHelper from '../../helper/dateHelper'
 
 class TemplesFeature extends SuperFeature {
   static getIcon() {
@@ -20,9 +20,6 @@ class TemplesFeature extends SuperFeature {
   }
 
   static getHtmlInfo(info) {
-    if (!info.startDateStr) {
-      info.startDateStr = ''
-    }
 
     if (!info.longBrief) {
       info.longBrief = ''
@@ -32,12 +29,12 @@ class TemplesFeature extends SuperFeature {
     const html = `<div class="temples-info panel-info">
       <h1>${info.name}</h1>
       <h2>${info.place}</h2>
-      <h2>${info.startDateStr}</h2>
+      <h2>${DateHelper.ymdToStr(info.start)}</h2>
       <p>${info.longBrief}</p>
       <div class="source-info">
         <a target='_blank' rel='noopener noreferrer' href=${
           info.eparchyUrl
-        }>Митрополия/Эпархия</a>
+        }>Митрополия/Епархия</a>
       </div>
       <div class="source-info">
         <a target='_blank' rel='noopener noreferrer' href=${
@@ -54,11 +51,7 @@ class TemplesFeature extends SuperFeature {
       return {
         ...elem,
         icon: TemplesFeature.getIcon(),
-        popupFirst: strHelper.ellipseLongString(elem.longBrief),
-        popupSecond: dateHelper.twoDateToStr2(elem.startDateStr, elem.endDateStr)
-        ,
-        popupThird: elem.place,
-        oneLine: strHelper.ellipseLongString(elem.name),
+        oneLine: StrHelper.ellipseLongString(elem.name),
       }
     })
   }
