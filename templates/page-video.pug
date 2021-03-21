@@ -1,0 +1,16 @@
+extends layout
+block head
+  link(rel='stylesheet' href='libs/materialdesignicons.min.css')
+  link(rel='stylesheet' href='/style-video.css')
+
+  script(src='/libs/main-video.js')
+
+block content
+    +header('video')
+    div.content(role='content' id='content' dragable='true')
+        .d-flex.justify-content-center
+            .row
+                .h5 Донской монастырь
+        .d-flex.justify-content-center
+            .row
+                iframe(width='450' height='253' src='https://www.youtube.com/embed/o-byL3UU1jE' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen='')

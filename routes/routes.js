@@ -19,6 +19,7 @@ router.get('/index', require('./page-index'))
 router.get('/about', require('./page-about'))
 router.get('/person', require('./page-person'))
 router.get('/churches', require('./page-churches'))
+router.get('/video', require('./page-video'))
 router.get('/events', require('./page-events'))
 router.get('/logout', require('./logout').get)
 
