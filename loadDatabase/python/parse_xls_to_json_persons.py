@@ -5,8 +5,8 @@ import os
 import re
 import datetime
 from urllib.request import urlopen
-from loadDatabase.python.helper import helper
-from loadDatabase.python.excel_helper import ExcelHelper
+import helper
+from excel_helper import ExcelHelper
 print(sys.stdout.encoding)
 
 root_folder = 'out_persons'
