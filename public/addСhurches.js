@@ -9,7 +9,7 @@ export default class addСhurches {
     dvTable.html('')
   }
 
-  rowTableClickHandler(thisThis, thisTr, showSlides,plusSlides,currentSlide) {
+  rowTableClickHandler(thisThis, thisTr, showSlides, plusSlides, currentSlide) {
     //console.log("clicked " + $(thisTr).attr('id'));
     var _id = $(thisTr).attr('id');
     var cur = thisThis.data.temples[_id];
@@ -42,6 +42,7 @@ export default class addСhurches {
     //$('#imgChurches').src = '/images/temples/'+cur.pageUrl+'.jpg'
     //$('#imgChurches').attr('src', '/images/temples/'+cur.pageUrl+'.jpg')
     let imgCount = 5;
+
     let elm = document.getElementById('image-cont');
     elm.innerHTML = '';
     let elemSC = document.createElement('div');
@@ -51,47 +52,48 @@ export default class addСhurches {
 
       let iUFN;
       if (index > 0) {
-          iUFN = 'imgUrl' + '_' + index;
+        iUFN = 'imgUrl' + '_' + index;
       }
       else {
-          iUFN = 'imgUrl';
+        iUFN = 'imgUrl';
       }
-      if(cur.hasOwnProperty(iUFN)){
+      if (cur.hasOwnProperty(iUFN)) {
         let pu;
-        if(index > 0){
-           pu = cur.pageUrl + '_' + index
-        }else{
-            pu = cur.pageUrl;
+        if (index > 0) {
+          pu = cur.pageUrl + '_' + index
+        } else {
+          pu = cur.pageUrl;
         }
-        let elemMS = document.createElement('div');
-        elemMS.classList.add("mySlides");
-        elemMS.classList.add("fade");
-        elemSC.appendChild(elemMS);
-        let elemNT = document.createElement('div');
-        elemNT.classList.add("numbertext");
-        elemNT.innerHTML = index+' / '+imgCount;
-        let img = document.createElement('img');
-        img.classList.add("image-center");
-        img.classList.add("img-rounded");
-        img.classList.add("resized-image");
-        img.src = '/images/temples/' + pu + '.jpg';
-        elemMS.appendChild(img);
+        console.log(cur[iUFN]);
+        if (cur[iUFN] !== 'undefined'&&cur[iUFN]!==null&&cur[iUFN]!=='') {
+          console.log('if');
+          let elemMS = document.createElement('div');
+          elemMS.classList.add("mySlides");
+          elemMS.classList.add("fade");
+          elemSC.appendChild(elemMS);
+          let elemNT = document.createElement('div');
+          elemNT.classList.add("numbertext");
+          elemNT.innerHTML = index + ' / ' + imgCount;
+          let img = document.createElement('img');
+          img.classList.add("image-center");
+          img.classList.add("img-rounded");
+          img.classList.add("resized-image");
+          img.src = '/images/temples/' + pu + '.jpg';
+          elemMS.appendChild(img);
+        }
+
       }
-
-
-
-
     }
     let al = document.createElement('a');
     al.classList.add("prev");
     al.innerHTML = '&#10094;';
-    al.onclick = function(){plusSlides(-1)};
+    al.onclick = function () { plusSlides(-1) };
     elemSC.appendChild(al);
 
     let ar = document.createElement('a');
     ar.classList.add("next");
     ar.innerHTML = '&#10095;';
-    ar.onclick = function(){plusSlides(1)};
+    ar.onclick = function () { plusSlides(1) };
     elemSC.appendChild(ar);
 
     let elemBR = document.createElement('div');
@@ -106,7 +108,7 @@ export default class addСhurches {
     for (let index = 0; index <= imgCount; index++) {
       let elemD = document.createElement('span');
       elemD.classList.add("dot");
-      elemD.onclick = function(){currentSlide(index)};
+      elemD.onclick = function () { currentSlide(index) };
       elemDD.appendChild(elemD);
     }
 
@@ -156,7 +158,7 @@ export default class addСhurches {
 
   }
 
-  addDataToTable(showSlides,plusSlides,currentSlide) {
+  addDataToTable(showSlides, plusSlides, currentSlide) {
     //console.log("addDataTotable");
     //console.log(JSON.stringify(this.data));
     var obj = this.data.temples;
@@ -196,11 +198,10 @@ export default class addСhurches {
         //if (j == 5 || j == 7 || j == 8)
         if (columns[j] == 'name' || columns[j] == 'startYear' || columns[j] == 'place') {
           var cell = $('<td />')
-          if(columns[j] == 'startYear'&&obj[i][columns[j]]==-999)
-          {
-            cell.html(obj[i]['startCentury']*100-100)
+          if (columns[j] == 'startYear' && obj[i][columns[j]] == -999) {
+            cell.html(obj[i]['startCentury'] * 100 - 100)
           }
-          else{
+          else {
             cell.html(obj[i][columns[j]])
           }
           row.append(cell)
@@ -248,7 +249,7 @@ export default class addСhurches {
 
     document.querySelectorAll('#' + this.idTable + ' tr').forEach((e) =>
       e.addEventListener('click', function () {
-        thisThis.rowTableClickHandler(thisThis, this, showSlides,plusSlides,currentSlide)
+        thisThis.rowTableClickHandler(thisThis, this, showSlides, plusSlides, currentSlide)
       })
     )
 
@@ -256,12 +257,12 @@ export default class addСhurches {
     $('#0').trigger('click')
   }
 
-  fillTable(showSlides,plusSlides,currentSlide) {
+  fillTable(showSlides, plusSlides, currentSlide) {
     //console.log("fillTable");
     if (this.data == null) {
       console.log('data empty')
     } else {
-      this.addDataToTable(showSlides,plusSlides,currentSlide)
+      this.addDataToTable(showSlides, plusSlides, currentSlide)
     }
   }
 }

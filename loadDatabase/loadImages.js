@@ -72,7 +72,7 @@ function loadImages(collName, imgUrlFieldName) {
                             download(encodeURI(item[iUFN]), `.\\public\\images\\${collName}\\${pu}.jpg`, item[iUFN].trim(), item.name);
                         }
                         else {
-                            console.log(`Not image url for ${item.name}`);
+                           // console.log(`Not image url for ${item.name}`);
                         }
                     }
                     // else {
@@ -86,4 +86,4 @@ function loadImages(collName, imgUrlFieldName) {
 }
 
 loadImages('temples','imgUrl');
-//loadImages('personsreligions', 'photoUrl');
+loadImages('personsreligions', 'photoUrl');

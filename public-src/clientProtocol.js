@@ -76,6 +76,16 @@ export default class ClientProtocol extends EventEmitter {
     )
   }
 
+  getPersons() {
+    this.socket.emit(
+      'clGetPersons',
+      JSON.stringify({}),
+      (msg) => {
+        this.emit('persons', JSON.parse(msg))
+      }
+    )
+  }
+
   getDataByYear(dateObject) {
     if (undefined === dateObject.year) {
       return

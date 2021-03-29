@@ -150,15 +150,38 @@ class HolyProtocol extends ServerProtocol {
           cb(JSON.stringify({ error: error }))
         })
     } catch (err) {
-      res.err = 'Ошибка парсинга даты: ' + err
+      res.err = 'Ошибка возврата храмов: ' + err
       res.events = ''
       cb(JSON.stringify(res))
     }
   }
 
-  getPersons(socket, msg, cb) {
-    trycatch(PersonsModel.find({}), cb)
+  getPersons(socket, msg, cb)
+  {
+    let res = {}
+
+    try {
+      PersonsModel.find({})
+        .then(
+          (res) => {
+            cb(
+              JSON.stringify({
+                temples: res
+              })
+            )
+          })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка возврата храмов: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
   }
+  // {
+  //   trycatch(PersonsModel.find({}), cb)
+  // }
 
   getPersonsMartyrs(socket, msg, cb) {
     trycatch(PersonsModel.find({"groupStatus": "мученик"}), cb)

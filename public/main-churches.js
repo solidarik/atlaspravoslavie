@@ -112,11 +112,13 @@ function currentSlide(n) {
 }
 
 function showSlides(n) {
+  console.log(n);
   var i;
   var slides = document.getElementsByClassName("mySlides");
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) { slideIndex = 1 }
-  if (n < 1) { slideIndex = slides.length }
+  else if (n < 1) { slideIndex = slides.length }
+  else{slideIndex = n}
   for (i = 0; i < slides.length; i++) {
     slides[i].style.display = "none";
     slides[i].className = slides[i].className.replace(" show", "");
