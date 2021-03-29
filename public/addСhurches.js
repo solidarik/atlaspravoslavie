@@ -19,7 +19,7 @@ export default class addСhurches {
     )
     $('#startDateStr').html(
       '<b>Дата основания</b> - ' +
-      cur.startDateStr
+      cur.start.dateStr
     )
     $('#place').html(
       '<b>Место расположения</b> - ' + cur.place
@@ -108,7 +108,7 @@ export default class addСhurches {
     for (let index = 0; index <= imgCount; index++) {
       let elemD = document.createElement('span');
       elemD.classList.add("dot");
-      elemD.onclick = function () { currentSlide(index) };
+      elemD.onclick = function () { currentSlide(index+1) };
       elemDD.appendChild(elemD);
     }
 
