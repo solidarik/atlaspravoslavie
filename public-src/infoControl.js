@@ -42,6 +42,7 @@ export class InfoControl extends EventEmitter {
   }
 
   showItemInfo(item) {
+    this.emit('showItem', item)
     ClassHelper.removeClass(window.infoControl.contentDiv, 'events-info-hide')
     ClassHelper.addClass(window.infoControl.contentDiv, 'events-info-show')
     const classFeature = item.get('classFeature')

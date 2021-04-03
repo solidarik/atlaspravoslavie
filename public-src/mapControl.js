@@ -219,6 +219,8 @@ export class MapControl extends EventEmitter {
 
     this.clusterSource = clusterSource
 
+    this.isShowInfoMode = false
+
     map.on('click', (event) => {
       // disable-popup window.map.popup.hide()
       this.emit('mapclick', undefined)
@@ -237,7 +239,14 @@ export class MapControl extends EventEmitter {
         { hitTolerance: 5 }
       )
 
-      if (!featureEvent) return
+      if (!featureEvent) {
+        this.emit('mapEmptyClick', undefined)
+        return
+      }
+
+      if (this.isShowInfoMode) {
+        return
+      }
 
       //simple feature
       let features = featureEvent.get('features')
@@ -310,20 +319,21 @@ export class MapControl extends EventEmitter {
     return geom
   }
 
-  showAdditionalInfo(items) {
-    if (items.length > 1 )
-      return
+  showAdditionalInfo(item) {
 
-    const info = items[0].get('info')
-    const classFeature = items[0].get('classFeature')
+    const info = item.get('info')
+    const classFeature = item.get('classFeature')
 
     if (!info.hasOwnProperty('livePoints') || !info.livePoints)
       return
+
+    this.isShowInfoMode = true
 
     this.subSource.clear()
     this.lineSource.clear()
     let prevPoint = undefined
     let currentPoint = undefined
+
     info.livePoints.forEach((item) => {
       item.icon = classFeature.getIcon(item.kindAndStatus)
       const ft = new olFeature({
@@ -360,6 +370,8 @@ export class MapControl extends EventEmitter {
 
   returnNormalMode() {
     this.emit('returnNormalMode', undefined)
+    this.isShowInfoMode = false
+
     ClassHelper.removeClass(
       document.getElementById('year-control'),
       'hide-element'

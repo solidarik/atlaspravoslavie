@@ -81951,6 +81951,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     _this.clusterLayer = clusterLayer;
     map.addLayer(clusterLayer);
     _this.clusterSource = clusterSource;
+    _this.isShowInfoMode = false;
     map.on('click', function (event) {
       // disable-popup window.map.popup.hide()
       _this.emit('mapclick', undefined);
@@ -81965,7 +81966,17 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
       }, {
         hitTolerance: 5
       });
-      if (!featureEvent) return; //simple feature
+
+      if (!featureEvent) {
+        _this.emit('mapEmptyClick', undefined);
+
+        return;
+      }
+
+      if (_this.isShowInfoMode) {
+        return;
+      } //simple feature
+
 
       var features = featureEvent.get('features');
 
@@ -82038,13 +82049,13 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "showAdditionalInfo",
-    value: function showAdditionalInfo(items) {
+    value: function showAdditionalInfo(item) {
       var _this2 = this;
 
-      if (items.length > 1) return;
-      var info = items[0].get('info');
-      var classFeature = items[0].get('classFeature');
+      var info = item.get('info');
+      var classFeature = item.get('classFeature');
       if (!info.hasOwnProperty('livePoints') || !info.livePoints) return;
+      this.isShowInfoMode = true;
       this.subSource.clear();
       this.lineSource.clear();
       var prevPoint = undefined;
@@ -82085,6 +82096,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     key: "returnNormalMode",
     value: function returnNormalMode() {
       this.emit('returnNormalMode', undefined);
+      this.isShowInfoMode = false;
 
       _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
 
@@ -82617,11 +82629,6 @@ var SuperFeature = /*#__PURE__*/function () {
     key: "getCaptionInfo",
     value: function getCaptionInfo(info) {
       return 'Суперкласс';
-    }
-  }, {
-    key: "getAdditionalInfo",
-    value: function getAdditionalInfo(info) {
-      return undefined;
     }
   }, {
     key: "getIcon",
@@ -91825,6 +91832,8 @@ var InfoControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "showItemInfo",
     value: function showItemInfo(item) {
+      this.emit('showItem', item);
+
       _classHelper.default.removeClass(window.infoControl.contentDiv, 'events-info-hide');
 
       _classHelper.default.addClass(window.infoControl.contentDiv, 'events-info-show');
@@ -102821,9 +102830,16 @@ function startApp() {
     mapControl.returnNormalMode();
     mapControl.hidePulse();
   });
+  infoControl.subscribe('showItem', function (item) {
+    mapControl.showAdditionalInfo(item);
+  });
+  mapControl.subscribe('mapEmptyClick', function () {
+    console.log('mapEmptyClick');
+    mapControl.returnNormalMode();
+    infoControl.hide();
+  });
   mapControl.subscribe('selectFeatures', function (items) {
     infoControl.updateItems(items);
-    mapControl.showAdditionalInfo(items);
   });
   mapControl.subscribe('showAdditionalInfo', function () {
     legendControl.switchOff();

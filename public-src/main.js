@@ -58,9 +58,18 @@ function startApp() {
     mapControl.hidePulse()
   })
 
+  infoControl.subscribe('showItem', (item) => {
+    mapControl.showAdditionalInfo(item)
+  })
+
+  mapControl.subscribe('mapEmptyClick', () => {
+    console.log('mapEmptyClick')
+    mapControl.returnNormalMode()
+    infoControl.hide()
+  })
+
   mapControl.subscribe('selectFeatures', (items) => {
     infoControl.updateItems(items)
-    mapControl.showAdditionalInfo(items)
   })
 
   mapControl.subscribe('showAdditionalInfo', () => {
