@@ -81907,7 +81907,36 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     });
     _this.simpleLayer = simpleLayer;
     _this.simpleSource = simpleSource;
-    map.addLayer(simpleLayer); // Cluster Source
+    map.addLayer(simpleLayer); // Sub Source, Additional info
+
+    var subSource = new olSource.Vector();
+    var subLayer = new _Vector.default({
+      source: subSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: getStyleSimple
+    });
+    _this.subLayer = subLayer;
+    _this.subSource = subSource;
+    map.addLayer(subLayer); // Line Source, Additional info
+
+    var lineSource = new olSource.Vector();
+    var lineLayer = new _Vector.default({
+      source: lineSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: new olStyle.Style({
+        stroke: new olStyle.Stroke({
+          color: '#666666',
+          width: 2
+        })
+      })
+    });
+    _this.lineLayer = lineLayer;
+    _this.lineSource = lineSource;
+    map.addLayer(lineLayer); // Cluster Source
 
     var clusterSource = new olSource.Cluster({
       distance: 10,
@@ -82009,11 +82038,46 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "showAdditionalInfo",
-    value: function showAdditionalInfo(info) {
+    value: function showAdditionalInfo(items) {
+      var _this2 = this;
+
+      if (items.length > 1) return;
+      var info = items[0].get('info');
+      var classFeature = items[0].get('classFeature');
+      if (!info.hasOwnProperty('livePoints') || !info.livePoints) return;
+      this.subSource.clear();
+      this.lineSource.clear();
+      var prevPoint = undefined;
+      var currentPoint = undefined;
+      info.livePoints.forEach(function (item) {
+        item.icon = classFeature.getIcon(item.kindAndStatus);
+        var ft = new _Feature.default({
+          info: item,
+          classFeature: classFeature,
+          icon: item.icon,
+          geometry: new olGeom.Point(item.point)
+        });
+
+        _this2.subSource.addFeature(ft);
+
+        currentPoint = item.point;
+
+        if (prevPoint) {
+          var _ft = new _Feature.default({
+            geometry: new olGeom.LineString([prevPoint, currentPoint])
+          });
+
+          _this2.lineSource.addFeature(_ft);
+        }
+
+        prevPoint = item.point;
+      });
       this.emit('showAdditionalInfo', undefined);
       this.hidePulse();
       this.simpleLayer.setVisible(false);
       this.clusterLayer.setVisible(false);
+      this.subLayer.setVisible(true);
+      this.lineLayer.setVisible(true);
 
       _classHelper.default.addClass(document.getElementById('year-control'), 'hide-element');
     }
@@ -82025,6 +82089,8 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
       _classHelper.default.removeClass(document.getElementById('year-control'), 'hide-element');
 
       this.showPulse();
+      this.subLayer.setVisible(false);
+      this.lineLayer.setVisible(false);
       this.simpleLayer.setVisible(true);
       this.clusterLayer.setVisible(true);
     }
@@ -82066,7 +82132,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "addYearControl",
     value: function addYearControl() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.map.addControl(new YearControl({
         caption: 'Выбрать год событий',
@@ -82074,7 +82140,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
         century: this.currentCentury,
         kind: this.currentKind,
         handler: function handler(dateObj) {
-          _this2.changeYear({
+          _this3.changeYear({
             'year': dateObj.year,
             'century': dateObj.century,
             'kind': dateObj.kind
@@ -82085,7 +82151,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "addYearLayer",
     value: function addYearLayer() {
-      var _this3 = this;
+      var _this4 = this;
 
       var yearLayer = new _Tile.default({
         preload: 5,
@@ -82093,7 +82159,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
         zIndex: 2,
         source: new olSource.XYZ({
           tileUrlFunction: function tileUrlFunction(tileCoord, pixelRatio, projection) {
-            return _this3.getGeacronLayerUrl.call(_this3, tileCoord, pixelRatio, projection);
+            return _this4.getGeacronLayerUrl.call(_this4, tileCoord, pixelRatio, projection);
           }
         })
       });
@@ -82202,11 +82268,11 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "showPulse",
     value: function showPulse() {
-      var _this4 = this;
+      var _this5 = this;
 
       clearInterval(window.pulse);
       window.pulse = setInterval(function () {
-        _this4.pulseFeature(_this4.currentFeatureCoord);
+        _this5.pulseFeature(_this5.currentFeatureCoord);
       }, 1000);
     }
   }, {
@@ -82238,12 +82304,12 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "refreshInfo",
     value: function refreshInfo(info) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       info.forEach(function (item) {
-        return _this5.addFeature(item);
+        return _this6.addFeature(item);
       });
     }
   }], [{
@@ -82293,51 +82359,51 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
   var _super3 = _createSuper(YearControl);
 
   function YearControl(inputParams) {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, YearControl);
 
-    _this6 = _super3.call(this, inputParams);
+    _this7 = _super3.call(this, inputParams);
     var caption = inputParams.caption;
     var hint = inputParams.hint || caption;
-    _this6.century = inputParams.century;
-    _this6.year = inputParams.year;
-    _this6.kind = inputParams.kind;
-    _this6.handler = inputParams.handler;
+    _this7.century = inputParams.century;
+    _this7.year = inputParams.year;
+    _this7.kind = inputParams.kind;
+    _this7.handler = inputParams.handler;
     var yearInput = document.createElement('input');
     yearInput.className = 'input-without-focus';
     yearInput.title = hint;
     yearInput.setAttribute('id', 'year-input');
-    yearInput.value = _this6.kind == 'year' ? _this6.year : _dateHelper.default.intCenturyToStr(_this6.century);
+    yearInput.value = _this7.kind == 'year' ? _this7.year : _dateHelper.default.intCenturyToStr(_this7.century);
     yearInput.addEventListener('keyup', function (event) {
       if (event.keyCode == 13) {
-        _this6.inputKeyUp();
+        _this7.inputKeyUp();
 
         event.preventDefault();
       }
     });
     var yearLabel = document.createElement('label');
     yearLabel.setAttribute('id', 'year-label');
-    yearLabel.innerHTML = _this6.kind == 'year' ? 'год' : 'век';
     yearLabel.addEventListener('click', function () {
-      _this6.yearCenturyClick();
+      _this7.yearCenturyClick();
     }, false);
-    _this6.yearInput = yearInput;
-    _this6.yearLabel = yearLabel;
+    _this7.yearInput = yearInput;
+    _this7.yearLabel = yearLabel;
+    _this7.kind == 'year' ? _this7.changeKind('year') : _this7.changeKind('century');
     var yearLeftButton = document.createElement('button');
-    yearLeftButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-backward-2');
+    yearLeftButton.innerHTML = _this7.getBSIconHTML('mdi mdi-step-backward-2');
     yearLeftButton.title = 'Предыдущий год/век';
     yearLeftButton.setAttribute('id', 'year-left-button');
     yearLeftButton.addEventListener('click', function () {
-      _this6.leftButtonClick();
+      _this7.leftButtonClick();
     }, false); // yearLeftButton.addEventListener('touchstart', () => { this.leftButtonClick(); }, false);
 
     var yearRightButton = document.createElement('button');
-    yearRightButton.innerHTML = _this6.getBSIconHTML('mdi mdi-step-forward-2');
+    yearRightButton.innerHTML = _this7.getBSIconHTML('mdi mdi-step-forward-2');
     yearRightButton.title = 'Следующий год/век';
     yearRightButton.setAttribute('id', 'year-right-button');
     yearRightButton.addEventListener('click', function () {
-      _this6.rightButtonClick();
+      _this7.rightButtonClick();
     }, false); // yearRightButton.addEventListener('touchstart', () => { this.rightButtonClick(); }, false);
 
     var parentDiv = document.createElement('div');
@@ -82347,28 +82413,29 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
     parentDiv.appendChild(yearInput);
     parentDiv.appendChild(yearLabel);
     parentDiv.appendChild(yearRightButton);
-    _this6.element = parentDiv;
-    olControl.Control.call(_assertThisInitialized(_this6), {
+    _this7.element = parentDiv;
+    olControl.Control.call(_assertThisInitialized(_this7), {
       label: 'test',
       hint: 'test',
       tipLabel: caption,
       element: parentDiv // target: get(inputParams, "target")
 
     });
-    return _this6;
+    return _this7;
   }
 
   _createClass(YearControl, [{
     key: "changeKind",
-    value: function changeKind(kind, caption) {
+    value: function changeKind(kind) {
       this.kind = kind;
-      this.yearLabel.innerHTML = caption;
 
       if (kind == 'century') {
         this.century = _dateHelper.default.yearToCentury(this.year);
         this.yearInput.value = _dateHelper.default.intCenturyToStr(this.century);
+        this.yearLabel.innerHTML = 'ВЕК / год';
       } else {
         this.yearInput.value = this.year;
+        this.yearLabel.innerHTML = 'ГОД / век';
       }
 
       this.handler({
@@ -82381,9 +82448,9 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
     key: "yearCenturyClick",
     value: function yearCenturyClick() {
       if (this.kind == 'year') {
-        this.changeKind('century', 'век');
+        this.changeKind('century');
       } else {
-        this.changeKind('year', 'год');
+        this.changeKind('year');
       }
     }
   }, {
@@ -82550,6 +82617,11 @@ var SuperFeature = /*#__PURE__*/function () {
     key: "getCaptionInfo",
     value: function getCaptionInfo(info) {
       return 'Суперкласс';
+    }
+  }, {
+    key: "getAdditionalInfo",
+    value: function getAdditionalInfo(info) {
+      return undefined;
     }
   }, {
     key: "getIcon",
@@ -83024,10 +83096,9 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
         return item.kindAndStatus == kind;
       });
       res = res.map(function (elem) {
-        var info = elem.info;
         return _objectSpread(_objectSpread({}, elem), {}, {
           icon: PersonFeature.getIcon(kind),
-          oneLine: "".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename)
+          oneLine: "".concat(elem.caption)
         });
       });
       return res;
@@ -91607,9 +91678,18 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       });
     }
   }, {
+    key: "getPersons",
+    value: function getPersons() {
+      var _this3 = this;
+
+      this.socket.emit('clGetPersons', JSON.stringify({}), function (msg) {
+        _this3.emit('persons', JSON.parse(msg));
+      });
+    }
+  }, {
     key: "getDataByYear",
     value: function getDataByYear(dateObject) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (undefined === dateObject.year) {
         return;
@@ -91640,7 +91720,7 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       }
 
       this.socket.emit('clQueryDataByYear', JSON.stringify(searchData), function (msg) {
-        _this3.emit('refreshInfo', JSON.parse(msg));
+        _this4.emit('refreshInfo', JSON.parse(msg));
       });
     }
   }], [{
@@ -102743,6 +102823,7 @@ function startApp() {
   });
   mapControl.subscribe('selectFeatures', function (items) {
     infoControl.updateItems(items);
+    mapControl.showAdditionalInfo(items);
   });
   mapControl.subscribe('showAdditionalInfo', function () {
     legendControl.switchOff();

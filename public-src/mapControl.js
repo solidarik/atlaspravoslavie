@@ -172,6 +172,37 @@ export class MapControl extends EventEmitter {
     this.simpleSource = simpleSource
     map.addLayer(simpleLayer)
 
+    // Sub Source, Additional info
+    let subSource = new olSource.Vector()
+    let subLayer = new olLayerVector({
+      source: subSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: getStyleSimple,
+    })
+    this.subLayer = subLayer
+    this.subSource = subSource
+    map.addLayer(subLayer)
+
+    // Line Source, Additional info
+    let lineSource = new olSource.Vector()
+    let lineLayer = new olLayerVector({
+      source: lineSource,
+      zIndex: 1,
+      updateWhileAnimating: true,
+      updateWhileInteracting: true,
+      style: new olStyle.Style({
+        stroke: new olStyle.Stroke({
+          color: '#666666',
+          width: 2,
+        }),
+      })
+    })
+    this.lineLayer = lineLayer
+    this.lineSource = lineSource
+    map.addLayer(lineLayer)
+
     // Cluster Source
     let clusterSource = new olSource.Cluster({
       distance: 10,
@@ -279,11 +310,48 @@ export class MapControl extends EventEmitter {
     return geom
   }
 
-    showAdditionalInfo(info) {
+  showAdditionalInfo(items) {
+    if (items.length > 1 )
+      return
+
+    const info = items[0].get('info')
+    const classFeature = items[0].get('classFeature')
+
+    if (!info.hasOwnProperty('livePoints') || !info.livePoints)
+      return
+
+    this.subSource.clear()
+    this.lineSource.clear()
+    let prevPoint = undefined
+    let currentPoint = undefined
+    info.livePoints.forEach((item) => {
+      item.icon = classFeature.getIcon(item.kindAndStatus)
+      const ft = new olFeature({
+        info: item,
+        classFeature: classFeature,
+        icon: item.icon,
+        geometry: new olGeom.Point(item.point),
+      })
+      this.subSource.addFeature(ft)
+
+      currentPoint = item.point
+      if (prevPoint) {
+        const ft = new olFeature({
+          geometry: new olGeom.LineString([prevPoint, currentPoint])
+        })
+        this.lineSource.addFeature(ft)
+      }
+
+      prevPoint = item.point
+
+    })
+
     this.emit('showAdditionalInfo', undefined)
     this.hidePulse()
     this.simpleLayer.setVisible(false)
     this.clusterLayer.setVisible(false)
+    this.subLayer.setVisible(true)
+    this.lineLayer.setVisible(true)
     ClassHelper.addClass(
       document.getElementById('year-control'),
       'hide-element'
@@ -298,6 +366,8 @@ export class MapControl extends EventEmitter {
     )
 
     this.showPulse()
+    this.subLayer.setVisible(false)
+    this.lineLayer.setVisible(false)
     this.simpleLayer.setVisible(true)
     this.clusterLayer.setVisible(true)
   }
@@ -593,13 +663,13 @@ class YearControl extends SuperCustomControl {
 
     let yearLabel = document.createElement('label')
     yearLabel.setAttribute('id', 'year-label')
-    yearLabel.innerHTML = this.kind == 'year' ? 'год' : 'век'
     yearLabel.addEventListener('click', () => {
       this.yearCenturyClick()
     }, false)
 
     this.yearInput = yearInput
     this.yearLabel = yearLabel
+    this.kind == 'year' ? this.changeKind('year') : this.changeKind('century')
 
     let yearLeftButton = document.createElement('button')
     yearLeftButton.innerHTML = this.getBSIconHTML('mdi mdi-step-backward-2')
@@ -647,16 +717,16 @@ class YearControl extends SuperCustomControl {
     })
   }
 
-  changeKind(kind, caption) {
+  changeKind(kind) {
     this.kind = kind
-    this.yearLabel.innerHTML = caption
 
     if (kind == 'century') {
       this.century = DateHelper.yearToCentury(this.year)
       this.yearInput.value = DateHelper.intCenturyToStr(this.century)
+      this.yearLabel.innerHTML = 'ВЕК / год'
     } else {
       this.yearInput.value = this.year
-
+      this.yearLabel.innerHTML = 'ГОД / век'
     }
 
     this.handler({
@@ -668,9 +738,9 @@ class YearControl extends SuperCustomControl {
 
   yearCenturyClick() {
     if (this.kind == 'year') {
-      this.changeKind('century', 'век')
+      this.changeKind('century')
     } else {
-      this.changeKind('year', 'год')
+      this.changeKind('year')
     }
   }
 

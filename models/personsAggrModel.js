@@ -22,6 +22,10 @@ var personsAggrSchema = new mongoose.Schema(
         type: [],
         required: 'Координаты обязательны'
     },
+    livePoints: {
+      type: [],
+      required: 'Линия жизни обязательна для заполнения'
+    },
     startYear: Number,
     endYear: Number,
     startCentury: {

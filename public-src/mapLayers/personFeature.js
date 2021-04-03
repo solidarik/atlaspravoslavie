@@ -121,11 +121,10 @@ class PersonFeature extends SuperFeature {
 
     res = info.persons.filter( item => { return item.kindAndStatus == kind })
     res = res.map((elem) => {
-      const info = elem.info
       return {
         ...elem,
         icon: PersonFeature.getIcon(kind),
-        oneLine: `${info.surname} ${info.name} ${info.middlename}`,
+        oneLine: `${elem.caption}`,
       }
     })
 

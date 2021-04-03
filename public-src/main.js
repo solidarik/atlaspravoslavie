@@ -60,6 +60,7 @@ function startApp() {
 
   mapControl.subscribe('selectFeatures', (items) => {
     infoControl.updateItems(items)
+    mapControl.showAdditionalInfo(items)
   })
 
   mapControl.subscribe('showAdditionalInfo', () => {

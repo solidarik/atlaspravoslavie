@@ -5,6 +5,16 @@ const StrHelper = require('../helper/strHelper')
 
 class PersonsAggr {
 
+  getLivePointsJson(json) {
+    return {
+        "kind": json.kind,
+        "kindAndStatus": json.kindAndStatus,
+        "groupStatus": json.groupStatus,
+        "engStatus": json.engStatus,
+        "point": json.point
+    }
+  }
+
   start() {
     return new Promise((resolve, reject) => {
       PersonsModel.find({}) //'surname': 'Садзаглишвили'})
@@ -40,6 +50,7 @@ class PersonsAggr {
 
             let birthJson = {}
             let birthJsonToParse = ''
+            let livePoints = []
 
             if (person.birth.placeCoord && person.birth.placeCoord.length > 1) {
                 let json = JSON.parse(JSON.stringify(superJson))
@@ -51,6 +62,7 @@ class PersonsAggr {
                 json.startCentury = person.birth.century
                 birthJson = json
                 birthJsonToParse = JSON.stringify(json)
+                livePoints.push(this.getLivePointsJson(json))
                 onePersonsJsons.push(json)
             }
             person.achievements.forEach(achiev => {
@@ -68,6 +80,7 @@ class PersonsAggr {
                     if (json.startCentury) {
                         onePersonsJsons.push(json)
                     }
+                    livePoints.push(this.getLivePointsJson(json))
                 }
             });
 
@@ -81,6 +94,7 @@ class PersonsAggr {
                 if (json.startYear) {
                     json.endYear = json.startYear
                 }
+                livePoints.push(this.getLivePointsJson(json))
                 onePersonsJsons.push(json)
             }
 
@@ -102,14 +116,17 @@ class PersonsAggr {
                             injectJson.endYear = json.startYear - 1
                             injectJson.kind = 'live'
                             injectJson.kindAndStatus = `live_${birthJson.engStatus}`
+                            injectJson.livePoints = livePoints
                             addJsons.push(injectJson)
                         }
                     }
                 }
             }
             for (let i = 0; i < onePersonsJsons.length; i++) {
+                onePersonsJsons[i].livePoints = livePoints
                 jsons.push(onePersonsJsons[i])
             }
+
             addJsons.forEach(json => {
                 jsons.push(json)
             })

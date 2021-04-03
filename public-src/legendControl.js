@@ -49,6 +49,7 @@ export class LegendControl extends EventEmitter {
 
   fillPersonsFeature(info) {
     let res = []
+
     res = res.concat(PersonFeature.fillPersonItems(info, 'birth_martyrs'))
     res = res.concat(PersonFeature.fillPersonItems(info, 'live_martyrs'))
     res = res.concat(PersonFeature.fillPersonItems(info, 'death_martyrs'))
