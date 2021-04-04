@@ -176,7 +176,7 @@ export class MapControl extends EventEmitter {
     let subSource = new olSource.Vector()
     let subLayer = new olLayerVector({
       source: subSource,
-      zIndex: 1,
+      zIndex: 100,
       updateWhileAnimating: true,
       updateWhileInteracting: true,
       style: getStyleSimple,
@@ -189,15 +189,24 @@ export class MapControl extends EventEmitter {
     let lineSource = new olSource.Vector()
     let lineLayer = new olLayerVector({
       source: lineSource,
-      zIndex: 1,
+      zIndex: 10,
       updateWhileAnimating: true,
       updateWhileInteracting: true,
-      style: new olStyle.Style({
-        stroke: new olStyle.Stroke({
-          color: '#666666',
+      style: [
+        new olStyle.Style({
+          stroke: new olStyle.Stroke({
+          color: [255, 255, 255, 0.6],
           width: 2,
-        }),
-      })
+          lineDash: [4, 8],
+          lineDashOffset: 6
+        })}),
+        new olStyle.Style({
+          stroke: new olStyle.Stroke({
+          color: [0, 0, 0, 0.6],
+          width: 2,
+          lineDash: [4, 8]
+        })})
+      ]
     })
     this.lineLayer = lineLayer
     this.lineSource = lineSource

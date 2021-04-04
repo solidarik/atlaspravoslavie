@@ -81912,7 +81912,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     var subSource = new olSource.Vector();
     var subLayer = new _Vector.default({
       source: subSource,
-      zIndex: 1,
+      zIndex: 100,
       updateWhileAnimating: true,
       updateWhileInteracting: true,
       style: getStyleSimple
@@ -81924,15 +81924,23 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     var lineSource = new olSource.Vector();
     var lineLayer = new _Vector.default({
       source: lineSource,
-      zIndex: 1,
+      zIndex: 10,
       updateWhileAnimating: true,
       updateWhileInteracting: true,
-      style: new olStyle.Style({
+      style: [new olStyle.Style({
         stroke: new olStyle.Stroke({
-          color: '#666666',
-          width: 2
+          color: [255, 255, 255, 0.6],
+          width: 2,
+          lineDash: [4, 8],
+          lineDashOffset: 6
         })
-      })
+      }), new olStyle.Style({
+        stroke: new olStyle.Stroke({
+          color: [0, 0, 0, 0.6],
+          width: 2,
+          lineDash: [4, 8]
+        })
+      })]
     });
     _this.lineLayer = lineLayer;
     _this.lineSource = lineSource;
