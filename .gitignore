@@ -17,3 +17,4 @@ loadDatabase/python/out_*
 loadDatabase/out*
 *-copy.*
 * - copy.*
+.env

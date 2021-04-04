@@ -11,25 +11,25 @@ print(sys.stdout.encoding)
 
 root_folder = 'out_persons'
 
-col_surname, col_name, col_middlename = tuple(range(0, 3))
-col_birthDate, col_birthPlace = tuple(range(3, 5))
-col_monkname = 5
+col_surname, col_sitename, col_name, col_middlename = tuple(range(0, 4))
+col_birthDate, col_birthPlace = tuple(range(4, 6))
+col_monkname = 6
 
-col_achievement_start = 6
-col_achievement_end = 10
+col_achievement_start = 7
+col_achievement_end = 11
 
-col_canonizationDate = 12
-col_status = 13
-col_groupStatus = 14
-col_worshipDays = 15
+col_canonizationDate = 13
+col_status = 14
+col_groupStatus = 15
+col_worshipDays = 16
 
-col_profession = 16
-col_fullDescription = 17
-col_srcUrl = 18
-col_photoUrl = 19
+col_profession = 17
+col_fullDescription = 18
+col_srcUrl = 19
+col_photoUrl = 20
 
-col_deathDate = 20
-col_deathPlace = 21
+col_deathDate = 21
+col_deathPlace = 22
 
 filename = os.path.abspath(__file__)
 filename += os.path.sep + '..' + os.path.sep + '..' + os.path.sep
@@ -59,6 +59,7 @@ for row in range(START_ROW, END_ROW):
         persons['middlename'] = xls.GetSheetValue(row, col_middlename)
         persons['monkname'] = helper.capitalize_first(
             xls.GetSheetValue(row, col_monkname))
+        persons['sitename'] = xls.GetSheetValue(row, col_sitename)
 
         birthObj = {}
         birthDate = xls.GetSheetValue(row, col_birthDate, True)

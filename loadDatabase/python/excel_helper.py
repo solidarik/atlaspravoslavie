@@ -22,7 +22,7 @@ class ExcelHelper():
             v = str(int(round(cell_value, 0)))
         else:
             v = str(cell_value)
-        return v.replace('"', '\\"').rstrip().rstrip(',')
+        return v.replace('"', '\\"').rstrip().rstrip(',').strip()
 
     def GetSheetValueDateRange(self, row: int,
                                col: int) -> typing.Tuple[dict, dict]:

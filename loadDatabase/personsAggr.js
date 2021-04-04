@@ -25,9 +25,15 @@ class PersonsAggr {
         persons.forEach(person => {
 
             let onePersonsJsons = []
+
+            let caption = person.sitename
+            if (!caption) {
+                caption = `${person.surname} ${person.name} ${person.middlename}`.trim()
+            }
+
             const superJson = {
                 'info': person,
-                'caption': `${person.surname} ${person.name} ${person.middlename}`.trim(),
+                'caption': caption,
                 'groupStatus': person.groupStatus,
                 'shortDescription': StrHelper.ellipseLongString(person.fullDescription, 400)
             }

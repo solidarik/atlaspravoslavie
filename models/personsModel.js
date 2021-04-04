@@ -7,6 +7,7 @@ var personsSchema = new mongoose.Schema(
     name: String,
     middlename: String,
     monkname: String,
+    sitename: String,
 
     birth: {
       year: Number,

@@ -1,6 +1,10 @@
 const log = require('../helper/logHelper')
 const fileHelper = require('../helper/fileHelper')
 const mongoose = require('mongoose')
+
+const dotenv = require('dotenv')
+dotenv.config()
+
 const config = require('config')
 const chalk = require('chalk')
 const path = require('path')

@@ -37,6 +37,7 @@ class PersonFeature extends SuperFeature {
   }
 
   static getHtmlInfo(outerInfo) {
+
     let info = outerInfo.info
     window.CURRENT_ITEM = info
 
@@ -49,7 +50,7 @@ class PersonFeature extends SuperFeature {
     }
 
     let html = `<div class="person-info panel-info">
-      <h1>${info.surname} ${info.name} ${info.middlename}</h1>
+      <h1>${outerInfo.caption}</h1>
       ${monkname}
       <h2>${info.status}</h2>
       <table id='person-table' class='table table-borderless'>

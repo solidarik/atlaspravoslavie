@@ -47,6 +47,7 @@
     "d3": "^4.2.2",
     "d3-geo-projection": "latest",
     "d3v4": "latest",
+    "dotenv": "latest",
     "jquery": "latest",
     "koa": "latest",
     "koa-bodyparser": "latest",
