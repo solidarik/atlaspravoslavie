@@ -78,17 +78,17 @@ function startApp() {
   const clientProtocol = ClientProtocol.create();
   clientProtocol.getPersons();
   clientProtocol.subscribe('persons', (persons) => {
-    console.log(JSON.stringify(persons))
-    //var holyPersons = new addHolyPersons("persons-table", "persons");
-    //holyPersons.clearTable();
-    //holyPersons.fillTable();
-    //$("#persons-table tr:eq(0) td:first-child span").click();
+    //console.log(JSON.stringify(persons))
+    var holyPersons = new addHolyPersons("persons-table", persons);
+    holyPersons.clearTable();
+    holyPersons.fillTable();
+    $("#persons-table tr:eq(0) td:first-child span").click();
   })
 
-  var holyPersons = new addHolyPersons("persons-table", "data/holy_persons.json");
-  holyPersons.clearTable();
-  holyPersons.fillTable();
-  $("#persons-table tr:eq(0) td:first-child span").click();
+  //var holyPersons = new addHolyPersons("persons-table", "data/holy_persons.json");
+  //holyPersons.clearTable();
+  //holyPersons.fillTable();
+  //$("#persons-table tr:eq(0) td:first-child span").click();
 }
 
 $(document).ready(function () {

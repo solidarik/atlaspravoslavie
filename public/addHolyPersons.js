@@ -1,10 +1,9 @@
 import * as d3 from './libs/d3.min.js';
 
 export default class addHolyPersons {
-  constructor(idTable, fileUrl) {
+  constructor(idTable, data) {
     this.idTable = idTable
-    this.fileUrl = fileUrl
-    this.data = null
+    this.data = data
   }
 
   clearTable() {
@@ -17,61 +16,87 @@ export default class addHolyPersons {
     //console.log("clicked " + $(thisTr).attr('id'));
     var id = parseInt($(thisTr).attr('id'))
     $('#FIO').html(
-      thisThis.data[id].Surname +
-        ' ' +
-        thisThis.data[id].Name +
-        ' ' +
-        thisThis.data[id].MiddleName
+      ((typeof thisThis.data.persons[id].surname !== 'undefined') ? thisThis.data.persons[id].surname : '')
+      +
+      ' ' +
+      ((typeof thisThis.data.persons[id].name !== 'undefined') ? thisThis.data.persons[id].name : '')
+      +
+      ' ' +
+      ((typeof thisThis.data.persons[id].middlename !== 'undefined') ? thisThis.data.persons[id].middlename : '')
     )
     $('#LifeTime').html(
       '<b>Дата и место рождения</b> - ' +
-        thisThis.data[id].DateBirth +
-        ' ' +
-        thisThis.data[id].PlaceBirth
+      ((typeof thisThis.data.persons[id].birth.dateStr !== 'undefined') ? thisThis.data.persons[id].birth.dateStr : '')
+      +
+      ' ' +
+      ((typeof thisThis.data.persons[id].birth.place !== 'undefined') ? thisThis.data.persons[id].birth.place : '')
+
     )
-    $('#AchievementPlace').html(
-      '<b>Место и дата подвига</b> - ' + thisThis.data[id].PlaceAchievement+'-' + thisThis.data[id].DateAchievement+';'
-      +thisThis.data[id].PlaceAchievement1 +'-'+ thisThis.data[id].DateAchievement1+';'
-      +thisThis.data[id].PlaceAchievement2 + thisThis.data[id].DateAchievement2
-    )
+
+    if (typeof thisThis.data.persons[id].achievements !== 'undefined' && thisThis.data.persons[id].achievements.length > 0) {
+      var str = '<b>Место и дата подвига</b> - '
+
+      for (var i = 0; i < thisThis.data.persons[id].achievements.length; i++) {
+        str = str +
+          ((typeof thisThis.data.persons[id].achievements[i].place !== 'undefined') ? thisThis.data.persons[id].achievements[i].place : '') +
+          ' - ' +
+          ((typeof thisThis.data.persons[id].achievements[i].dateStr !== 'undefined') ? thisThis.data.persons[id].achievements[i].dateStr : '') +
+          ';'
+
+        $('#AchievementPlace').html(str)
+      }
+    }
     $('#DeathTime').html(
       '<b>Дата смерти, захоронение</b> - ' +
-        thisThis.data[id].DateDeath +
-        ' ' +
-        thisThis.data[id].PlaceDeath
+      ((typeof thisThis.data.persons[id].death.dateStr !== 'undefined') ? thisThis.data.persons[id].death.dateStr : '') +
+      ' ' +
+      ((typeof thisThis.data.persons[id].death.place !== 'undefined') ? thisThis.data.persons[id].death.place : '')
     )
     $('#DateCanonization').html(
       '<b>Дата канонизации</b> - ' +
-        thisThis.data[id].DateCanonization
+      ((typeof thisThis.data.persons[id].canonizationDate !== 'undefined' && thisThis.data.persons[id].canonizationDate.dateStr !== 'undefined') ? thisThis.data.persons[id].canonizationDate.dateStr : '')
     )
+
     $('#HolinessStatus').html(
       '<b>Статус святости</b> - ' +
-        thisThis.data[id].HolinessStatus
-    )    
-    $('#DateVeneration').html(
-      '<b>Дата почитания</b> - ' +
-        thisThis.data[id].DateVeneration
-    )  
+      ((typeof thisThis.data.persons[id].status !== 'undefined') ? thisThis.data.persons[id].status : '')
+    )
+    //цикл
+    if (typeof thisThis.data.persons[id].worshipDays !== 'undefined' && thisThis.data.persons[id].worshipDays.length > 0) {
+      var str = '<b>Дата почитания</b> - '
+      for (var i = 0; i < thisThis.data.persons[id].worshipDays.length; i++) {
+        str = str +
+          ((typeof thisThis.data.persons[id].worshipDays[i].dateStr !== 'undefined') ? thisThis.data.persons[id].worshipDays[i].dateStr : '') +
+          ';'
+
+        $('#DateVeneration').html(str)
+      }
+    }
+
+    // $('#DateVeneration').html(
+    //   '<b>Дата почитания</b> - ' +
+    //     thisThis.data.persons[id].DateVeneration
+    // )
     $('#FieldActivity').html(
       '<b>Сфера деятельности</b> - ' +
-        thisThis.data[id].FieldActivity
-    )  
+      ((typeof thisThis.data.persons[id].profession !== 'undefined') ? thisThis.data.persons[id].profession : '')
+    )
 
-    $('#imgPerson').src = thisThis.data[id].PhotoUrl
-    $('#imgPerson').attr('src', thisThis.data[id].PhotoUrl)
+    $('#imgPerson').src = thisThis.data.persons[id].photoUrl
+    $('#imgPerson').attr('src', thisThis.data.persons[id].photoUrl)
     // $('#description').html(
-    //   thisThis.data[id].Description +
+    //   thisThis.data.persons[id].Description +
     //     " <a target='_blank' rel='noopener noreferrer' href='" +
-    //     thisThis.data[id].Source +
+    //     thisThis.data.persons[id].Source +
     //     "'>" +
     //     'Подробнее...</a>'
     // )
     $('#fullDescription').html(
-      thisThis.data[id].Description +
-        " <a target='_blank' rel='noopener noreferrer' href='" +
-        thisThis.data[id].Source +
-        "'>" +
-        'Подробнее...</a>'
+      thisThis.data.persons[id].fullDescription +
+      " <a target='_blank' rel='noopener noreferrer' href='" +
+      thisThis.data.persons[id].srcUrl +
+      "'>" +
+      'Подробнее...</a>'
     )
     $(thisTr).addClass('event-active-row')
     $(thisTr).siblings().removeClass('event-active-row')
@@ -79,8 +104,9 @@ export default class addHolyPersons {
 
   addDataToTable() {
     //console.log("addDataTotable");
+    //console.log(JSON.stringify(this.data))
+    var obj = this.data.persons
 
-    var obj = this.data
     this.clearTable()
     var table = $('#' + this.idTable)
     //table[0].border = "1";
@@ -88,23 +114,28 @@ export default class addHolyPersons {
     var columnCount = columns.length
     var row = $(table[0].insertRow(-1))
     for (var i = 0; i < columnCount; i++) {
-      if (i == 0 || i == 1 || i == 3 || i == 4|| i == 5) {
-        var headerCell = $('<th />')
-        if (columns[i] == 'Surname') {
-          headerCell.html('Фамилия')
-        } else if (columns[i] == 'Name') {
-          headerCell.html('Имя')
-        } else if (columns[i] == 'DateBirth') {
-          headerCell.html('Дата рождения')
-        } else if (columns[i] == 'PlaceBirth') {
-          headerCell.html('Место рождения')
-        }  else if (columns[i] == 'NameInMonasticism') {
-          headerCell.html('Имя в монашестве')
-        } else {
-          headerCell.html('N/A')
-        }
+      //if (i == 0 || i == 1 || i == 3 || i == 4|| i == 5) {
+      var headerCell = $('<th />')
+      if (columns[i] == 'surname') {
+        headerCell.html('Фамилия')
         row.append(headerCell)
+      } else if (columns[i] == 'name') {
+        headerCell.html('Имя')
+        row.append(headerCell)
+      } else if (columns[i] == 'birth') {
+        headerCell.html('Дата рождения')
+        row.append(headerCell)
+        headerCell = $('<th />')
+        headerCell.html('Место рождения')
+        row.append(headerCell)
+      } else if (columns[i] == 'monkname') {
+        headerCell.html('Имя в монашестве')
+        row.append(headerCell)
+      } else {
+        //headerCell.html('N/A')
       }
+      //row.append(headerCell)
+      //}
     }
 
     for (var i = 0; i < obj.length; i++) {
@@ -112,11 +143,28 @@ export default class addHolyPersons {
       row.addClass('hand-cursor')
       row.attr('id', i)
       for (var j = 0; j < columnCount; j++) {
-        if (j == 0 || j == 1 || j == 3 || j == 4|| j == 5) {
-          var cell = $('<td />')
+        //if (j == 0 || j == 1 || j == 3 || j == 4|| j == 5) {
+        var cell = $('<td />')
+
+        if (columns[j] == 'surname') {
           cell.html(obj[i][columns[j]])
           row.append(cell)
+        } else if (columns[j] == 'name') {
+          cell.html(obj[i][columns[j]])
+          row.append(cell)
+        } else if (columns[j] == 'birth') {
+          cell.html(obj[i][columns[j]].dateStr)
+          row.append(cell)
+          cell = $('<td />')
+          cell.html(obj[i][columns[j]].place)
+          row.append(cell)
+        } else if (columns[j] == 'monkname') {
+          cell.html(obj[i][columns[j]])
+          row.append(cell)
+        } else {
+          //headerCell.html('N/A')
         }
+        //}
       }
     }
 
@@ -169,19 +217,8 @@ export default class addHolyPersons {
   }
 
   fillTable() {
-    //console.log("fillTable");
-
     if (this.data == null) {
-      var thisThis = this
-
-      console.time('load persons')
-      d3.json(this.fileUrl, function (error, persons) {
-        console.timeEnd('load persons')
-        if (error) console.log(error)
-
-        thisThis.data = persons
-        thisThis.addDataToTable()
-      })
+      console.log('data empty')
     } else {
       this.addDataToTable()
     }

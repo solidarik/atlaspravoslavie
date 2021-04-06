@@ -166,7 +166,7 @@ class HolyProtocol extends ServerProtocol {
           (res) => {
             cb(
               JSON.stringify({
-                temples: res
+                persons: res
               })
             )
           })
