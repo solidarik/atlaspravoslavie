@@ -41,7 +41,7 @@ export default class CookieHelper {
       }
     }
 
-    document.cookie = updatedCookie
+    document.cookie = updatedCookie + ';path=/'
   }
 
   static deleteCookie(name) {

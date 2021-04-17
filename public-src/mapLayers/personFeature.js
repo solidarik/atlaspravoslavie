@@ -4,7 +4,7 @@ import * as olStyle from 'ol/style'
 
 class PersonFeature extends SuperFeature {
   static getIcon(kind) {
-    return `images/persons_${kind}.png`
+    return `/images/persons_${kind}.png`
   }
 
   static getCaptionInfo(outerInfo) {
@@ -114,6 +114,10 @@ class PersonFeature extends SuperFeature {
     info.name && res.push(info.name)
     info.middlename && res.push(info.middlename)
     return res.join(' ')
+  }
+
+  static fillPersonForInfo(info) {
+    
   }
 
   static fillPersonItems(info, kind) {

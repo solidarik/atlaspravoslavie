@@ -306,6 +306,7 @@ export class MapControl extends EventEmitter {
     setTimeout(() => {
       this.addYearLayer()
     }, 10)
+
   }
 
   static create() {

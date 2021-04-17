@@ -82641,7 +82641,7 @@ var SuperFeature = /*#__PURE__*/function () {
   }, {
     key: "getIcon",
     value: function getIcon() {
-      var icon = 'images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
+      var icon = '/images/undefined_icon.png'; //const icon = 'data:image/svg+xml;utf8,'
       // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
       // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
       // '<rect x="7" y="1" width="10" height="2"/><polygon points="13 14 13 8 11 8 11 16 18 16 18 14 13 14"/>' +
@@ -82739,7 +82739,7 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
   _createClass(ChronosFeature, null, [{
     key: "getIcon",
     value: function getIcon() {
-      return 'images/event.png';
+      return '/images/event.png';
     }
   }, {
     key: "getCaptionInfo",
@@ -82831,7 +82831,7 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
   _createClass(ChronosChurchFeature, null, [{
     key: "getIcon",
     value: function getIcon() {
-      return 'images/eventChurch.png';
+      return '/images/eventChurch.png';
     }
   }, {
     key: "getCaptionInfo",
@@ -82923,7 +82923,7 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
   _createClass(TemplesFeature, null, [{
     key: "getIcon",
     value: function getIcon() {
-      return 'images/temples.png';
+      return '/images/temples.png';
     }
   }, {
     key: "getCaptionInfo",
@@ -82987,8 +82987,6 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -83009,6 +83007,8 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
   _inherits(PersonFeature, _SuperFeature);
 
@@ -83023,7 +83023,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
   _createClass(PersonFeature, null, [{
     key: "getIcon",
     value: function getIcon(kind) {
-      return "images/persons_".concat(kind, ".png");
+      return "/images/persons_".concat(kind, ".png");
     }
   }, {
     key: "getCaptionInfo",
@@ -83123,6 +83123,8 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
   return PersonFeature;
 }(_superFeature.default);
 
+_defineProperty(PersonFeature, "fillPerson", void 0);
+
 module.exports = PersonFeature;
 },{"./superFeature":"hPGt","../../helper/dateHelper":"IrKG","ol/style":"TZKB"}],"WAuT":[function(require,module,exports) {
 "use strict";
@@ -83180,7 +83182,7 @@ var CookieHelper = /*#__PURE__*/function () {
         }
       }
 
-      document.cookie = updatedCookie;
+      document.cookie = updatedCookie + ';path=/';
     }
   }, {
     key: "deleteCookie",

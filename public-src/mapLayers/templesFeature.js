@@ -4,7 +4,7 @@ import DateHelper from '../../helper/dateHelper'
 
 class TemplesFeature extends SuperFeature {
   static getIcon() {
-    return 'images/temples.png'
+    return '/images/temples.png'
   }
 
   static getCaptionInfo(info) {

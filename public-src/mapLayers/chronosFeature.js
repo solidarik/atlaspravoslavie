@@ -4,7 +4,7 @@ import DateHelper from '../../helper/dateHelper'
 
 class ChronosFeature extends SuperFeature {
   static getIcon() {
-    return 'images/event.png'
+    return '/images/event.png'
   }
 
   static getCaptionInfo(info) {

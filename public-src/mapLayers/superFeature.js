@@ -10,7 +10,7 @@ class SuperFeature {
   }
 
   static getIcon() {
-    const icon = 'images/undefined_icon.png'
+    const icon = '/images/undefined_icon.png'
     //const icon = 'data:image/svg+xml;utf8,'
     // '<svg width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
     // '<path d="M19.74,7.68l1-1L19.29,5.29l-1,1a10,10,0,1,0,1.42,1.42ZM12,22a8,8,0,1,1,8-8A8,8,0,0,1,12,22Z"/>' +
