@@ -1,4 +1,4 @@
-export default class addСhurches {
+export default class addChurches {
   constructor(idTable, data) {
     this.idTable = idTable
     this.data = data
@@ -10,9 +10,9 @@ export default class addСhurches {
   }
 
   rowTableClickHandler(thisThis, thisTr, showSlides, plusSlides, currentSlide) {
-    //console.log("clicked " + $(thisTr).attr('id'));
+    // console.log("clicked " + $(thisTr).attr('id'));
     var _id = $(thisTr).attr('id');
-    var cur = thisThis.data.temples[_id];
+    var cur = thisThis.data[_id];
     //console.log(cur);
     $('#name').html(
       cur.name
@@ -64,9 +64,9 @@ export default class addСhurches {
         } else {
           pu = cur.pageUrl;
         }
-        console.log(cur[iUFN]);
+        //console.log(cur[iUFN]);
         if (cur[iUFN] !== 'undefined'&&cur[iUFN]!==null&&cur[iUFN]!=='') {
-          console.log('if');
+          //console.log('if');
           let elemMS = document.createElement('div');
           elemMS.classList.add("mySlides");
           elemMS.classList.add("fade");
@@ -158,14 +158,14 @@ export default class addСhurches {
 
   }
 
-  addDataToTable(showSlides, plusSlides, currentSlide) {
+  addDataToTable(showSlides, plusSlides, currentSlide, currChurch) {
     //console.log("addDataTotable");
     //console.log(JSON.stringify(this.data));
-    var obj = this.data.temples;
-    this.clearTable()
-    var table = $('#' + this.idTable)
+    var obj = this.data;
+    this.clearTable();
+    var table = $('#' + this.idTable);
     //table[0].border = "1";
-    var columns = Object.keys(obj[0])
+    var columns = Object.keys(obj[0]);
     var columnCount = columns.length
     var row = $(table[0].insertRow(-1))
     for (var i = 0; i < columnCount; i++) {
@@ -189,7 +189,7 @@ export default class addСhurches {
 
       }
     }
-
+    var curId = -1;
     for (var i = 0; i < obj.length; i++) {
       row = $(table[0].insertRow(-1))
       row.addClass('hand-cursor')
@@ -206,6 +206,10 @@ export default class addСhurches {
           }
           row.append(cell)
         }
+      }
+      // console.log(currChurch);
+      if(currChurch!=undefined&&currChurch.pageUrl==obj[i]['pageUrl']){
+        curId = i;
       }
     }
 
@@ -253,16 +257,24 @@ export default class addСhurches {
       })
     )
 
-    $('#churches-table tr:eq(0) td:first-child span').click()
-    $('#0').trigger('click')
+    //$('#churches-table tr:eq(0) td:first-child span').click()
+    if(currChurch!=undefined){
+      var str = '#'+curId;
+      // console.log(str);
+      $(str).click();
+    }else{
+      $('#0').click();
+    }
+
+    //$('#0').trigger('click')
   }
 
-  fillTable(showSlides, plusSlides, currentSlide) {
+  fillTable(showSlides, plusSlides, currentSlide, currChurch) {
     //console.log("fillTable");
     if (this.data == null) {
-      console.log('data empty')
+      // console.log('data empty')
     } else {
-      this.addDataToTable(showSlides, plusSlides, currentSlide)
+      this.addDataToTable(showSlides, plusSlides, currentSlide, currChurch)
     }
   }
 }

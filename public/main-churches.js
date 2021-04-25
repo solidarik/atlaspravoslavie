@@ -1,5 +1,5 @@
 "use strict";
-import addСhurches from './addСhurches.js';
+import addChurches from './addChurches.js';
 import ClientProtocol from '../public-src/clientProtocol.js'
 window.app = {};
 var app = window.app;
@@ -74,16 +74,13 @@ if (!Object.getOwnPropertyDescriptor(NodeList.prototype, 'forEach')) {
 
 //////////////////////////////////////////////////
 function startApp() {
-  const clientProtocol = ClientProtocol.create();
-  clientProtocol.getTemples();
-  clientProtocol.subscribe('temples', (temples) => {
-    //console.log(JSON.stringify(temples))
-    var churches = new addСhurches("churches-table", temples);
-    churches.clearTable();
-    churches.fillTable(showSlides,plusSlides,currentSlide);
-    $("#churches-table tr:eq(0) td:first-child span").click();
-    //showSlides(slideIndex);
-  })
+  var temples = window.state.churches;
+  var temple = window.state.church;
+  // console.log(temples);
+  // console.log(temple);
+  var churches = new addChurches("churches-table", temples);
+  churches.clearTable();
+  churches.fillTable(showSlides, plusSlides, currentSlide, temple);
 }
 
 $(document).ready(function () {
@@ -101,24 +98,24 @@ $(document).ready(function () {
 
 // Next/previous controls
 function plusSlides(n) {
-  console.log('plusSlides, n='+n);
+  // console.log('plusSlides, n=' + n);
   showSlides(slideIndex += n);
 }
 
 // Thumbnail image controls
 function currentSlide(n) {
-  console.log('currentSlide,n='+n);
+  // console.log('currentSlide,n=' + n);
   showSlides(slideIndex = n);
 }
 
 function showSlides(n) {
-  console.log(n);
+  // console.log(n);
   var i;
   var slides = document.getElementsByClassName("mySlides");
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) { slideIndex = 1 }
   else if (n < 1) { slideIndex = slides.length }
-  else{slideIndex = n}
+  else { slideIndex = n }
   for (i = 0; i < slides.length; i++) {
     slides[i].style.display = "none";
     slides[i].className = slides[i].className.replace(" show", "");

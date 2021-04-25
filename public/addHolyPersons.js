@@ -16,31 +16,31 @@ export default class addHolyPersons {
     //console.log("clicked " + $(thisTr).attr('id'));
     var id = parseInt($(thisTr).attr('id'))
     $('#FIO').html(
-      ((typeof thisThis.data.persons[id].surname !== 'undefined') ? thisThis.data.persons[id].surname : '')
+      ((typeof thisThis.data[id].surname !== 'undefined') ? thisThis.data[id].surname : '')
       +
       ' ' +
-      ((typeof thisThis.data.persons[id].name !== 'undefined') ? thisThis.data.persons[id].name : '')
+      ((typeof thisThis.data[id].name !== 'undefined') ? thisThis.data[id].name : '')
       +
       ' ' +
-      ((typeof thisThis.data.persons[id].middlename !== 'undefined') ? thisThis.data.persons[id].middlename : '')
+      ((typeof thisThis.data[id].middlename !== 'undefined') ? thisThis.data[id].middlename : '')
     )
     $('#LifeTime').html(
       '<b>Дата и место рождения</b> - ' +
-      ((typeof thisThis.data.persons[id].birth.dateStr !== 'undefined') ? thisThis.data.persons[id].birth.dateStr : '')
+      ((typeof thisThis.data[id].birth.dateStr !== 'undefined') ? thisThis.data[id].birth.dateStr : '')
       +
       ' ' +
-      ((typeof thisThis.data.persons[id].birth.place !== 'undefined') ? thisThis.data.persons[id].birth.place : '')
+      ((typeof thisThis.data[id].birth.place !== 'undefined') ? thisThis.data[id].birth.place : '')
 
     )
 
-    if (typeof thisThis.data.persons[id].achievements !== 'undefined' && thisThis.data.persons[id].achievements.length > 0) {
+    if (typeof thisThis.data[id].achievements !== 'undefined' && thisThis.data[id].achievements.length > 0) {
       var str = '<b>Место и дата подвига</b> - '
 
-      for (var i = 0; i < thisThis.data.persons[id].achievements.length; i++) {
+      for (var i = 0; i < thisThis.data[id].achievements.length; i++) {
         str = str +
-          ((typeof thisThis.data.persons[id].achievements[i].place !== 'undefined') ? thisThis.data.persons[id].achievements[i].place : '') +
+          ((typeof thisThis.data[id].achievements[i].place !== 'undefined') ? thisThis.data[id].achievements[i].place : '') +
           ' - ' +
-          ((typeof thisThis.data.persons[id].achievements[i].dateStr !== 'undefined') ? thisThis.data.persons[id].achievements[i].dateStr : '') +
+          ((typeof thisThis.data[id].achievements[i].dateStr !== 'undefined') ? thisThis.data[id].achievements[i].dateStr : '') +
           ';'
 
         $('#AchievementPlace').html(str)
@@ -48,25 +48,25 @@ export default class addHolyPersons {
     }
     $('#DeathTime').html(
       '<b>Дата смерти, захоронение</b> - ' +
-      ((typeof thisThis.data.persons[id].death.dateStr !== 'undefined') ? thisThis.data.persons[id].death.dateStr : '') +
+      ((typeof thisThis.data[id].death.dateStr !== 'undefined') ? thisThis.data[id].death.dateStr : '') +
       ' ' +
-      ((typeof thisThis.data.persons[id].death.place !== 'undefined') ? thisThis.data.persons[id].death.place : '')
+      ((typeof thisThis.data[id].death.place !== 'undefined') ? thisThis.data[id].death.place : '')
     )
     $('#DateCanonization').html(
       '<b>Дата канонизации</b> - ' +
-      ((typeof thisThis.data.persons[id].canonizationDate !== 'undefined' && thisThis.data.persons[id].canonizationDate.dateStr !== 'undefined') ? thisThis.data.persons[id].canonizationDate.dateStr : '')
+      ((typeof thisThis.data[id].canonizationDate !== 'undefined' && thisThis.data[id].canonizationDate.dateStr !== 'undefined') ? thisThis.data[id].canonizationDate.dateStr : '')
     )
 
     $('#HolinessStatus').html(
       '<b>Статус святости</b> - ' +
-      ((typeof thisThis.data.persons[id].status !== 'undefined') ? thisThis.data.persons[id].status : '')
+      ((typeof thisThis.data[id].status !== 'undefined') ? thisThis.data[id].status : '')
     )
     //цикл
-    if (typeof thisThis.data.persons[id].worshipDays !== 'undefined' && thisThis.data.persons[id].worshipDays.length > 0) {
+    if (typeof thisThis.data[id].worshipDays !== 'undefined' && thisThis.data[id].worshipDays.length > 0) {
       var str = '<b>Дата почитания</b> - '
-      for (var i = 0; i < thisThis.data.persons[id].worshipDays.length; i++) {
+      for (var i = 0; i < thisThis.data[id].worshipDays.length; i++) {
         str = str +
-          ((typeof thisThis.data.persons[id].worshipDays[i].dateStr !== 'undefined') ? thisThis.data.persons[id].worshipDays[i].dateStr : '') +
+          ((typeof thisThis.data[id].worshipDays[i].dateStr !== 'undefined') ? thisThis.data[id].worshipDays[i].dateStr : '') +
           ';'
 
         $('#DateVeneration').html(str)
@@ -75,26 +75,26 @@ export default class addHolyPersons {
 
     // $('#DateVeneration').html(
     //   '<b>Дата почитания</b> - ' +
-    //     thisThis.data.persons[id].DateVeneration
+    //     thisThis.data[id].DateVeneration
     // )
     $('#FieldActivity').html(
       '<b>Сфера деятельности</b> - ' +
-      ((typeof thisThis.data.persons[id].profession !== 'undefined') ? thisThis.data.persons[id].profession : '')
+      ((typeof thisThis.data[id].profession !== 'undefined') ? thisThis.data[id].profession : '')
     )
 
-    $('#imgPerson').src = thisThis.data.persons[id].photoUrl
-    $('#imgPerson').attr('src', thisThis.data.persons[id].photoUrl)
+    $('#imgPerson').src = thisThis.data[id].photoUrl
+    $('#imgPerson').attr('src', thisThis.data[id].photoUrl)
     // $('#description').html(
-    //   thisThis.data.persons[id].Description +
+    //   thisThis.data[id].Description +
     //     " <a target='_blank' rel='noopener noreferrer' href='" +
-    //     thisThis.data.persons[id].Source +
+    //     thisThis.data[id].Source +
     //     "'>" +
     //     'Подробнее...</a>'
     // )
     $('#fullDescription').html(
-      thisThis.data.persons[id].fullDescription +
+      thisThis.data[id].fullDescription +
       " <a target='_blank' rel='noopener noreferrer' href='" +
-      thisThis.data.persons[id].srcUrl +
+      thisThis.data[id].srcUrl +
       "'>" +
       'Подробнее...</a>'
     )
@@ -102,10 +102,10 @@ export default class addHolyPersons {
     $(thisTr).siblings().removeClass('event-active-row')
   }
 
-  addDataToTable() {
+  addDataToTable(currPerson) {
     //console.log("addDataTotable");
     //console.log(JSON.stringify(this.data))
-    var obj = this.data.persons
+    var obj = this.data
 
     this.clearTable()
     var table = $('#' + this.idTable)
@@ -137,7 +137,7 @@ export default class addHolyPersons {
       //row.append(headerCell)
       //}
     }
-
+    var curId = -1;
     for (var i = 0; i < obj.length; i++) {
       row = $(table[0].insertRow(-1))
       row.addClass('hand-cursor')
@@ -165,6 +165,9 @@ export default class addHolyPersons {
           //headerCell.html('N/A')
         }
         //}
+      }
+      if(currPerson!=undefined&&currPerson.pageUrl==obj[i]['pageUrl']){
+        curId = i;
       }
     }
 
@@ -212,15 +215,19 @@ export default class addHolyPersons {
       })
     )
 
-    $('#persons-table tr:eq(0) td:first-child span').click()
-    $('#0').trigger('click')
+    if(currPerson!=undefined){
+      var str = '#'+curId;
+      $(str).click();
+    }else{
+      $('#0').click();
+    }
   }
 
-  fillTable() {
+  fillTable(currPerson) {
     if (this.data == null) {
       console.log('data empty')
     } else {
-      this.addDataToTable()
+      this.addDataToTable(currPerson)
     }
   }
 }
