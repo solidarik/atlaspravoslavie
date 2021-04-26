@@ -96,12 +96,12 @@ class PersonFeature extends SuperFeature {
       html += `<h2>Дата канонизации: ${DateHelper.ymdToStr(info.canonizationDate)}</h2>`
     }
 
+    const personUrl = `person/${info.pageUrl}`
+
     html += `
       <p>${outerInfo.shortDescription}</p>
       <div class="source-info">
-        <a target='_blank' rel='noopener noreferrer' href=${
-          info.pageUrl
-        }>Подробнее</a>
+        <a rel='noopener noreferrer' href="${personUrl}">Подробнее</a>
       </div>
     </div>
     `
@@ -117,7 +117,7 @@ class PersonFeature extends SuperFeature {
   }
 
   static fillPersonForInfo(info) {
-    
+
   }
 
   static fillPersonItems(info, kind) {

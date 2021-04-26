@@ -25,6 +25,8 @@ class TemplesFeature extends SuperFeature {
       info.longBrief = ''
     }
 
+    const templeUrl = `church/${info.pageUrl}`
+
     window.CURRENT_ITEM = info
     const html = `<div class="temples-info panel-info">
       <h1>${info.name}</h1>
@@ -32,14 +34,7 @@ class TemplesFeature extends SuperFeature {
       <h2>${DateHelper.ymdToStr(info.start)}</h2>
       <p>${info.longBrief}</p>
       <div class="source-info">
-        <a target='_blank' rel='noopener noreferrer' href=${
-          info.eparchyUrl
-        }>Митрополия/Епархия</a>
-      </div>
-      <div class="source-info">
-        <a target='_blank' rel='noopener noreferrer' href=${
-          info.srcUrl
-        }>Источник информации</a>
+        <a rel='noopener noreferrer' href="${templeUrl}">Подробнее</a>
       </div>
     </div>
     `
