@@ -36,7 +36,7 @@ class TemplesJsonMediator extends SuperJsonMediator {
           resolve(newJson)
         })
         .catch((err) => {
-          console.log(geoName)
+          console.log('geoName', geoName)
           resolve({ error: `ошибка в processJson: ${err}` })
         })
     })

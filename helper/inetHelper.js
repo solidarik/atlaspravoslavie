@@ -81,6 +81,11 @@ class InetHelper {
     }
 
     const isExistCoords = this.coords && this.coords[name]
+
+    if (!isExistCoords) {
+      console.log(`Не найдены предустановленные координаты для ${name}`)
+    }
+
     let coords = null
     try {
       coords = isExistCoords
