@@ -2,6 +2,7 @@ const chalk = require('chalk')
 const log = require('../helper/logHelper')
 
 const DbHelper = require('../loadDatabase/dbHelper')
+const XlsParser = require('../loadDatabase/xlsParser')
 const PersonsAggr = require('../loadDatabase/personsAggr')
 const inetHelper = require('../helper/inetHelper')
 const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
@@ -54,13 +55,19 @@ Promise.resolve(true)
      return dbHelper.clearDb('temples')
    })
    .then(() => {
-     return dbHelper.saveFilesFrom({
-       source: 'python/out_temples',
-       procdir: 'out/out_temples_process',
-       errdir: 'out/out_temples_errors',
-       mediator: templesJsonMediator,
-     })
+      return XlsParser.loadData({
+        source: `${__dirname}/religion/temples_azbuka.xlsx`,
+        mediator: templesJsonMediator
+      })
    })
+  //  .then(() => {
+  //    return dbHelper.saveFilesFrom({
+  //      source: 'python/out_temples',
+  //      procdir: 'out/out_temples_process',
+  //      errdir: 'out/out_temples_errors',
+  //      mediator: templesJsonMediator,
+  //    })
+  //  })
   // .then(() => {
   //   return dbHelper.clearDb('persons')
   // })
