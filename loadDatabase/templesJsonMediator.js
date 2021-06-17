@@ -6,7 +6,7 @@ const TemplesModel = require('../models/templesModel');
 class TemplesJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
-    this.equilFields = ['name', 'place']
+    this.equilFields = ['pageUrl']
     this.model = TemplesModel
   }
 

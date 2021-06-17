@@ -1,5 +1,4 @@
 const log = require('../helper/logHelper')
-const mongoose = require('mongoose')
 const XLSX = require('xlsx')
 const chalk = require('chalk')
 const geoHelper = require('../helper/geoHelper')
@@ -23,7 +22,7 @@ class XlsParser {
             throw new Error(`Неизвестный формат координат ${strValue}`)
         }
 
-        return geoHelper.fromLonLat([arr[1], arr[0]])
+        return geoHelper.fromLonLat(arr.reverse().map( item => Number(item)))
     }
 
     getDateValue(input) {
@@ -50,47 +49,51 @@ class XlsParser {
         json.start = this.getDateValue(this.getValue(sheet, row, 4))
         json.longBrief = this.getValue(sheet, row, 5)
         json.srcUrl = this.getValue(sheet, row, 7)
-        json.pageUrl = strHelper.generatePageUrl([json.name, json.place])
         return json
     }
 
-    loadData(input) {
-        return new Promise((resolve) => {
-            log.info(`Начинаем обрабатывать файл ${chalk.cyan(input.source)}`)
-            const mediator = input.mediator
-            const workbook = XLSX.readFile(input.source)
-            const sheet = workbook.Sheets[workbook.SheetNames[0]]
-            const range = XLSX.utils.decode_range(sheet['!ref'])
-            let promises = []
-            for (let row = 1; row <= range.e.r + 1; row++) {
-                try {
-                    const json = this.getJsonFromRow(sheet, row)
-                    promises.push(mediator.addObjectToBase(json))
+    async loadData(input) {
+        log.info(`Начинаем обрабатывать файл ${chalk.cyan(input.source)}`)
+        const mediator = input.mediator
+        const workbook = XLSX.readFile(input.source)
+        const sheet = workbook.Sheets[workbook.SheetNames[0]]
+        const range = XLSX.utils.decode_range(sheet['!ref'])
+        const maxCount = range.e.r + 1
+        log.info(`Количество входящих строк: ${maxCount}`)
+        let successCount = 0
+        for (let row = 1; row <= maxCount; row++) {
+            try {
+                let json = this.getJsonFromRow(sheet, row)
+
+                json.pageUrl = strHelper.generatePageUrl([json.name, json.place])
+                const isExistObject = await mediator.isExistObject(json)
+                if (isExistObject) {
+                    json.pageUrl = strHelper.replaceEnd(json.pageUrl, '_' + Number(row))
                 }
-                catch (e) {
-                    log.error(`Не удалось обработать строку ${row}: ${e}`)
+
+                const res = await mediator.addObjectToBase(json)
+                if (res) {
+                    successCount += 1
+                    // if (successCount > 30) {
+                    //     break
+                    // }
+                } else {
+                    throw new Error(`Ошибка обработки ${res}`)
                 }
+
             }
+            catch (e) {
+                log.error(`Не удалось обработать строку ${row}: ${e}`)
+            }
+        }
 
-            log.info(`Количество входящих элементов, промисов: ${promises.length}`)
+        if (successCount == maxCount) {
+            log.info(chalk.green('Успешная загрузка'))
+        } else {
+            log.info(chalk.cyan(`Частичная загрузка ${successCount} из ${maxCount}`))
+        }
 
-            const countObjects = promises.length
-            Promise.all(promises).then(
-                (res) => {
-                    const status = `Количество успешно обработанных элементов: ${countObjects} из ${res.length}`
-                    log.info(status)
-                    if (countObjects == res.length) {
-                        log.info(chalk.green('успешная загрузка'))
-                        resolve(status)
-                    }},
-                (err) => {
-                    let msg = `Непредвиденная ошибка в процессе обработки ${err}`
-                    log.error(msg)
-                    resolve(msg)
-                }
-            )
-            resolve(true)
-        })
+        return true
     }
 }
 
