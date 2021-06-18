@@ -8,7 +8,7 @@ class ChronosChurchFeature extends SuperFeature {
   }
 
   static getCaptionInfo(info) {
-    return `${info.kind}. ${info.place}`
+    return `${info.name}`
   }
 
   static getPopupInfo(feature) {

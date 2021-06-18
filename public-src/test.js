@@ -1,3 +1,11 @@
+const StrHelper = require('../helper/strHelper')
+
+
+const testValue = StrHelper.replaceEnd('hello my world', '_12345678')
+console.log(testValue)
+
+return
+
 const InetHelper = require('../helper/inetHelper')
 
 function deleteAbbrev(place) {

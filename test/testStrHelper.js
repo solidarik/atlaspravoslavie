@@ -3,6 +3,13 @@ const assert = require('assert')
 
 const f = (input) => strHelper.generatePageUrl(input)
 const f2 = (input) => strHelper.getMaxLenNumber(input)
+const f3 = strHelper.replaceEnd
+
+describe('replaceEnd', () => {
+  it('simple replaceEnd', () => {
+    assert.strictEqual(f3('hello my world', '_12345678'), 'hello_12345678')
+  })
+})
 
 describe('getMaxNumbers', () => {
   it('simple number', () => {

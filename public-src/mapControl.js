@@ -30,18 +30,20 @@ const MAP_PARAMS = {
   isEnableAnimate: true,
 }
 
+const yaex = [
+  -20037508.342789244,
+  -20037508.342789244,
+  20037508.342789244,
+  20037508.342789244,
+]
+
 export class MapControl extends EventEmitter {
   constructor() {
     super() //first must
 
     window.map = this
 
-    const yaex = [
-      -20037508.342789244,
-      -20037508.342789244,
-      20037508.342789244,
-      20037508.342789244,
-    ]
+
     proj4.defs(
       'EPSG:3395',
       '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'
@@ -53,15 +55,8 @@ export class MapControl extends EventEmitter {
     const rasterLayer = new olLayer({
       preload: 5,
       zIndex: 0,
-      // source: new olSource.OSM(),
-      source: new olSource.XYZ({
-        projection: 'EPSG:3395',
-        tileGrid: olTilegrid.createXYZ({
-          extent: yaex,
-        }),
-        url:
-          'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU',
-      }),
+      source: new olSource.OSM(),
+      // source: this.getYandexSourceMap()
     })
 
     this.isEnableAnimate = MAP_PARAMS.isEnableAnimate
@@ -214,7 +209,7 @@ export class MapControl extends EventEmitter {
 
     // Cluster Source
     let clusterSource = new olSource.Cluster({
-      distance: 10,
+      distance: 100,
       source: new olSource.Vector(),
     })
     let clusterLayer = new olAnimatedCluster({
@@ -547,6 +542,16 @@ export class MapControl extends EventEmitter {
 
     let url = `http://cdn.geacron.com/tiles/area/${anow}/Z${z}/${y}/${x}.png`
     return url
+  }
+
+  getYandexSourceMap() {
+    return new olSource.XYZ({
+      projection: 'EPSG:3395',
+      tileGrid: olTilegrid.createXYZ({
+        extent: yaex,
+      }),
+      url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU',
+    })
   }
 
   getYandexLayerUrl(tileCoord, pixelRatio, projection) {

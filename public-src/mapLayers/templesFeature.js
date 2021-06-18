@@ -2,6 +2,7 @@ import SuperFeature from './superFeature'
 import StrHelper from '../../helper/strHelper'
 import DateHelper from '../../helper/dateHelper'
 
+
 class TemplesFeature extends SuperFeature {
   static getIcon() {
     return '/images/temples.png'

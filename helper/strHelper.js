@@ -37,6 +37,13 @@ class StrHelper {
     return output
   }
 
+  static replaceEnd(input, end) {
+    const inputLen = input.length
+    const endLen = end.length
+    const output = input.substring(0, inputLen - endLen)
+    return (output + end)
+  }
+
   static generatePageUrl(input, len = 50) {
     if (Array.isArray(input)) {
       input = input.join('_')

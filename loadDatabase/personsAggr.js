@@ -158,7 +158,7 @@ class PersonsAggr {
   }
 
   free() {
-      log.info('free personsAggr')
+    //   log.info('Free PersonsAggr')
   }
 }
 

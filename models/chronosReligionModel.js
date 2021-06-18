@@ -23,6 +23,7 @@ var chronosReligionSchema = new mongoose.Schema(
       century: Number
     },
 
+    name: String,
     place: String,
     point: [],
     pageUrl: {

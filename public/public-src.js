@@ -76330,6 +76330,14 @@ var StrHelper = /*#__PURE__*/function () {
       return output;
     }
   }, {
+    key: "replaceEnd",
+    value: function replaceEnd(input, end) {
+      var inputLen = input.length;
+      var endLen = end.length;
+      var output = input.substring(0, inputLen - endLen);
+      return output + end;
+    }
+  }, {
     key: "generatePageUrl",
     value: function generatePageUrl(input) {
       var len = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 50;
@@ -82488,6 +82496,7 @@ var MAP_PARAMS = {
   max_year: 1965,
   isEnableAnimate: true
 };
+var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
 
 var MapControl = /*#__PURE__*/function (_EventEmitter) {
   _inherits(MapControl, _EventEmitter);
@@ -82502,7 +82511,6 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     _this = _super.call(this); //first must
 
     window.map = _assertThisInitialized(_this);
-    var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
 
     _proj2.default.defs('EPSG:3395', '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 
@@ -82512,14 +82520,8 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     var rasterLayer = new _Tile.default({
       preload: 5,
       zIndex: 0,
-      // source: new olSource.OSM(),
-      source: new olSource.XYZ({
-        projection: 'EPSG:3395',
-        tileGrid: olTilegrid.createXYZ({
-          extent: yaex
-        }),
-        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
-      })
+      source: new olSource.OSM() // source: this.getYandexSourceMap()
+
     });
     _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
     _this.isDisableSavePermalink = true;
@@ -82668,7 +82670,7 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     map.addLayer(lineLayer); // Cluster Source
 
     var clusterSource = new olSource.Cluster({
-      distance: 10,
+      distance: 100,
       source: new olSource.Vector()
     });
     var clusterLayer = new _AnimatedCluster.default({
@@ -82984,6 +82986,17 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
       if (z == 0 || z > 6) return;
       var url = "http://cdn.geacron.com/tiles/area/".concat(anow, "/Z").concat(z, "/").concat(y, "/").concat(x, ".png");
       return url;
+    }
+  }, {
+    key: "getYandexSourceMap",
+    value: function getYandexSourceMap() {
+      return new olSource.XYZ({
+        projection: 'EPSG:3395',
+        tileGrid: olTilegrid.createXYZ({
+          extent: yaex
+        }),
+        url: 'http://vec0{1-4}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU'
+      });
     }
   }, {
     key: "getYandexLayerUrl",
@@ -83465,7 +83478,7 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
   }, {
     key: "getCaptionInfo",
     value: function getCaptionInfo(info) {
-      return "".concat(info.kind, ". ").concat(info.place);
+      return "".concat(info.name);
     }
   }, {
     key: "getPopupInfo",
@@ -83557,7 +83570,7 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
   }, {
     key: "getCaptionInfo",
     value: function getCaptionInfo(info) {
-      return "".concat(info.kind, ". ").concat(info.place);
+      return "".concat(info.name);
     }
   }, {
     key: "getPopupInfo",
@@ -93234,6 +93247,111 @@ var InfoControl = /*#__PURE__*/function (_EventEmitter) {
 
 
 exports.InfoControl = InfoControl;
+},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq"}],"rgWZ":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UrlControl = void 0;
+
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
+
+var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var UrlControl = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(UrlControl, _EventEmitter);
+
+  var _super = _createSuper(UrlControl);
+
+  function UrlControl() {
+    var _this;
+
+    _classCallCheck(this, UrlControl);
+
+    _this = _super.call(this); //first must
+
+    window.urlControl = _assertThisInitialized(_this);
+
+    _this.readViewFromPermalink();
+
+    return _this;
+  }
+
+  _createClass(UrlControl, [{
+    key: "readViewFromPermalink",
+    value: function readViewFromPermalink() {
+      var location = window.location;
+
+      if (location.search !== '') {
+        var searchParams = new URLSearchParams(location.search.slice(1));
+        console.log('current location search: ' + searchParams);
+
+        if (searchParams.has('test')) {
+          console.log('test is exist');
+        }
+      }
+
+      if (location.hash !== '') {
+        console.log('current location hash: ' + location.hash); //   var hash = location.hash.replace('#map=', '')
+        //   var parts = hash.split('/')
+        //   if (parts.length === 3) {
+        //     this.zoom = parseInt(parts[0], 10)
+        //     this.center = [parseFloat(parts[1]), parseFloat(parts[2])]
+        //   }
+      }
+    }
+  }, {
+    key: "savePermalink",
+    value: function savePermalink() {
+      if (this.isDisableSavePermalink) {
+        this.isDisableSavePermalink = false;
+      }
+
+      var center = this.view.getCenter();
+      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
+      var state = {
+        zoom: this.view.getZoom(),
+        center: this.view.getCenter()
+      };
+      window.history.pushState(state, 'map', hash);
+    }
+  }], [{
+    key: "create",
+    value: function create() {
+      console.log('Создание компонента UrlControl');
+      return new UrlControl();
+    }
+  }]);
+
+  return UrlControl;
+}(_eventEmitter.default);
+
+exports.UrlControl = UrlControl;
 },{"./eventEmitter":"STwH","../helper/classHelper":"LZLq"}],"juYr":[function(require,module,exports) {
 var global = arguments[3];
 var process = require("process");
@@ -104136,6 +104254,8 @@ var _clientProtocol = _interopRequireDefault(require("./clientProtocol"));
 
 var _infoControl = require("./infoControl");
 
+var _urlControl = require("./urlControl");
+
 var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -104167,6 +104287,12 @@ function startApp() {
 
   var infoControl = _infoControl.InfoControl.create();
 
+  var urlControl = _urlControl.UrlControl.create();
+
+  urlControl.subscribe('initUrl', function (state) {
+    mapControl.updateState(state);
+    intoControl.updateState(state);
+  });
   protocol.subscribe('setCurrentYear', function (obj) {
     mapControl.setCurrentYearFromServer(obj);
   });
@@ -104186,6 +104312,8 @@ function startApp() {
     protocol.getDataByYear(dateObject);
     infoControl.hide();
   });
+  mapControl.subscribe('clickItem', function (item) {});
+  protocol.subscribe('getItem', function (item) {});
   infoControl.subscribe('hide', function () {
     mapControl.returnNormalMode();
     mapControl.hidePulse();
@@ -104210,7 +104338,7 @@ function startApp() {
   (0, _jquery.default)(document.getElementsByClassName('ol-attribution ol-unselectable ol-control ol-collapsed')).remove();
   changeWindowSize();
 }
-},{"./mapControl":"p4qv","./legendControl":"pD6K","./clientProtocol":"VmvZ","./infoControl":"s1dy","jquery":"juYr"}],"Focm":[function(require,module,exports) {
+},{"./mapControl":"p4qv","./legendControl":"pD6K","./clientProtocol":"VmvZ","./infoControl":"s1dy","./urlControl":"rgWZ","jquery":"juYr"}],"Focm":[function(require,module,exports) {
 "use strict";
 
 var _main = require("./main.js");
