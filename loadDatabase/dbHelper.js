@@ -15,6 +15,7 @@ class DbHelper {
       mongoose.set('debug', true)
     }
 
+    console.log(`config ${JSON.stringify(config)}`)
     mongoose.Promise = global.Promise
     mongoose.connect(config.mongoose.uri, config.mongoose.options)
     return mongoose
@@ -92,7 +93,7 @@ class DbHelper {
         let errpath = path.join(errdir, filename)
 
         //обход на случай отсутствия массивов (ex persons)
-        if (!Array.isArray(json) ) {
+        if (!Array.isArray(json)) {
           json = [json]
         }
 

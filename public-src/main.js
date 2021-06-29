@@ -1,8 +1,8 @@
+import { StateControl } from './stateControl'
 import { MapControl } from './mapControl'
 import { LegendControl } from './legendControl'
 import ClientProtocol from './clientProtocol'
 import { InfoControl } from './infoControl'
-import { UrlControl } from './urlControl'
 
 import $ from 'jquery'
 window.app = {}
@@ -25,15 +25,16 @@ function changeWindowSize() {
 window.onresize = fixMapHeight //changeWindowSize
 
 function startApp() {
+  const stateControl = StateControl.create()
   const protocol = ClientProtocol.create()
   const mapControl = MapControl.create()
-  const legendControl = LegendControl.create()
   const infoControl = InfoControl.create()
-  const urlControl = UrlControl.create()
+  const legendControl = LegendControl.create()
 
-  urlControl.subscribe('initUrl', (state) => {
-    mapControl.updateState(state)
-    intoControl.updateState(state)
+  stateControl.subscribe('fillState', (state) => {
+    mapControl.showMap(state.center, state.zoom)
+    mapControl.showYearControl(state.yearOrCentury, state.dateMode)
+    legendControl.showHideLegend(state.isVisibleLegend)
   })
 
   protocol.subscribe('setCurrentYear', (obj) => {
@@ -42,12 +43,24 @@ function startApp() {
 
   protocol.subscribe('refreshInfo', (info) => {
     //сначала данные проходят через одноименный фильтр контрола легенды
+    console.log('timing, get info from server')
     legendControl.refreshInfo.call(legendControl, info)
+    console.log('timing, finish processing data in legendcontrol')
+  })
+
+  legendControl.subscribe('isLineClick', (isCheckArrLegend) => {
+    stateControl.saveStateValue('isCheckArrLegend', isCheckArrLegend)
+  })
+
+  legendControl.subscribe('isVisibleClick', (isVisible) => {
+    stateControl.saveStateValue('isVisibleLegend', isVisible)
   })
 
   legendControl.subscribe('refreshInfo', (info) => {
     //...и потом поступают в контрол карты
+    console.log('timing, recieve info from legend')
     mapControl.refreshInfo.call(mapControl, info)
+    console.log('timing, finish processing data in mapcontrol')
   })
 
   legendControl.subscribe('legendClick', () => {
@@ -65,7 +78,7 @@ function startApp() {
   })
 
   protocol.subscribe('getItem', (item) => {
-    
+
   })
 
   infoControl.subscribe('hide', () => {

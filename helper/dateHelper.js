@@ -1,9 +1,9 @@
 const strHelper = require('../helper/strHelper')
 const moment = require('moment')
 
-const ROMAN_KEYS = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
-               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
-               "","I","II","III","IV","V","VI","VII","VIII","IX"]
+const ROMAN_KEYS = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
+  "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
+  "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"]
 
 class DateHelper {
   static ignoreAlterDate(input) {
@@ -102,8 +102,8 @@ class DateHelper {
     return endDateStr != undefined && startDateStr != endDateStr
       ? `${startDateStr} - ${endDateStr}`
       : isOnlyYear
-      ? this.getYearStr(startDate)
-      : startDateStr
+        ? this.getYearStr(startDate)
+        : startDateStr
   }
 
   static twoDateToStr2(startDateStr, endDateStr) {
@@ -134,9 +134,9 @@ class DateHelper {
   static yearToCentury(year) {
     let century = 0
     if (year >= 0) {
-        century = Math.floor(year / 100) + 1
+      century = Math.floor(year / 100) + 1
     } else {
-        century = Math.trunc(year / 100) - 1
+      century = Math.trunc(year / 100) - 1
     }
     return Number(century)
   }
@@ -155,12 +155,12 @@ class DateHelper {
 
   static arabicToRoman(num) {
     if (isNaN(num))
-        return NaN;
+      return NaN;
     let digits = String(+num).split("")
     let roman = ""
     let i = 3
     while (i--)
-        roman = (ROMAN_KEYS[+digits.pop() + (i * 10)] || "") + roman;
+      roman = (ROMAN_KEYS[+digits.pop() + (i * 10)] || "") + roman;
     return Array(+digits.join("") + 1).join("M") + roman;
   }
 
@@ -171,38 +171,48 @@ class DateHelper {
 
     //https://stackoverflow.com/questions/48946083/convert-roman-number-to-arabic-using-javascript
     if (roman == null)
-        return undefined;
+      return undefined;
 
     let totalValue = 0
     let value = 0
     let prev = 0
 
-    for(let i = 0; i<roman.length; i++) {
-        let current = DateHelper.romanToInt(roman.charAt(i));
-        if (current > prev) {
-            // Undo the addition that was done, turn it into subtraction
-            totalValue -= 2 * value;
-        }
-        if (current !== prev) { // Different symbol?
-            value = 0; // reset the sum for the new symbol
-        }
-        value += current // keep adding same symbols
-        totalValue += current
-        prev = current
+    for (let i = 0; i < roman.length; i++) {
+      let current = DateHelper.romanToInt(roman.charAt(i));
+      if (current > prev) {
+        // Undo the addition that was done, turn it into subtraction
+        totalValue -= 2 * value;
+      }
+      if (current !== prev) { // Different symbol?
+        value = 0; // reset the sum for the new symbol
+      }
+      value += current // keep adding same symbols
+      totalValue += current
+      prev = current
     }
     return totalValue
   }
 
   static romanToInt(character) {
-    switch(character){
-        case 'I': return 1;
-        case 'V': return 5;
-        case 'X': return 10;
-        case 'L': return 50;
-        case 'C': return 100;
-        case 'D': return 500;
-        case 'M': return 1000;
-        default: return -1;
+    switch (character) {
+      case 'I': return 1;
+      case 'V': return 5;
+      case 'X': return 10;
+      case 'L': return 50;
+      case 'C': return 100;
+      case 'D': return 500;
+      case 'M': return 1000;
+      default: return -1;
+    }
+  }
+
+  static getMiddleOfCentury(century) {
+    const range = this.getCenturyRange(century)
+    console.log(range)
+    if (century < 0) {
+      return range[1] + (range[0] - range[1] - 1) / 2
+    } else {
+      return range[0] + (range[1] - range[0] + 1) / 2
     }
   }
 

@@ -5,8 +5,6 @@ import ChronosFeature from './mapLayers/chronosFeature'
 import ChronosChurchFeature from './mapLayers/chronosChurchFeature'
 import TemplesFeature from './mapLayers/templesFeature'
 import PersonFeature from './mapLayers/personFeature'
-import CookieHelper from './cookieHelper'
-//import TileSource from 'ol/source/Tile'
 
 export class LegendControl extends EventEmitter {
   constructor() {
@@ -17,16 +15,12 @@ export class LegendControl extends EventEmitter {
 
     this.legendSpan = document.getElementById('legend-span')
     this.legendDiv = document.getElementById('legend-div')
-    const isVisible = CookieHelper.getCookie('isVisibleLegend', false)
-    this.isVisible = isVisible ? JSON.parse(isVisible) : false
+    this.isVisible = false
     this.showHideLegend()
 
     this.lines = this.addLines()
     this.linesCount = 7
-    const isCheckArr = CookieHelper.getCookie('isCheckArrLegend', undefined)
-    this.isCheckArr = isCheckArr
-      ? JSON.parse(isCheckArr)
-      : JsHelper.fillArray(true, this.linesCount)
+    this.isCheckArr = JsHelper.fillArray(true, this.linesCount)
 
     this.items = []
     this.uniqueItems = {}
@@ -161,7 +155,11 @@ export class LegendControl extends EventEmitter {
     return lines
   }
 
-  showHideLegend() {
+  showHideLegend(isShow = undefined) {
+    if (isShow !== undefined) {
+      this.isVisible = isShow
+    }
+
     if (this.isVisible) {
       ClassHelper.removeClass(this.legendDiv, 'legend-div-hide')
       ClassHelper.addClass(this.legendDiv, 'legend-div-show')
@@ -177,7 +175,7 @@ export class LegendControl extends EventEmitter {
     const legend = window.legend
     legend.isVisible = !legend.isVisible
     legend.showHideLegend.call(legend)
-    CookieHelper.setCookie('isVisibleLegend', legend.isVisible)
+    legend.emit('isVisibleClick', legend.isVisible)
   }
 
   getIcons(line) {
@@ -229,7 +227,7 @@ export class LegendControl extends EventEmitter {
     return maybeLine
   }
 
-  changeParentCheck() {}
+  changeParentCheck() { }
 
   repaintLegend() {
     let html = `
@@ -256,7 +254,7 @@ export class LegendControl extends EventEmitter {
     //const line = this.searchLinesById.call(this, rowId)
 
     this.isCheckArr[rowId] = !this.isCheckArr[rowId]
-    CookieHelper.setCookie('isCheckArrLegend', JSON.stringify(this.isCheckArr))
+    this.emit('isCheckArrLegend', this.isCheckArr)
     this.repaintLegend()
     this.filterInfo()
   }

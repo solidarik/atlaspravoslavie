@@ -1,7 +1,6 @@
 import io from 'socket.io-client'
-import  EventEmitter  from './eventEmitter'
-import  CookieHelper  from './cookieHelper'
-import DateHelper from '../helper/dateHelper'
+import EventEmitter from './eventEmitter'
+import CookieHelper from './cookieHelper'
 
 export default class ClientProtocol extends EventEmitter {
   constructor() {
@@ -10,23 +9,6 @@ export default class ClientProtocol extends EventEmitter {
 
     this.lang = 'rus'
     this.dict = new Map() //key - hash (tobject), value {объект}
-
-    socket.emit('clGetCurrentYear', '', (msg) => {
-      const server = JSON.parse(msg)
-      const client = {
-        'year': CookieHelper.getCookie('year'),
-        'century': CookieHelper.getCookie('century'),
-        'kind': CookieHelper.getCookie('kind')
-      }
-
-      this.emit(
-        'setCurrentYear', {
-          'year': server.year ? server.year : client.year ? client.year : 1945,
-          'century': server.century ? server.century : client.century ? client.century : 20,
-          'kind': server.kind ? server.kind : client.kind ? client.kind : 'year',
-        }
-      )
-    })
 
     socket.on('error', (message) => {
       console.error(message)
@@ -38,6 +20,26 @@ export default class ClientProtocol extends EventEmitter {
     })
 
     this.socket = socket
+  }
+
+  //Получение данных за определенный год
+  _getInfoByDate(year) {
+    this.socket.emit('clGetCurrentYear', '', (msg) => {
+      const server = JSON.parse(msg)
+      const client = {
+        'year': CookieHelper.getCookie('year'),
+        'century': CookieHelper.getCookie('century'),
+        'kind': CookieHelper.getCookie('kind')
+      }
+
+      this.emit(
+        'setCurrentYear', {
+        'year': server.year ? server.year : client.year ? client.year : 1945,
+        'century': server.century ? server.century : client.century ? client.century : 20,
+        'kind': server.kind ? server.kind : client.kind ? client.kind : 'year',
+      }
+      )
+    })
   }
 
   _getStrDateFromEvent(inputDate) {
@@ -101,9 +103,9 @@ export default class ClientProtocol extends EventEmitter {
 
     let searchData = {}
     if (kind == 'year') {
-      searchData = {isYearMode: true, value: year}
+      searchData = { isYearMode: true, value: year }
     } else {
-      searchData = {isYearMode: false, value: century}
+      searchData = { isYearMode: false, value: century }
     }
 
     this.socket.emit(

@@ -7,7 +7,7 @@ const config = require('config')
 // const redisClient = redis.createClient(config.redis_uri);
 const util = require('util')
 
-ensureAuthenticated = async function(ctx, next) {
+ensureAuthenticated = async function (ctx, next) {
   if (ctx.isAuthenticated()) {
     return next()
   }
@@ -39,9 +39,9 @@ router.get('/video', require('./page-video'))
 router.get('/events', require('./page-events'))
 router.get('/logout', require('./logout').get)
 
-const defaultSelectParam = {'name': 1, 'point': 1}
+const defaultSelectParam = { 'name': 1, 'point': 1 }
 
-getUsers = async function(ctx, next) {
+getUsers = async function (ctx, next) {
   // persons = await redisClient.get('persons')
   // if (!persons) return
 
@@ -50,11 +50,11 @@ getUsers = async function(ctx, next) {
 
   const persons = await PersonsModel.find({})
   //ctx.state = {'persons': JSON.parse(persons)}
-  ctx.state = {'persons': persons}
+  ctx.state = { 'persons': persons }
   next()
 }
 
-getChurches = async function(ctx, next) {
+getChurches = async function (ctx, next) {
 
   // churches = await redisClient.get('churches')
   // if (!churches) return
@@ -64,12 +64,12 @@ getChurches = async function(ctx, next) {
   const churches = await TemplesModel.find({})
 
   // ctx.state = {'churches': JSON.parse(churches)}
-  ctx.state = {'churches': churches}
+  ctx.state = { 'churches': churches }
   next()
 }
 
-getUser = async function(ctx, next) {
-  person = await PersonsModel.find({'pageUrl': ctx.params.name})
+getUser = async function (ctx, next) {
+  person = await PersonsModel.find({ 'pageUrl': ctx.params.name })
   if (!person) return
 
   // persons = await redisClient.get('persons')
@@ -77,12 +77,13 @@ getUser = async function(ctx, next) {
 
   const persons = await PersonsModel.find({})
 
-  ctx.state = {'person': person[0], 'persons': JSON.parse(persons)}
+  ctx.state = { 'person': person[0], 'persons': persons }
   next()
 }
 
-getChurch = async function(ctx, next) {
-  church = await TemplesModel.find({'pageUrl': ctx.params.name})
+getChurch = async function (ctx, next) {
+  console.log(ctx.params.name)
+  church = await TemplesModel.find({ 'pageUrl': ctx.params.name })
   if (!church) return
 
   // churches = await redisClient.get('churches')
@@ -90,7 +91,7 @@ getChurch = async function(ctx, next) {
 
   const churches = await TemplesModel.find({})
 
-  ctx.state = {'church': church[0], 'churches': JSON.parse(churches)}
+  ctx.state = { 'church': church[0], 'churches': churches }
   next()
 }
 

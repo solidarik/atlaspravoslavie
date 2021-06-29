@@ -3,10 +3,8 @@ import * as olStyle from 'ol/style'
 import * as olGeom from 'ol/geom'
 import { default as olFeature } from 'ol/Feature'
 import {
-  fromLonLat,
   toLonLat,
   get as getProjection,
-  //transformExtent,
 } from 'ol/proj'
 import * as olControl from 'ol/control'
 import { default as olLayer } from 'ol/layer/Tile'
@@ -27,7 +25,8 @@ import DateHelper from '../helper/dateHelper'
 const MAP_PARAMS = {
   min_year: 1914,
   max_year: 1965,
-  isEnableAnimate: true,
+  isEnableAnimate: false,
+  clusterDistance: 40
 }
 
 const yaex = [
@@ -52,41 +51,26 @@ export class MapControl extends EventEmitter {
     let projection = getProjection('EPSG:3395')
     projection.setExtent(yaex)
 
+    this.isEnableAnimate = MAP_PARAMS.isEnableAnimate
+    this.clusterDistance = MAP_PARAMS.clusterDistance
+    this.isDisableSavePermalink = true
+    this.isDisableMoveend = false
+    this.map = undefined
+  }
+
+  showMap(center, zoom) {
+
+    const view = new olView({
+      center: center,
+      zoom: zoom,
+    })
+
     const rasterLayer = new olLayer({
       preload: 5,
       zIndex: 0,
       source: new olSource.OSM(),
       // source: this.getYandexSourceMap()
     })
-
-    this.isEnableAnimate = MAP_PARAMS.isEnableAnimate
-    this.isDisableSavePermalink = true
-    this.isDisableMoveend = false
-    this.readViewFromPermalink()
-
-    const view = new olView({
-      center: this.center ? this.center : new fromLonLat([56.004, 54.695]), // ufa place
-      zoom: this.zoom ? this.zoom : 3,
-      // projection: 'EPSG:4326',
-      // projection: 'EPSG:3857',
-      // projection: 'EPSG:3395',
-    })
-
-    /* temporarily disable-popup
-    this.popup = new olPopup({
-      popupClass: 'default shadow', //"default shadow", "tooltips", "warning" "black" "default", "tips", "shadow",
-      closeBox: true,
-      onshow: function () {
-        // console.log('You opened the box')
-      },
-      onclose: function () {
-        // console.log('You close the box')
-      },
-      positioning: 'auto',
-      autoPan: true,
-      autoPanAnimation: { duration: this.isEnableAnimate ? 250 : 0 },
-    })
-    */
 
     const map = new olMap({
       interactions: olInteraction.defaults({
@@ -190,17 +174,19 @@ export class MapControl extends EventEmitter {
       style: [
         new olStyle.Style({
           stroke: new olStyle.Stroke({
-          color: [255, 255, 255, 0.6],
-          width: 2,
-          lineDash: [4, 8],
-          lineDashOffset: 6
-        })}),
+            color: [255, 255, 255, 0.6],
+            width: 2,
+            lineDash: [4, 8],
+            lineDashOffset: 6
+          })
+        }),
         new olStyle.Style({
           stroke: new olStyle.Stroke({
-          color: [0, 0, 0, 0.6],
-          width: 2,
-          lineDash: [4, 8]
-        })})
+            color: [0, 0, 0, 0.6],
+            width: 2,
+            lineDash: [4, 8]
+          })
+        })
       ]
     })
     this.lineLayer = lineLayer
@@ -209,7 +195,7 @@ export class MapControl extends EventEmitter {
 
     // Cluster Source
     let clusterSource = new olSource.Cluster({
-      distance: 100,
+      distance: this.clusterDistance ? this.clusterDistance : 40,
       source: new olSource.Vector(),
     })
     let clusterLayer = new olAnimatedCluster({
@@ -275,7 +261,7 @@ export class MapControl extends EventEmitter {
         this.isDisableMoveend = false
         return
       }
-      window.map.savePermalink.call(window.map)
+      // window.map.savePermalink.call(window.map)
     })
 
     map.on('pointermove', (event) => {
@@ -297,11 +283,6 @@ export class MapControl extends EventEmitter {
 
     this.map = map
     this.view = view
-
-    setTimeout(() => {
-      this.addYearLayer()
-    }, 10)
-
   }
 
   static create() {
@@ -419,8 +400,23 @@ export class MapControl extends EventEmitter {
     )
   }
 
-  setCurrentYearFromServer(obj) {
-    this.changeYear(obj)
+  showYearControl(yearOrCentury, dateMode) {
+    let obj = {}
+    if (dateMode === 'century') {
+      obj.century = yearOrCentury
+      obj.year = DateHelper.getMiddleOfCentury(yearOrCentury)
+      obj.kind = 'century'
+    } else {
+      obj.year = yearOrCentury
+      obj.century = DateHelper.yearToCentury(yearOrCentury)
+      obj.kind = 'year'
+    }
+
+    this.currentYear = obj.year
+    this.currentCentury = obj.century
+    this.currentKind = obj.kind
+
+    this.addYearLayer()
     this.addYearControl()
   }
 
@@ -465,7 +461,7 @@ export class MapControl extends EventEmitter {
 
   fixMapHeight() {
     this.isDisableMoveend = true
-    this.map.updateSize()
+    if (this.map) this.map.updateSize()
   }
 
   updateView() {
@@ -479,43 +475,6 @@ export class MapControl extends EventEmitter {
       this.view.setCenter(this.center)
       this.view.setZoom(this.zoom)
     }
-  }
-
-  readViewFromState(state) {
-    this.center = state.center
-    this.zoom = state.zoom
-  }
-
-  readViewFromPermalink() {
-    if (window.location.hash !== '') {
-      var hash = window.location.hash.replace('#map=', '')
-      var parts = hash.split('/')
-      if (parts.length === 3) {
-        this.zoom = parseInt(parts[0], 10)
-        this.center = [parseFloat(parts[1]), parseFloat(parts[2])]
-      }
-    }
-  }
-
-  savePermalink() {
-    if (this.isDisableSavePermalink) {
-      this.isDisableSavePermalink = false
-    }
-
-    const center = this.view.getCenter()
-    const hash =
-      '#map=' +
-      Math.round(this.view.getZoom()) +
-      '/' +
-      Math.round(center[0] * 100) / 100 +
-      '/' +
-      Math.round(center[1] * 100) / 100
-    const state = {
-      zoom: this.view.getZoom(),
-      center: this.view.getCenter(),
-    }
-
-    window.history.pushState(state, 'map', hash)
   }
 
   getGeacronLayerUrl(tileCoord, pixelRatio, projection) {
@@ -621,24 +580,37 @@ export class MapControl extends EventEmitter {
     let source = item.simple
       ? this.simpleSource
       : this.clusterSource.getSource()
+
     source.addFeature(ft)
   }
 
   refreshInfo(info) {
     this.simpleSource.clear()
     this.clusterSource.getSource().clear()
-    info.forEach((item) => this.addFeature(item))
-  }
-}
 
-window.onpopstate = (event) => {
-  const map = window.map
-  map.isDisableSavePermalink = true
-  map.isDisableMoveend = true
-  event.state
-    ? map.readViewFromState.call(map, event.state)
-    : map.readViewFromPermalink.call(map)
-  map.updateView.call(map)
+    let simpleSourceFeatures = []
+    let clusterSourceFeatures = []
+
+    //оптимизация для ускорения добавления на карту
+    info.forEach((item) => {
+      const ft = new olFeature({
+        info: item,
+        classFeature: item.classFeature,
+        geometry: new olGeom.Point(item.point),
+      })
+
+      if (item.simple) {
+        simpleSourceFeatures.push(ft)
+      } else {
+        clusterSourceFeatures.push(ft)
+      }
+    })
+
+    console.log('timing, before add features')
+    this.simpleSource.addFeatures(simpleSourceFeatures)
+    this.clusterSource.getSource().addFeatures(clusterSourceFeatures)
+    console.log('timing, after add features')
+  }
 }
 
 class SuperCustomControl extends olControl.Control {
@@ -815,7 +787,7 @@ class YearControl extends SuperCustomControl {
         const dateRange = DateHelper.getCenturyRange(newValue)
         allowToChange = (dateRange) && (dateRange.length == 2)
         allowToChange = dateRange[0] < YearControl.max_year
-        allowToChange=  dateRange[1] > YearControl.min_year
+        allowToChange = dateRange[1] > YearControl.min_year
 
       }
     }
@@ -832,7 +804,8 @@ class YearControl extends SuperCustomControl {
       this.handler({
         'year': this.year,
         'century': this.century,
-        'kind': this.kind})
+        'kind': this.kind
+      })
     } else {
       if (this.kind == 'year')
         this.yearInput.value = this.year

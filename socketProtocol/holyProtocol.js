@@ -5,13 +5,13 @@ const PersonsModel = require('../models/personsModel')
 const PersonsAggrModel = require('../models/personsAggrModel')
 const TemplesModel = require('../models/templesModel')
 
-function trycatch(func, cb){
+function trycatch(func, cb) {
   let res = {}
   try {
     func()
       .then(
         (res) => {
-          cb(JSON.stringify({persons: res}))
+          cb(JSON.stringify({ persons: res }))
         })
       .catch((error) => {
         cb(JSON.stringify({ error: error }))
@@ -73,9 +73,9 @@ class HolyProtocol extends ServerProtocol {
         }
         personSearchParam = {
           $and: [
-            {"startYear": {"$ne": -999}},
-            {"startYear": lteDates},
-            {"endYear": gteDates}
+            { "startYear": { "$ne": -999 } },
+            { "startYear": lteDates },
+            { "endYear": gteDates }
           ]
         }
       } else {
@@ -87,8 +87,8 @@ class HolyProtocol extends ServerProtocol {
         }
         personSearchParam = {
           $and: [
-            {"startCentury": searchDates},
-            {"kind": {$ne: "live"}}
+            { "startCentury": searchDates },
+            { "kind": { $ne: "live" } }
           ]
         }
       }
@@ -102,13 +102,14 @@ class HolyProtocol extends ServerProtocol {
 
       // db.getCollection('personsreligions').find({"achievements": {"$elemMatch": {"start.century": 19}}})
 
-      const defaultSelectParam = {'name': 1, 'point': 1}
+      const defaultSelectParam = { 'name': 1, 'point': 1 }
 
       const promices = [
-        ChronosModel.find(defaultSearchParam).select(defaultSelectParam),
-        ChronosChurchModel.find(defaultSearchParam).select(defaultSelectParam),
-        TemplesModel.find(gteSearchParam).select(defaultSelectParam),
-        PersonsAggrModel.find(personSearchParam).select(defaultSelectParam),
+        ChronosModel.find(defaultSearchParam), //.select(defaultSelectParam),
+        ChronosChurchModel.find(defaultSearchParam), //.select(defaultSelectParam),
+        TemplesModel.find(gteSearchParam), //.select(defaultSelectParam),
+        PersonsAggrModel.find(personSearchParam) //.select(defaultSelectParam),
+
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "achiev"})
@@ -158,8 +159,7 @@ class HolyProtocol extends ServerProtocol {
     }
   }
 
-  getPersons(socket, msg, cb)
-  {
+  getPersons(socket, msg, cb) {
     let res = {}
 
     try {
@@ -186,15 +186,15 @@ class HolyProtocol extends ServerProtocol {
   // }
 
   getPersonsMartyrs(socket, msg, cb) {
-    trycatch(PersonsModel.find({"groupStatus": "мученик"}), cb)
+    trycatch(PersonsModel.find({ "groupStatus": "мученик" }), cb)
   }
 
   getPersonsReverends(socket, msg, cb) {
-    trycatch(PersonsModel.find({"groupStatus": "преподобный"}), cb)
+    trycatch(PersonsModel.find({ "groupStatus": "преподобный" }), cb)
   }
 
   getPersonsHoly(socket, msg, cb) {
-    trycatch(PersonsModel.find({"groupStatus": "святой"}), cb)
+    trycatch(PersonsModel.find({ "groupStatus": "святой" }), cb)
   }
 }
 

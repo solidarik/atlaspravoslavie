@@ -52,22 +52,22 @@ Promise.resolve(true)
   //   })
   // })
   .then(() => {
-     return dbHelper.clearDb('temples')
-   })
+    return dbHelper.clearDb('temples')
+  })
   //  .then(() => {
   //     return XlsParser.loadData({
   //       source: `${__dirname}/religion/temples_azbuka.xlsx`,
   //       mediator: templesJsonMediator
   //     })
   //  })
-   .then(() => {
-     return dbHelper.saveFilesFrom({
-       source: 'python/out_temples',
-       procdir: 'out/out_temples_process',
-       errdir: 'out/out_temples_errors',
-       mediator: templesJsonMediator,
-     })
-   })
+  .then(() => {
+    return dbHelper.saveFilesFrom({
+      source: 'python/out_temples',
+      procdir: 'out/out_temples_process',
+      errdir: 'out/out_temples_errors',
+      mediator: templesJsonMediator,
+    })
+  })
   // .then(() => {
   //   return dbHelper.clearDb('persons')
   // })
