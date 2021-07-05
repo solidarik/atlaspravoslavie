@@ -209,8 +209,11 @@ class DateHelper {
     }
     return {
       "ymd": [y, m, d],
+      "year": y,
+      "month": m,
+      "day": d,
       "century": century,
-      "outputStr": outputStr,
+      "dateStr": outputStr,
       "isOnlyYear": isOnlyYear,
       "isOnlyCentury": isOnlyCentury,
       "isUserText": isUserText
