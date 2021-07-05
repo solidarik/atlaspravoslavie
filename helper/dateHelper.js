@@ -80,6 +80,143 @@ class DateHelper {
     return res
   }
 
+  static getMonthNum(input) {
+    const months = [
+      'янв', 'февр', 'март', 'апрел', 'ма', 'июн', 'июл', 'август', 'сентяб',
+      'октяб', 'нояб', 'декаб'
+    ]
+
+    input = input.toLowerCase()
+
+    for (let num = 0; num < months.length; num++) {
+      if (input.includes(months[num])) {
+        return num + 1
+      }
+    }
+
+    return -1
+  }
+
+  static getDateFromInput(input) {
+
+    if (!input) return
+    let inputText = ('' + input).trim()
+
+    let outputStr = ''
+    let isUserText = false
+    let isOnlyYear = false
+    let isOnlyCentury = false
+    let isFound = false
+    let d = -1
+    let m = -1
+    let y = -999
+    let century = -1
+    let date_groups = ''
+    let testStr = ''
+
+    if (!isFound && inputText.includes('в')) {
+      date_groups = strHelper.getSearchGroupsInRegexp('(\\d+)[в]', inputText)
+      if (date_groups && date_groups.length > 0) {
+        century = parseInt(date_groups[0])
+        isOnlyCentury = true
+        isFound = true
+
+        date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText)
+        if (date_groups && date_groups.length > 0)
+          century = -century
+      }
+    }
+
+    if (!isFound) {
+      inputText = inputText.replace('г.', '').replace('гг.', '')
+      inputText = inputText.replace('гг', '')
+      inputText = strHelper.removeByRegExp('г$', inputText)
+    }
+
+    if (!isFound && !inputText.includes('.')) {
+      testStr = '' + parseInt(inputText)
+      if (inputText.length < 5 && parseInt(testStr) < 2022) {
+        y = parseInt(testStr)
+        isFound = true
+        isOnlyYear = true
+        outputStr = testStr
+      }
+    }
+
+    // если год до н.э.
+    if (!isFound) {
+      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText)
+      if (date_groups && date_groups.length > 0) {
+        y = parseInt(date_groups[0])
+        y = -y
+        isUserText = true
+        isOnlyYear = true
+        isFound = true
+      }
+    }
+
+    // если даты формата dd.mm.yyyy или dd / mm / yyyy
+    if (!isFound) {
+      date_groups = inputText.match(new RegExp('(\\d{1,4})', 'g'))
+      if (date_groups && date_groups.length === 3) {
+        d = parseInt(date_groups[0])
+        m = parseInt(date_groups[1])
+        y = parseInt(date_groups[2])
+        isFound = true
+      }
+    }
+
+    // если дата типа "1984, 1 мая"
+    if (!isFound) {
+      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
+      if (date_groups && date_groups.length > 0) {
+        y = parseInt(date_groups[0])
+        d = parseInt(date_groups[1])
+        m = parseInt(DateHelper.getMonthNum(date_groups[2]))
+        isFound = true
+      }
+    }
+
+    // если дата типа "15 июня 1389 (года)"
+    if (!isFound) {
+      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText)
+      if (date_groups && date_groups.length === 3) {
+        d = parseInt(date_groups[0])
+        m = parseInt(DateHelper.getMonthNum(date_groups[1]))
+        y = parseInt(date_groups[2])
+        isFound = (y > 0)
+        console.log(isFound, d, m, y, inputText)
+      }
+    }
+
+    if (!isFound) {
+      throw new Error(`Не удалось распарсить дату из текста ${inputText}`)
+    }
+
+    if (y != -999) {
+      if (y >= 0) {
+        century = Math.floor(y / 100) + 1
+      } else {
+        century = Math.floor(y / 100)
+        if (y % 100 == 0) {
+          century -= 1
+        }
+      }
+    }
+
+    if (!isUserText && !isOnlyYear && !isOnlyCentury) {
+      outputStr = `${strHelper.pad(d, 2)}.${strHelper.pad(m, 2)}.${y}`
+    }
+    return {
+      "ymd": [y, m, d],
+      "century": century,
+      "outputStr": outputStr,
+      "isOnlyYear": isOnlyYear,
+      "isOnlyCentury": isOnlyCentury,
+      "isUserText": isUserText
+    }
+  }
+
   static dateToStr(inputDate, isWithoutYear = true) {
     if (!inputDate) return undefined
     let date = new Date(inputDate)

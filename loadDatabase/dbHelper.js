@@ -15,7 +15,6 @@ class DbHelper {
       mongoose.set('debug', true)
     }
 
-    console.log(`config ${JSON.stringify(config)}`)
     mongoose.Promise = global.Promise
     mongoose.connect(config.mongoose.uri, config.mongoose.options)
     return mongoose

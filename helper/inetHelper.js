@@ -8,12 +8,19 @@ const axios = require('axios')
 const { info } = require('../helper/logHelper')
 
 class InetHelper {
-  constructor() {}
+  constructor() { }
+
+  trimNames() {
+    for (let name in this.coords) {
+      this.coords[name.trim()] = this.coords[name]
+    }
+  }
 
   loadCoords(filename) {
     this.coords = fileHelper.isFileExists(filename)
       ? fileHelper.getJsonFromFile(filename)
       : {}
+    console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
   }
 
   saveCoords(filename) {
@@ -73,25 +80,51 @@ class InetHelper {
     return await Promise.all(promises)
   }
 
+  getLonLatSavedCoords(input) {
+    input = input.replace(',', '')
+    let name = strHelper.shrinkStringBeforeDelim(input)
+    let testNames = [
+      strHelper.removeShortStrings(name, '', true).replace('  ', ' '),
+      strHelper.removeShortStrings(name, '', false).replace('  ', ' ')
+    ]
+
+    // console.log(testNames)
+
+    for (let i = 0; i < testNames.length; i++) {
+      const name = testNames[i]
+      if (name && this.coords && this.coords[name]) {
+        const coords = this.coords[name]
+        return [coords.lon, coords.lat]
+      }
+    }
+
+    return false
+  }
+
+  getSavedCoords(input) {
+
+    const lonLat = this.getLonLatSavedCoords(input)
+    if (lonLat && lonLat.length == 2)
+      return geoHelper.fromLonLat(lonLat)
+
+    return false
+  }
+
   async getLocalCoordsForName(input) {
-    const name = strHelper.shrinkStringBeforeDelim(input)
 
-    if (!name) {
-      return undefined
+    const isExistCoords = this.getSavedCoords(name)
+    if (isExistCoords) {
+      return isExistCoords
     }
 
-    const isExistCoords = this.coords && this.coords[name]
+    console.log(`Не найдены предустановленные координаты для ${name}`)
 
-    if (!isExistCoords) {
-      console.log(`Не найдены предустановленные координаты для ${name}`)
-    }
+    input = input.replace(',', '')
+    let name = strHelper.shrinkStringBeforeDelim(input)
+    name = strHelper.removeShortStrings(name)
 
-    let coords = null
     try {
-      coords = isExistCoords
-        ? this.coords[name]
-        : await this.getCoordsFromWiki(name)
-
+      const coords = await this.getCoordsFromWiki(name)
       return coords ? geoHelper.fromLonLat([coords.lon, coords.lat]) : null
 
       //const isRus = /[а-яА-ЯЁё]/.test(name)

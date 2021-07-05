@@ -1,8 +1,29 @@
-const StrHelper = require('../helper/strHelper')
-const DateHelper = require('../helper/dateHelper')
+const strHelper = require('../helper/strHelper')
+const dateHelper = require('../helper/dateHelper')
+const inetHelper = require('../helper/inetHelper')
+const fileHelper = require('../helper/fileHelper')
 
-const DbHelper = require('../loadDatabase/dbHelper')
-const TemplesModel = require('../models/templesModel')
+const res0 = dateHelper.getDateFromInput('5.07.1898')
+console.log(res0)
+
+return
+
+let input = 'Храм в честь иконы Пресвятой Богородицы "Всех скорбящих Радость" Омск, Омская обл.'
+
+const res1 = strHelper.removeShortStrings(input, '', true)
+const res2 = strHelper.removeShortStrings(input, '', false)
+
+const checkedCoordsPath = fileHelper.composePath('..\\loadDatabase\\dataSources\\checkedCoords.json')
+
+inetHelper.loadCoords(checkedCoordsPath)
+const res3 = inetHelper.getSavedCoords(input)
+
+console.log(checkedCoordsPath)
+console.log(`res1 ${JSON.stringify(res1)}`)
+console.log(`res2 ${JSON.stringify(res2)}`)
+console.log(`res3 ${JSON.stringify(res3)}`)
+
+return
 
 const dbHelper = new DbHelper()
 

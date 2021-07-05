@@ -2,17 +2,21 @@ const chalk = require('chalk')
 const log = require('../helper/logHelper')
 
 const DbHelper = require('../loadDatabase/dbHelper')
-const XlsParser = require('../loadDatabase/xlsParser')
 const PersonsAggr = require('../loadDatabase/personsAggr')
 const inetHelper = require('../helper/inetHelper')
+
 const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
 const chronosChurchJsonMediator = require('../loadDatabase/chronosChurchJsonMediator')
 const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
 const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
+const xlsGoogleParser = require('./xlsGoogleParser')
+
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
+
 inetHelper.loadCoords(checkedCoordsPath)
+inetHelper.trimNames()
 
 const dbHelper = new DbHelper()
 const personsAggr = new PersonsAggr()
@@ -54,19 +58,22 @@ Promise.resolve(true)
   .then(() => {
     return dbHelper.clearDb('temples')
   })
-  //  .then(() => {
-  //     return XlsParser.loadData({
-  //       source: `${__dirname}/religion/temples_azbuka.xlsx`,
-  //       mediator: templesJsonMediator
-  //     })
-  //  })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_temples',
+  //     procdir: 'out/out_temples_process',
+  //     errdir: 'out/out_temples_errors',
+  //     mediator: templesJsonMediator,
+  //   })
+  // })
+  // .then(() => {
+  //   return XlsParser.loadData({
+  //     source: `${__dirname}/religion/temples_azbuka.xlsx`,
+  //     mediator: templesJsonMediator
+  //   })
+  // })
   .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_temples',
-      procdir: 'out/out_temples_process',
-      errdir: 'out/out_temples_errors',
-      mediator: templesJsonMediator,
-    })
+    return xlsGoogleParser.loadData()
   })
   // .then(() => {
   //   return dbHelper.clearDb('persons')

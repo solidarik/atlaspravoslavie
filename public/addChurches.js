@@ -48,6 +48,7 @@ export default class addChurches {
     let elemSC = document.createElement('div');
     elemSC.classList.add("slideshow-container");
     elm.appendChild(elemSC);
+
     for (let index = 0; index <= imgCount; index++) {
 
       let iUFN;
@@ -65,7 +66,7 @@ export default class addChurches {
           pu = cur.pageUrl;
         }
         //console.log(cur[iUFN]);
-        if (cur[iUFN] !== 'undefined'&&cur[iUFN]!==null&&cur[iUFN]!=='') {
+        if (cur[iUFN] !== 'undefined' && cur[iUFN] !== null && cur[iUFN] !== '') {
           //console.log('if');
           let elemMS = document.createElement('div');
           elemMS.classList.add("mySlides");
@@ -108,7 +109,7 @@ export default class addChurches {
     for (let index = 0; index <= imgCount; index++) {
       let elemD = document.createElement('span');
       elemD.classList.add("dot");
-      elemD.onclick = function () { currentSlide(index+1) };
+      elemD.onclick = function () { currentSlide(index + 1) };
       elemDD.appendChild(elemD);
     }
 
@@ -208,7 +209,7 @@ export default class addChurches {
         }
       }
       // console.log(currChurch);
-      if(currChurch!=undefined&&currChurch.pageUrl==obj[i]['pageUrl']){
+      if (currChurch != undefined && currChurch.pageUrl == obj[i]['pageUrl']) {
         curId = i;
       }
     }
@@ -258,11 +259,11 @@ export default class addChurches {
     )
 
     //$('#churches-table tr:eq(0) td:first-child span').click()
-    if(currChurch!=undefined){
-      var str = '#'+curId;
+    if (currChurch != undefined) {
+      var str = '#' + curId;
       // console.log(str);
       $(str).click();
-    }else{
+    } else {
       $('#0').click();
     }
 

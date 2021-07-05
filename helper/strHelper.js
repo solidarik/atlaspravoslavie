@@ -44,6 +44,15 @@ class StrHelper {
     return (output + end)
   }
 
+  static removeShortStrings(inputText, regstring, onlyEnd = true) {
+    if (!regstring) {
+      const shortRegExp = onlyEnd ? `[а-я]{1,2}[.]$` : `[а-я]{1,2}[.]`
+      regstring = new RegExp(shortRegExp, 'g')
+    }
+    return inputText.replace(regstring, '').trim()
+  }
+
+
   static generatePageUrl(input, len = 50) {
     if (Array.isArray(input)) {
       input = input.join('_')
@@ -80,11 +89,18 @@ class StrHelper {
     return input.replace(/[(][^)]*[)]/g, '')
   }
 
+  static pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+  }
+
   static ignoreSpaces(input) {
     if (!input) return input
     input = '' + input
     return input.replace(/\s/g, '')
   }
+
 
   static getTwoStringByLastDelim(input, delim = '.') {
     const lastIndexOf = input.lastIndexOf(delim)
@@ -121,8 +137,8 @@ class StrHelper {
       typeof Number.isNaN !== 'undefined'
         ? Number.isNaN(tryFloat)
         : tryFloat !== tryFloat
-        ? true
-        : false
+          ? true
+          : false
     return isNaN ? 0 : tryFloat
   }
 
@@ -154,6 +170,25 @@ class StrHelper {
     }
     // let result = input.match(regexp) || []
     return result
+  }
+
+  static getSearchGroupsInRegexp(regStr, input) {
+    let res = []
+    const matches = input.match(new RegExp(regStr))
+    if (!matches || matches.length < 1)
+      return
+
+    for (let iMatch = 1; iMatch < matches.length; iMatch++) {
+      res.push(matches[iMatch])
+    }
+    return res
+  }
+
+  static removeByRegExp(regStr, input) {
+    if (!input) return input
+    input = '' + input
+    const r = new RegExp(regStr, 'g')
+    return input.replace(r, '')
   }
 
   static varToString(varObj) {
