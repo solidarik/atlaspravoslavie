@@ -110,7 +110,7 @@ class HolyProtocol extends ServerProtocol {
         ChronosModel.find(defaultSearchParam).select(defaultSelectParam),
         ChronosChurchModel.find(defaultSearchParam).select(defaultSelectParam),
         TemplesModel.find(gteSearchParam).select(defaultSelectParam),
-        PersonsAggrModel.find(personSearchParam).select(defaultSelectParam),
+        PersonsAggrModel.find(personSearchParam)
 
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
@@ -203,8 +203,11 @@ class HolyProtocol extends ServerProtocol {
         case 'TemplesFeature':
           model = TemplesModel
           break;
-        case 'PersonsAggrModel':
+        case 'PersonAggrFeature':
           model = PersonsAggrModel
+          break;
+        case 'PersonFeature':
+          model = PersonsModel
           break;
         default:
           throw new Error(`Undefined model by classFeature ${data.classFeature}`)
@@ -223,8 +226,8 @@ class HolyProtocol extends ServerProtocol {
         .catch((error) => {
           cb(JSON.stringify({ error: error }))
         })
-    } catch (err) {
-      res.err = 'Ошибка возврата данных: ' + err
+    } catch (error) {
+      res.error = 'Ошибка возврата данных: ' + error
       res.events = ''
       cb(JSON.stringify(res))
     }

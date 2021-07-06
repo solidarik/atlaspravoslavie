@@ -93423,11 +93423,16 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
         'classFeature': classFeature.name
       };
       window.classFeature = classFeature;
+
+      if (searchData.classFeature === 'PersonFeature') {
+        searchData.classFeature = 'PersonAggrFeature';
+      }
+
       this.socket.emit('clGetInfoItem', JSON.stringify(searchData), function (msg) {
         var res = JSON.parse(msg);
 
         if (res.error) {
-          console.log("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0442 \u0441\u0435\u0440\u0432\u0435\u0440\u0430 ".concat(res.error));
+          console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0442 \u0441\u0435\u0440\u0432\u0435\u0440\u0430 ".concat(res.error));
         } else {
           _this6.emit('onGetInfoItem', res);
         }
@@ -104586,7 +104591,6 @@ function startApp() {
     infoControl.hide();
   });
   mapControl.subscribe('clickItem', function (item) {});
-  protocol.subscribe('getItem', function (item) {});
   infoControl.subscribe('hide', function () {
     mapControl.returnNormalMode();
     mapControl.hidePulse();

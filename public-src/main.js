@@ -77,10 +77,6 @@ function startApp() {
 
   })
 
-  protocol.subscribe('getItem', (item) => {
-
-  })
-
   infoControl.subscribe('hide', () => {
     mapControl.returnNormalMode()
     mapControl.hidePulse()

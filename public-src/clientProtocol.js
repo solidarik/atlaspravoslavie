@@ -109,11 +109,15 @@ export default class ClientProtocol extends EventEmitter {
     const searchData = { 'id': info._id, 'classFeature': classFeature.name }
     window.classFeature = classFeature
 
+    if (searchData.classFeature === 'PersonFeature') {
+      searchData.classFeature = 'PersonAggrFeature'
+    }
+
     this.socket.emit('clGetInfoItem', JSON.stringify(searchData),
       (msg) => {
         const res = JSON.parse(msg)
         if (res.error) {
-          console.log(`Ошибка от сервера ${res.error}`)
+          console.error(`Ошибка от сервера ${res.error}`)
         } else {
           this.emit('onGetInfoItem', res)
         }
