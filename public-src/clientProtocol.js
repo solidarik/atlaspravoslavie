@@ -78,6 +78,8 @@ export default class ClientProtocol extends EventEmitter {
     )
   }
 
+
+
   getPersons() {
     this.socket.emit(
       'clGetPersons',
@@ -86,6 +88,37 @@ export default class ClientProtocol extends EventEmitter {
         this.emit('persons', JSON.parse(msg))
       }
     )
+  }
+
+  getTempleItem(id) {
+    const searchData = { 'id': id }
+    this.socket.emit('clGetTempleItem', JSON.stringify(searchData),
+      (msg) => {
+        const res = JSON.parse(msg)
+        if (res.error) {
+          console.log(`Ошибка от сервера ${res.error}`)
+        } else {
+          this.emit('onGetTempleItem', res)
+        }
+      })
+  }
+
+  getInfoItem(item) {
+    const classFeature = item.get('classFeature')
+    const info = item.get('info')
+    const searchData = { 'id': info._id, 'classFeature': classFeature.name }
+    window.classFeature = classFeature
+
+    this.socket.emit('clGetInfoItem', JSON.stringify(searchData),
+      (msg) => {
+        const res = JSON.parse(msg)
+        if (res.error) {
+          console.log(`Ошибка от сервера ${res.error}`)
+        } else {
+          this.emit('onGetInfoItem', res)
+        }
+      })
+
   }
 
   getDataByYear(dateObject) {

@@ -39,7 +39,7 @@ router.get('/video', require('./page-video'))
 router.get('/events', require('./page-events'))
 router.get('/logout', require('./logout').get)
 
-const defaultSelectParam = { 'name': 1, 'point': 1 }
+const defaultSelectParam = { 'name': 1, 'point': 1, 'start': 1, 'place': 1, 'pageUrl': 1 }
 
 getUsers = async function (ctx, next) {
   // persons = await redisClient.get('persons')
@@ -60,8 +60,10 @@ getChurches = async function (ctx, next) {
   // if (!churches) return
 
   //! churches только с набором необходимых полей
-  // const churches = await TemplesModel.find({}).select(defaultSelectParam)
-  const churches = await TemplesModel.find({})
+  const churches = await TemplesModel.find({}).select(defaultSelectParam)
+
+  // получение полного набора полей (долго по времени)
+  // const churches = await TemplesModel.find({})
 
   // ctx.state = {'churches': JSON.parse(churches)}
   ctx.state = { 'churches': churches }

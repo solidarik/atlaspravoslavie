@@ -28,7 +28,7 @@ export class InfoControl extends EventEmitter {
       console.log(`showActiveItem: ${id}`)
       for (let i = 0; i < items.length; i++) {
         if (id === items[i].get('info')._id) {
-          window.infoControl.showItemInfo(items[i])
+          this.emit('showItem', items[i])
           break
         }
       }
@@ -41,12 +41,10 @@ export class InfoControl extends EventEmitter {
     this.emit('hide', undefined)
   }
 
-  showItemInfo(item) {
-    this.emit('showItem', item)
+  showItemInfo(info) {
     ClassHelper.removeClass(window.infoControl.contentDiv, 'events-info-hide')
     ClassHelper.addClass(window.infoControl.contentDiv, 'events-info-show')
-    const classFeature = item.get('classFeature')
-    const info = item.get('info')
+    const classFeature = window.classFeature
     this.contentDiv.innerHTML = classFeature.getHtmlInfo(info)
   }
 
@@ -76,15 +74,10 @@ export class InfoControl extends EventEmitter {
     })
     html += `</table></div>`
     this.contentDiv.innerHTML = html
-    console.log(`show item list: ${items.length}`)
   }
 
   updateItems(items) {
-    if (1 == items.length) {
-      this.showItemInfo(items[0])
-    } else {
-      this.showItemList(items)
-    }
+
     this.contentDiv.scrollTop = 0
   }
 

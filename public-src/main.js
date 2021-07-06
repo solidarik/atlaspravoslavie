@@ -87,7 +87,7 @@ function startApp() {
   })
 
   infoControl.subscribe('showItem', (item) => {
-    mapControl.showAdditionalInfo(item)
+    protocol.getInfoItem(item)
   })
 
   mapControl.subscribe('mapEmptyClick', () => {
@@ -96,8 +96,18 @@ function startApp() {
     infoControl.hide()
   })
 
+
+  protocol.subscribe('onGetInfoItem', (info) => {
+    infoControl.showItemInfo(info)
+    mapControl.showAdditionalInfo(info)
+  })
+
   mapControl.subscribe('selectFeatures', (items) => {
-    infoControl.updateItems(items)
+    if (1 == items.length) {
+      protocol.getInfoItem(items[0])
+    } else {
+      infoControl.showItemList(items)
+    }
   })
 
   mapControl.subscribe('showAdditionalInfo', () => {

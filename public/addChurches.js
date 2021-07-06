@@ -1,19 +1,20 @@
-export default class addChurches {
+import ClientProtocol from '../public-src/clientProtocol.js'
+import EventEmitter from '../public-src/eventEmitter.js'
+
+export default class addChurches extends EventEmitter {
+
   constructor(idTable, data) {
+    super() //first must
     this.idTable = idTable
     this.data = data
+
+    this.protocol = ClientProtocol.create()
+    this.protocol.subscribe('onGetTempleItem', (item) => this.showItem(item))
   }
 
-  clearTable() {
-    var dvTable = $('#' + this.idTable)
-    dvTable.html('')
-  }
+  showItem(item) {
 
-  rowTableClickHandler(thisThis, thisTr, showSlides, plusSlides, currentSlide) {
-    // console.log("clicked " + $(thisTr).attr('id'));
-    var _id = $(thisTr).attr('id');
-    var cur = thisThis.data[_id];
-    //console.log(cur);
+    const cur = item
     $('#name').html(
       cur.name
     )
@@ -41,7 +42,7 @@ export default class addChurches {
 
     //$('#imgChurches').src = '/images/temples/'+cur.pageUrl+'.jpg'
     //$('#imgChurches').attr('src', '/images/temples/'+cur.pageUrl+'.jpg')
-    let imgCount = 5;
+    let imgCount = cur.imgUrls.length;
 
     let elm = document.getElementById('image-cont');
     elm.innerHTML = '';
@@ -49,7 +50,25 @@ export default class addChurches {
     elemSC.classList.add("slideshow-container");
     elm.appendChild(elemSC);
 
+    for (let index = 0; index < cur.imgUrls.length; index++) {
+      let elemMS = document.createElement('div');
+      elemMS.classList.add("mySlides");
+      elemMS.classList.add("fade");
+      elemSC.appendChild(elemMS);
+      let elemNT = document.createElement('div');
+      elemNT.classList.add("numbertext");
+      elemNT.innerHTML = index + ' / ' + imgCount;
+      let img = document.createElement('img');
+      img.classList.add("image-center");
+      img.classList.add("img-rounded");
+      img.classList.add("resized-image");
+      img.src = cur.imgUrls[index];
+      elemMS.appendChild(img);
+    }
+
     for (let index = 0; index <= imgCount; index++) {
+
+      continue; //soli
 
       let iUFN;
       if (index > 0) {
@@ -88,13 +107,13 @@ export default class addChurches {
     let al = document.createElement('a');
     al.classList.add("prev");
     al.innerHTML = '&#10094;';
-    al.onclick = function () { plusSlides(-1) };
+    al.onclick = function () { window.plusSlides(-1) };
     elemSC.appendChild(al);
 
     let ar = document.createElement('a');
     ar.classList.add("next");
     ar.innerHTML = '&#10095;';
-    ar.onclick = function () { plusSlides(1) };
+    ar.onclick = function () { window.plusSlides(1) };
     elemSC.appendChild(ar);
 
     let elemBR = document.createElement('div');
@@ -106,14 +125,14 @@ export default class addChurches {
     elemDD.style = "margin-left: auto; margin-right: auto;"
     elm.appendChild(elemDD);
 
-    for (let index = 0; index <= imgCount; index++) {
+    for (let index = 0; index < imgCount; index++) {
       let elemD = document.createElement('span');
       elemD.classList.add("dot");
-      elemD.onclick = function () { currentSlide(index + 1) };
+      elemD.onclick = function () { window.currentSlide(index + 1) };
       elemDD.appendChild(elemD);
     }
 
-    showSlides(1);
+    window.showSlides(1);
 
 
     // $('#image-cont').html(
@@ -140,26 +159,37 @@ export default class addChurches {
     //   '  </div> ' +
 
     //   '  <!-- Next and previous buttons --> ' +
-    //   '  <a class="prev" onclick="plusSlides(-1)">&#10094;</a> ' +
-    //   '  <a class="next" onclick="plusSlides(1)">&#10095;</a> ' +
+    //   '  <a class="prev" onclick="window.plusSlides(-1)">&#10094;</a> ' +
+    //   '  <a class="next" onclick="window.plusSlides(1)">&#10095;</a> ' +
     //   '</div> ' +
     //   '<br> ' +
 
     //   '<!-- The dots/circles --> ' +
     //   '<div style="text-align:center"> ' +
-    //   '  <span class="dot" onclick="currentSlide(1)"></span> ' +
-    //   '  <span class="dot" onclick="currentSlide(2)"></span> ' +
-    //   '  <span class="dot" onclick="currentSlide(3)"></span> ' +
+    //   '  <span class="dot" onclick="window.currentSlide(1)"></span> ' +
+    //   '  <span class="dot" onclick="window.currentSlide(2)"></span> ' +
+    //   '  <span class="dot" onclick="window.currentSlide(3)"></span> ' +
     //   '</div> '
     // );
 
-    $(thisTr).addClass('event-active-row')
-    $(thisTr).siblings().removeClass('event-active-row')
-
-
+    $(window.thisTr).addClass('event-active-row')
+    $(window.thisTr).siblings().removeClass('event-active-row')
   }
 
-  addDataToTable(showSlides, plusSlides, currentSlide, currChurch) {
+  clearTable() {
+    var dvTable = $('#' + this.idTable)
+    dvTable.html('')
+  }
+
+  rowTableClickHandler(thisThis, thisTr) {
+    // console.log("clicked " + $(thisTr).attr('id'));
+    var _id = $(thisTr).attr('id');
+    var cur = thisThis.data[_id];
+    window.currentTr = thisTr
+    this.protocol.getTempleItem(cur._id)
+  }
+
+  addDataToTable(currChurch) {
     //console.log("addDataTotable");
     //console.log(JSON.stringify(this.data));
     var obj = this.data;
@@ -254,7 +284,7 @@ export default class addChurches {
 
     document.querySelectorAll('#' + this.idTable + ' tr').forEach((e) =>
       e.addEventListener('click', function () {
-        thisThis.rowTableClickHandler(thisThis, this, showSlides, plusSlides, currentSlide)
+        thisThis.rowTableClickHandler(thisThis, this)
       })
     )
 
@@ -270,12 +300,12 @@ export default class addChurches {
     //$('#0').trigger('click')
   }
 
-  fillTable(showSlides, plusSlides, currentSlide, currChurch) {
+  fillTable(currChurch) {
     //console.log("fillTable");
     if (this.data == null) {
-      // console.log('data empty')
+      console.log('data empty')
     } else {
-      this.addDataToTable(showSlides, plusSlides, currentSlide, currChurch)
+      this.addDataToTable(currChurch)
     }
   }
 }

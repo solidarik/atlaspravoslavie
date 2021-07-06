@@ -32,6 +32,8 @@ class HolyProtocol extends ServerProtocol {
     super.addHandler('clGetPersonsMartyrs', this.getPersonsMartyrs)
     super.addHandler('clGetPersonsReverends', this.getPersonsReverends)
     super.addHandler('clGetPersonsHoly', this.getPersonsHoly)
+    super.addHandler('clGetTempleItem', this.getTempleItem)
+    super.addHandler('clGetInfoItem', this.getInfoItem)
   }
 
   getCurrentYear(socket, msg, cb) {
@@ -105,10 +107,10 @@ class HolyProtocol extends ServerProtocol {
       const defaultSelectParam = { 'name': 1, 'point': 1 }
 
       const promices = [
-        ChronosModel.find(defaultSearchParam), //.select(defaultSelectParam),
-        ChronosChurchModel.find(defaultSearchParam), //.select(defaultSelectParam),
-        TemplesModel.find(gteSearchParam), //.select(defaultSelectParam),
-        PersonsAggrModel.find(personSearchParam) //.select(defaultSelectParam),
+        ChronosModel.find(defaultSearchParam).select(defaultSelectParam),
+        ChronosChurchModel.find(defaultSearchParam).select(defaultSelectParam),
+        TemplesModel.find(gteSearchParam).select(defaultSelectParam),
+        PersonsAggrModel.find(personSearchParam).select(defaultSelectParam),
 
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
         // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
@@ -154,6 +156,75 @@ class HolyProtocol extends ServerProtocol {
         })
     } catch (err) {
       res.err = 'Ошибка возврата храмов: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
+  }
+
+  getTempleItem(socket, msg, cb) {
+
+    let data = JSON.parse(msg)
+    let res = {}
+    try {
+      TemplesModel.find({ '_id': data.id })
+        .then(
+          (res) => {
+            if (res.length == 0) {
+              throw new Error('Temple by id is not Found')
+            } else {
+              cb(
+                JSON.stringify(res[0])
+              )
+            }
+          })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка возврата храма: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
+  }
+
+  getInfoItem(socket, msg, cb) {
+
+    let data = JSON.parse(msg)
+    let res = {}
+    try {
+      let model = undefined
+      switch (data.classFeature) {
+        case 'ChronosFeature':
+          model = ChronosModel
+          break
+        case 'ChronosChurchFeature':
+          model = ChronosChurchModel
+          break
+        case 'TemplesFeature':
+          model = TemplesModel
+          break;
+        case 'PersonsAggrModel':
+          model = PersonsAggrModel
+          break;
+        default:
+          throw new Error(`Undefined model by classFeature ${data.classFeature}`)
+      }
+      model.find({ '_id': data.id })
+        .then(
+          (res) => {
+            if (res.length == 0) {
+              throw new Error('Temple by id is not Found')
+            } else {
+              cb(
+                JSON.stringify(res[0])
+              )
+            }
+          })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка возврата данных: ' + err
       res.events = ''
       cb(JSON.stringify(res))
     }

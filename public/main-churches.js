@@ -1,9 +1,9 @@
 "use strict";
 import addChurches from './addChurches.js';
-import ClientProtocol from '../public-src/clientProtocol.js'
 window.app = {};
 var app = window.app;
 var slideIndex = 1;
+
 // Production steps of ECMA-262, Edition 5, 15.4.4.18
 // Reference: http://es5.github.io/#x15.4.4.18
 if (!Array.prototype.forEach) {
@@ -72,15 +72,15 @@ if (!Object.getOwnPropertyDescriptor(NodeList.prototype, 'forEach')) {
   Object.defineProperty(NodeList.prototype, 'forEach', Object.getOwnPropertyDescriptor(Array.prototype, 'forEach'));
 }
 
-//////////////////////////////////////////////////
 function startApp() {
   var temples = window.state.churches;
   var temple = window.state.church;
-  // console.log(temples);
-  // console.log(temple);
   var churches = new addChurches("churches-table", temples);
   churches.clearTable();
-  churches.fillTable(showSlides, plusSlides, currentSlide, temple);
+  window.showSlides = showSlides
+  window.plusSlides = plusSlides
+  window.currentSlide = currentSlide
+  churches.fillTable(temple);
 }
 
 $(document).ready(function () {
@@ -128,7 +128,6 @@ function showSlides(n) {
   dots[slideIndex - 1].className += " active";
 }
 
-/////////////////////////////////////////////////
 function addEvent(evnt, elem, func) {
   if (elem.addEventListener)  // W3C DOM
   {

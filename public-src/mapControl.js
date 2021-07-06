@@ -305,10 +305,9 @@ export class MapControl extends EventEmitter {
     return geom
   }
 
-  showAdditionalInfo(item) {
+  showAdditionalInfo(info) {
 
-    const info = item.get('info')
-    const classFeature = item.get('classFeature')
+    const classFeature = window.classFeature
 
     if (!info.hasOwnProperty('livePoints') || !info.livePoints)
       return
