@@ -13,23 +13,23 @@ root_folder = 'out_persons'
 
 col_surname, col_sitename, col_name, col_middlename = tuple(range(0, 4))
 col_birthDate, col_birthPlace = tuple(range(4, 6))
-col_monkname = 6
+col_monkname = 7
 
-col_achievement_start = 7
-col_achievement_end = 11
+col_achievement_start = 8
+col_achievement_end = 12
 
-col_canonizationDate = 13
-col_status = 14
-col_groupStatus = 15
-col_worshipDays = 16
+col_canonizationDate = 14
+col_status = 15
+col_groupStatus = 16
+col_worshipDays = 17
 
-col_profession = 17
-col_fullDescription = 18
-col_srcUrl = 19
-col_photoUrl = 20
+col_profession = 18
+col_fullDescription = 19
+col_srcUrl = 20
+col_photoUrl = 21
 
-col_deathDate = 21
-col_deathPlace = 22
+col_deathDate = 22
+col_deathPlace = 23
 
 filename = os.path.abspath(__file__)
 filename += os.path.sep + '..' + os.path.sep + '..' + os.path.sep

@@ -28,40 +28,44 @@ class PersonsJsonMediator extends SuperJsonMediator {
     return new Promise((resolve, reject) => {
 
       let promises = [
-        InetHelper.getLocalCoordsForName(this.deleteAbbrev(json.birth.place)),
-        InetHelper.getLocalCoordsForName(this.deleteAbbrev(json.death.place))
+        InetHelper.getLocalCoordsForName(json.birth.place),
+        InetHelper.getLocalCoordsForName(json.death.place)
       ]
 
       json.achievements.forEach((achiev) => {
         promises.push(
-          InetHelper.getLocalCoordsForName(this.deleteAbbrev(achiev.place))
+          InetHelper.getLocalCoordsForName(achiev.place)
         )
       })
 
       Promise.all(promises)
         .then((coords) => {
+
           const birthCoords = coords[0]
           const deathCoords = coords[1]
 
           if (birthCoords && birthCoords.length < 2)
-              resolve({
-                error: `не удалось определить координаты рождения ${json.birth.place}`,
-                errorPlace: json.birth.place })
+            resolve({
+              error: `не удалось определить координаты рождения ${json.birth.place}`,
+              errorPlace: json.birth.place
+            })
 
           if (deathCoords && deathCoords.length < 2)
-              resolve({
-                error: `не удалось определить координаты смерти ${json.death.place}`,
-                errorPlace: json.death.place })
+            resolve({
+              error: `не удалось определить координаты смерти ${json.death.place}`,
+              errorPlace: json.death.place
+            })
 
           for (let i = 2; i < json.achievements.length + 2; i++) {
             if (coords[i] && coords[i].length < 2) {
               errorPlace = json.achievemnts[i - 2].place
               resolve({
                 error: `не удалось определить координаты достижения для ${errorPlace}`,
-                errorPlace: errorPlace })
+                errorPlace: errorPlace
+              })
             } else {
-              json.achievements[i-2] = {
-                ...json.achievements[i-2],
+              json.achievements[i - 2] = {
+                ...json.achievements[i - 2],
                 placeCoord: coords[i]
               }
             }

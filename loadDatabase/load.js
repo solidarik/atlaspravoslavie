@@ -55,9 +55,9 @@ Promise.resolve(true)
   //     mediator: chronosChurchJsonMediator,
   //   })
   // })
-  .then(() => {
-    return dbHelper.clearDb('temples')
-  })
+  // .then(() => {
+  //   return dbHelper.clearDb('temples')
+  // })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
   //     source: 'python/out_temples',
@@ -72,27 +72,27 @@ Promise.resolve(true)
   //     mediator: templesJsonMediator
   //   })
   // })
+  // .then(() => {
+  //   return xlsGoogleParser.loadData()
+  // })
   .then(() => {
-    return xlsGoogleParser.loadData()
+    return dbHelper.clearDb('persons')
   })
-  // .then(() => {
-  //   return dbHelper.clearDb('persons')
-  // })
-  // .then(() => {
-  //   return dbHelper.saveFilesFrom({
-  //     source: 'python/out_persons',
-  //     procdir: 'out/out_person_process',
-  //     errdir: 'out/out_person_errors',
-  //     mediator: personsJsonMediator,
-  //   })
-  // })
-  // .then(() => {
-  //   return dbHelper.clearDb('personsAggr')
-  // })
-  // .then(() => {
-  //   log.info('аггрегация данных по персоналиям')
-  //   return personsAggr.start()
-  // })
+  .then(() => {
+    return dbHelper.saveFilesFrom({
+      source: 'python/out_persons',
+      procdir: 'out/out_person_process',
+      errdir: 'out/out_person_errors',
+      mediator: personsJsonMediator,
+    })
+  })
+  .then(() => {
+    return dbHelper.clearDb('personsAggr')
+  })
+  .then(() => {
+    log.info('аггрегация данных по персоналиям')
+    return personsAggr.start()
+  })
   .then(() => {
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()

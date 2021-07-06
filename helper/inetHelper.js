@@ -82,11 +82,13 @@ class InetHelper {
 
   getLonLatSavedCoords(input) {
     input = input.replace(',', '')
+    let testNames = [input]
+
     let name = strHelper.shrinkStringBeforeDelim(input)
-    let testNames = [
-      strHelper.removeShortStrings(name, '', true).replace('  ', ' '),
-      strHelper.removeShortStrings(name, '', false).replace('  ', ' ')
-    ]
+    testNames.push(name)
+
+    testNames.push(strHelper.removeShortStrings(name, '', true).replace('  ', ' '))
+    testNames.push(strHelper.removeShortStrings(name, '', false).replace('  ', ' '))
 
     // console.log(testNames)
 
@@ -112,12 +114,14 @@ class InetHelper {
 
   async getLocalCoordsForName(input) {
 
-    const isExistCoords = this.getSavedCoords(name)
+    if (!input) return null
+
+    const isExistCoords = this.getSavedCoords(input)
     if (isExistCoords) {
       return isExistCoords
     }
 
-    console.log(`Не найдены предустановленные координаты для ${name}`)
+    console.log(`Не найдены предустановленные координаты для ${input}`)
 
     input = input.replace(',', '')
     let name = strHelper.shrinkStringBeforeDelim(input)
@@ -136,7 +140,7 @@ class InetHelper {
       //  if (coords) return coords
       //}
     } catch (error) {
-      throw error
+      throw new Error(`Ошибка получения данных из Wiki ${error}`)
     } finally {
       if (this.coords && !isExistCoords && coords) {
         this.coords[name] = coords
