@@ -220,13 +220,28 @@ class DateHelper {
     }
   }
 
+  static convertTZ(date, tzString) {
+    return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", { timeZone: tzString }))
+  }
+
+  static dateTimeToStr(inputDate, timeZone = 'Europe/Moscow') {
+    const mskDateTime = DateHelper.convertTZ(inputDate, timeZone)
+    const day = ('0' + mskDateTime.getDate()).slice(-2)
+    const month = ('0' + (mskDateTime.getMonth() + 1)).slice(-2)
+    const year = mskDateTime.getFullYear()
+    var h = ('0' + mskDateTime.getHours()).slice(-2)
+    var m = ('0' + mskDateTime.getMinutes()).slice(-2)
+    var s = ('0' + mskDateTime.getSeconds()).slice(-2)
+    return `${[day, month, year].join('.')} ${[h, m, s].join(':')}`
+  }
+
   static dateToStr(inputDate, isWithoutYear = true) {
     if (!inputDate) return undefined
     let date = new Date(inputDate)
     const day = ('0' + date.getDate()).slice(-2)
     const month = ('0' + (date.getMonth() + 1)).slice(-2)
     const year = date.getFullYear()
-    return isWithoutYear && day == '01' && month == '01' ? year : `${day}.${month}.${year}`
+    return isWithoutYear && day == '01' && month == '01' ? year : `${day}.${month}.${year} `
   }
 
   static getYearStr(inputDate) {
@@ -240,7 +255,7 @@ class DateHelper {
     const startDateStr = DateHelper.dateToStr(startDate)
     const endDateStr = DateHelper.dateToStr(endDate)
     return endDateStr != undefined && startDateStr != endDateStr
-      ? `${startDateStr} - ${endDateStr}`
+      ? `${startDateStr} - ${endDateStr} `
       : isOnlyYear
         ? this.getYearStr(startDate)
         : startDateStr
@@ -248,7 +263,7 @@ class DateHelper {
 
   static twoDateToStr2(startDateStr, endDateStr) {
     return endDateStr != undefined && startDateStr != endDateStr
-      ? `${startDateStr} - ${endDateStr}`
+      ? `${startDateStr} - ${endDateStr} `
       : startDateStr
   }
 
@@ -288,7 +303,7 @@ class DateHelper {
     }
     const romanize = DateHelper.arabicToRoman(intCentury)
     if (isMinus) {
-      return `-${romanize}`
+      return `- ${romanize} `
     }
     return romanize
   }

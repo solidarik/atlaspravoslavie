@@ -832,3 +832,36 @@ input.form-control {
   width: 100%;
   background-color: yellow;
 }
+
+
+#load-status-container {
+  position: absolute;
+  right: 2px;
+  bottom: 26px;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#load-status-div {
+  position: absolute;
+  overflow: hidden;
+  padding: 0 5px;
+  right: 0px;
+  top: 0px;
+  z-index: 2;
+  border-radius: 3px;
+  background-color: rgba(20, 20, 20, 0.5) !important;
+  color: white;
+  /* transition: max-width 0.1s ease-out, max-height 0.1s ease-out;
+  -webkit-transition: max-width 0.1s ease-out, max-height 0.1s ease-out; */
+}
+
+.load-status-div-hide {
+  max-width: 0px;
+  max-height: 0px;
+}
+
+.load-status-div-show {
+  max-width: auto;
+  /* max-height: 600px; */
+}

@@ -81,7 +81,7 @@ class PersonsJsonMediator extends SuperJsonMediator {
               ...json.death,
               placeCoord: deathCoords
             },
-            pageUrl: StrHelper.generatePageUrl([json.surname, json.name, json.middlename])
+            pageUrl: StrHelper.generatePageUrl([json.sitename, json.surname, json.name, json.middlename])
           }
 
           resolve(json)

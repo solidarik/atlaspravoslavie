@@ -1,6 +1,7 @@
 import { StateControl } from './stateControl'
 import { MapControl } from './mapControl'
 import { LegendControl } from './legendControl'
+import { LoadCounterControl } from './loadCounterControl'
 import ClientProtocol from './clientProtocol'
 import { InfoControl } from './infoControl'
 
@@ -30,6 +31,7 @@ function startApp() {
   const mapControl = MapControl.create()
   const infoControl = InfoControl.create()
   const legendControl = LegendControl.create()
+  const loadCounterControl = LoadCounterControl.create()
 
   stateControl.subscribe('fillState', (state) => {
     mapControl.showMap(state.center, state.zoom)
@@ -61,7 +63,17 @@ function startApp() {
     console.log('timing, recieve info from legend')
     mapControl.refreshInfo.call(mapControl, info)
     console.log('timing, finish processing data in mapcontrol')
+    protocol.getLoadStatus()
   })
+
+  protocol.subscribe('onGetLoadStatus', (info) => {
+    if (info.err) {
+      console.error(`Ошибка получения статуса: ${info.err}`)
+    } else {
+      loadCounterControl.showStatus(info.statusText, info.loadedTime)
+    }
+  })
+
 
   legendControl.subscribe('legendClick', () => {
     mapControl.hidePopup()
@@ -96,6 +108,7 @@ function startApp() {
   protocol.subscribe('onGetInfoItem', (info) => {
     infoControl.showItemInfo(info)
     mapControl.showAdditionalInfo(info)
+    loadCounterControl.switchOff()
   })
 
   mapControl.subscribe('selectFeatures', (items) => {
@@ -103,15 +116,18 @@ function startApp() {
       protocol.getInfoItem(items[0])
     } else {
       infoControl.showItemList(items)
+      loadCounterControl.switchOff()
     }
   })
 
   mapControl.subscribe('showAdditionalInfo', () => {
     legendControl.switchOff()
+    loadCounterControl.switchOff()
   })
 
   mapControl.subscribe('returnNormalMode', () => {
     legendControl.switchOn()
+    loadCounterControl.switchOn()
   })
 
   $(

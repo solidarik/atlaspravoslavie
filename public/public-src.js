@@ -82790,6 +82790,26 @@ var DateHelper = /*#__PURE__*/function () {
       };
     }
   }, {
+    key: "convertTZ",
+    value: function convertTZ(date, tzString) {
+      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", {
+        timeZone: tzString
+      }));
+    }
+  }, {
+    key: "dateTimeToStr",
+    value: function dateTimeToStr(inputDate) {
+      var timeZone = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Europe/Moscow';
+      var mskDateTime = DateHelper.convertTZ(inputDate, timeZone);
+      var day = ('0' + mskDateTime.getDate()).slice(-2);
+      var month = ('0' + (mskDateTime.getMonth() + 1)).slice(-2);
+      var year = mskDateTime.getFullYear();
+      var h = ('0' + mskDateTime.getHours()).slice(-2);
+      var m = ('0' + mskDateTime.getMinutes()).slice(-2);
+      var s = ('0' + mskDateTime.getSeconds()).slice(-2);
+      return "".concat([day, month, year].join('.'), " ").concat([h, m, s].join(':'));
+    }
+  }, {
     key: "dateToStr",
     value: function dateToStr(inputDate) {
       var isWithoutYear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -82798,7 +82818,7 @@ var DateHelper = /*#__PURE__*/function () {
       var day = ('0' + date.getDate()).slice(-2);
       var month = ('0' + (date.getMonth() + 1)).slice(-2);
       var year = date.getFullYear();
-      return isWithoutYear && day == '01' && month == '01' ? year : "".concat(day, ".").concat(month, ".").concat(year);
+      return isWithoutYear && day == '01' && month == '01' ? year : "".concat(day, ".").concat(month, ".").concat(year, " ");
     }
   }, {
     key: "getYearStr",
@@ -82813,12 +82833,12 @@ var DateHelper = /*#__PURE__*/function () {
       var isOnlyYear = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var startDateStr = DateHelper.dateToStr(startDate);
       var endDateStr = DateHelper.dateToStr(endDate);
-      return endDateStr != undefined && startDateStr != endDateStr ? "".concat(startDateStr, " - ").concat(endDateStr) : isOnlyYear ? this.getYearStr(startDate) : startDateStr;
+      return endDateStr != undefined && startDateStr != endDateStr ? "".concat(startDateStr, " - ").concat(endDateStr, " ") : isOnlyYear ? this.getYearStr(startDate) : startDateStr;
     }
   }, {
     key: "twoDateToStr2",
     value: function twoDateToStr2(startDateStr, endDateStr) {
-      return endDateStr != undefined && startDateStr != endDateStr ? "".concat(startDateStr, " - ").concat(endDateStr) : startDateStr;
+      return endDateStr != undefined && startDateStr != endDateStr ? "".concat(startDateStr, " - ").concat(endDateStr, " ") : startDateStr;
     }
   }, {
     key: "betweenYearTwoDates",
@@ -82856,7 +82876,7 @@ var DateHelper = /*#__PURE__*/function () {
       var romanize = DateHelper.arabicToRoman(intCentury);
 
       if (isMinus) {
-        return "-".concat(romanize);
+        return "- ".concat(romanize, " ");
       }
 
       return romanize;
@@ -84835,7 +84855,100 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
 }(_eventEmitter.default);
 
 exports.LegendControl = LegendControl;
-},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/chronosChurchFeature":"ewPj","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g"}],"imeZ":[function(require,module,exports) {
+},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq","../helper/jsHelper":"uf5M","./mapLayers/chronosFeature":"iHtK","./mapLayers/chronosChurchFeature":"ewPj","./mapLayers/templesFeature":"WMTm","./mapLayers/personFeature":"oL5g"}],"TXLU":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LoadCounterControl = void 0;
+
+var _eventEmitter = _interopRequireDefault(require("./eventEmitter"));
+
+var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var LoadCounterControl = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(LoadCounterControl, _EventEmitter);
+
+  var _super = _createSuper(LoadCounterControl);
+
+  function LoadCounterControl() {
+    var _this;
+
+    _classCallCheck(this, LoadCounterControl);
+
+    _this = _super.call(this); //first must
+
+    _this.isVisible = false;
+    _this.loadStatusDiv = document.getElementById('load-status-div');
+    return _this;
+  }
+
+  _createClass(LoadCounterControl, [{
+    key: "showStatus",
+    value: function showStatus(statusText, loadedTime) {
+      if (statusText && statusText.length > 0) {
+        this.loadStatusDiv.innerHTML = statusText;
+        this.loadStatusDiv.title = loadedTime;
+        this.switchOn();
+      }
+    }
+  }, {
+    key: "switchOn",
+    value: function switchOn() {
+      if (this.isVisible) return;
+      this.isVisible = true;
+
+      _classHelper.default.removeClass(this.loadStatusDiv, 'load-status-div-hide');
+
+      _classHelper.default.addClass(this.loadStatusDiv, 'load-status-div-show');
+    }
+  }, {
+    key: "switchOff",
+    value: function switchOff() {
+      if (!this.isVisible) return;
+      this.isVisible = false;
+
+      _classHelper.default.addClass(this.loadStatusDiv, 'load-status-div-hide');
+
+      _classHelper.default.removeClass(this.loadStatusDiv, 'load-status-div-show');
+    }
+  }], [{
+    key: "create",
+    value: function create() {
+      return new LoadCounterControl();
+    }
+  }]);
+
+  return LoadCounterControl;
+}(_eventEmitter.default);
+
+exports.LoadCounterControl = LoadCounterControl;
+},{"./eventEmitter":"STwH","../helper/classHelper":"LZLq"}],"imeZ":[function(require,module,exports) {
 /**
  * Parses an URI
  *
@@ -93439,9 +93552,20 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       });
     }
   }, {
+    key: "getLoadStatus",
+    value: function getLoadStatus() {
+      var _this7 = this;
+
+      this.socket.emit('clGetLoadStatus', JSON.stringify({}), function (msg) {
+        console.log(msg);
+
+        _this7.emit('onGetLoadStatus', JSON.parse(msg));
+      });
+    }
+  }, {
     key: "getDataByYear",
     value: function getDataByYear(dateObject) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (undefined === dateObject.year) {
         return;
@@ -93472,7 +93596,7 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       }
 
       this.socket.emit('clQueryDataByYear', JSON.stringify(searchData), function (msg) {
-        _this7.emit('refreshInfo', JSON.parse(msg));
+        _this8.emit('refreshInfo', JSON.parse(msg));
       });
     }
   }], [{
@@ -104519,6 +104643,8 @@ var _mapControl = require("./mapControl");
 
 var _legendControl = require("./legendControl");
 
+var _loadCounterControl = require("./loadCounterControl");
+
 var _clientProtocol = _interopRequireDefault(require("./clientProtocol"));
 
 var _infoControl = require("./infoControl");
@@ -104556,6 +104682,8 @@ function startApp() {
 
   var legendControl = _legendControl.LegendControl.create();
 
+  var loadCounterControl = _loadCounterControl.LoadCounterControl.create();
+
   stateControl.subscribe('fillState', function (state) {
     mapControl.showMap(state.center, state.zoom);
     mapControl.showYearControl(state.yearOrCentury, state.dateMode);
@@ -104581,6 +104709,14 @@ function startApp() {
     console.log('timing, recieve info from legend');
     mapControl.refreshInfo.call(mapControl, info);
     console.log('timing, finish processing data in mapcontrol');
+    protocol.getLoadStatus();
+  });
+  protocol.subscribe('onGetLoadStatus', function (info) {
+    if (info.err) {
+      console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u044F \u0441\u0442\u0430\u0442\u0443\u0441\u0430: ".concat(info.err));
+    } else {
+      loadCounterControl.showStatus(info.statusText, info.loadedTime);
+    }
   });
   legendControl.subscribe('legendClick', function () {
     mapControl.hidePopup();
@@ -104606,24 +104742,28 @@ function startApp() {
   protocol.subscribe('onGetInfoItem', function (info) {
     infoControl.showItemInfo(info);
     mapControl.showAdditionalInfo(info);
+    loadCounterControl.switchOff();
   });
   mapControl.subscribe('selectFeatures', function (items) {
     if (1 == items.length) {
       protocol.getInfoItem(items[0]);
     } else {
       infoControl.showItemList(items);
+      loadCounterControl.switchOff();
     }
   });
   mapControl.subscribe('showAdditionalInfo', function () {
     legendControl.switchOff();
+    loadCounterControl.switchOff();
   });
   mapControl.subscribe('returnNormalMode', function () {
     legendControl.switchOn();
+    loadCounterControl.switchOn();
   });
   (0, _jquery.default)(document.getElementsByClassName('ol-attribution ol-unselectable ol-control ol-collapsed')).remove();
   changeWindowSize();
 }
-},{"./stateControl":"jfAu","./mapControl":"p4qv","./legendControl":"pD6K","./clientProtocol":"VmvZ","./infoControl":"s1dy","jquery":"juYr"}],"Focm":[function(require,module,exports) {
+},{"./stateControl":"jfAu","./mapControl":"p4qv","./legendControl":"pD6K","./loadCounterControl":"TXLU","./clientProtocol":"VmvZ","./infoControl":"s1dy","jquery":"juYr"}],"Focm":[function(require,module,exports) {
 "use strict";
 
 var _main = require("./main.js");

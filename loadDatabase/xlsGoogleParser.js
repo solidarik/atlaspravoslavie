@@ -6,6 +6,7 @@ const GeoHelper = require('../helper/geoHelper')
 const DateHelper = require('../helper/dateHelper')
 const StrHelper = require('../helper/strHelper')
 const TemplesModel = require('../models/templesModel');
+const ServiceModel = require('../models/serviceModel');
 
 class XlsGoogleParser {
 
@@ -132,6 +133,8 @@ class XlsGoogleParser {
 
         const headerColumns = this.fillHeaderColumns(rows[0])
         let insertObjects = []
+        let checkedObjectCount = 0
+        let skipObjectCount = 0
 
         //start from row = 1, because skip header row
         for (let row = 1; row < rows.length; row++) {
@@ -142,6 +145,7 @@ class XlsGoogleParser {
                     log.error(`Пропуск строки ${row} ${json.name}: ${json.isError}`)
                 else
                     log.info(`Пропуск строки ${json.name}`)
+                skipObjectCount += 1
                 continue
             }
 
@@ -151,14 +155,38 @@ class XlsGoogleParser {
             }
             pageUrls.push(json.pageUrl)
             insertObjects.push(json)
+
+            if (json.isChecked.trim() != '') {
+                checkedObjectCount += 1
+            }
         }
 
-        const res = await TemplesModel.insertMany(insertObjects)
+        let res = await TemplesModel.insertMany(insertObjects)
 
         if (res) {
             log.info(chalk.green(`Успешная загрузка: ${res.length}`))
         } else {
             log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
+        }
+
+        const totalLinesCount = rows.length - 1
+        const savedCount = insertObjects.length
+        const loadedTime = DateHelper.dateTimeToStr(new Date()) + ' МСК'
+        const statusText = [checkedObjectCount, skipObjectCount, totalLinesCount].join(' / ')
+        const serviceObjects = [
+            { 'name': 'checkedObjectCount', 'kind': 'detailStatus', 'value': checkedObjectCount },
+            { 'name': 'skipObjectCount', 'kind': 'detailStatus', 'value': skipObjectCount },
+            { 'name': 'savedCount', 'kind': 'detailStatus', 'value': savedCount },
+            { 'name': 'totalCount', 'kind': 'detailStatus', 'value': totalLinesCount },
+            { 'name': 'statusText', 'kind': 'status', 'value': statusText },
+            { 'name': 'loadedTime', 'kind': 'status', 'value': loadedTime }
+        ]
+
+        res = await ServiceModel.insertMany(serviceObjects)
+        if (res) {
+            log.info(chalk.green(`Успешное сохранение статуса`))
+        } else {
+            log.error(`Ошибка при сохранении статуса ${JSON.stringify(res)}`)
         }
 
         return true

@@ -4,6 +4,7 @@ const ChronosChurchModel = require('../models/chronosChurchModel')
 const PersonsModel = require('../models/personsModel')
 const PersonsAggrModel = require('../models/personsAggrModel')
 const TemplesModel = require('../models/templesModel')
+const ServiceModel = require('../models/serviceModel')
 
 function trycatch(func, cb) {
   let res = {}
@@ -34,6 +35,7 @@ class HolyProtocol extends ServerProtocol {
     super.addHandler('clGetPersonsHoly', this.getPersonsHoly)
     super.addHandler('clGetTempleItem', this.getTempleItem)
     super.addHandler('clGetInfoItem', this.getInfoItem)
+    super.addHandler('clGetLoadStatus', this.getLoadStatus)
   }
 
   getCurrentYear(socket, msg, cb) {
@@ -229,6 +231,25 @@ class HolyProtocol extends ServerProtocol {
     } catch (error) {
       res.error = 'Ошибка возврата данных: ' + error
       res.events = ''
+      cb(JSON.stringify(res))
+    }
+  }
+
+  getLoadStatus(socket, msg, cb) {
+    let res = {}
+    try {
+      ServiceModel.find({ 'kind': 'status' }).select({ 'name': 1, 'value': 1, '_id': 0 })
+        .then(
+          (res) => {
+            let outRes = {}
+            for (let i = 0; i < res.length; i++) {
+              outRes[res[i].name] = res[i].value
+            }
+            cb(JSON.stringify(outRes))
+          })
+    } catch (err) {
+      res.err = `Ошибка получения статуса: ` + err
+      res.msg = ''
       cb(JSON.stringify(res))
     }
   }
