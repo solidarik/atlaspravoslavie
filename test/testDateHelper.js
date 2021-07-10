@@ -1,4 +1,5 @@
-const log = require('../helper/logHelper')
+const Log = require('../helper/logHelper')
+const log = Log.create()
 const strHelper = require('../helper/strHelper')
 const dateHelper = require('../helper/dateHelper')
 const assert = require('assert')

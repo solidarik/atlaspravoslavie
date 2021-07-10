@@ -1,7 +1,6 @@
-const log = require('../helper/logHelper')
 const fileHelper = require('../helper/fileHelper')
 const mongoose = require('mongoose')
-
+const Log = require('../helper/logHelper')
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -34,7 +33,7 @@ class DbHelper {
                 if (err) reject(err)
 
                 resolve(true)
-                log.info(`removed collection: ${modelFilePath}`)
+                this.log.info(`removed collection: ${modelFilePath}`)
               })
             })
           )
@@ -47,16 +46,20 @@ class DbHelper {
     })
   }
 
-  constructor(db) {
+  constructor(db = undefined, log = undefined) {
     this.isOuter = db != undefined
     this.db = db != undefined ? db : this.getLocalDb()
+    if (!log) {
+      log = Log.create()
+    }
+    this.log = log
   }
 
   free() {
     if (this.isOuter) return
     setTimeout(() => {
       this.db.disconnect()
-      log.info(chalk.yellow('db disconnected'))
+      this.log.info(chalk.yellow('db disconnected'))
     }, 100)
   }
 
@@ -81,7 +84,7 @@ class DbHelper {
         files.push(source)
       }
 
-      log.info(`начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
+      this.log.info(`начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
 
       let promises = []
 
@@ -122,14 +125,14 @@ class DbHelper {
                     jsonItem
                   )}`
                   fileHelper.saveJsonToFileSync(newJsonItem, errpath)
-                  log.error(msg)
+                  this.log.error(msg)
                   resolve({ error: new Error(msg) })
                 })
             })
           )
         })
       })
-      log.info(`количество входящих элементов, промисов: ${promises.length}`)
+      this.log.info(`количество входящих элементов, промисов: ${promises.length}`)
 
       Promise.all(promises).then(
         (res) => {
@@ -137,21 +140,21 @@ class DbHelper {
           res.forEach((r) => {
             countObjects += r.hasOwnProperty('error') ? 0 : 1
             if (r.hasOwnProperty('errorPlace')) {
-              log.warn(r.errorPlace)
+              this.log.warn(r.errorPlace)
             }
           })
           const status = `количество успешно обработанных элементов: ${countObjects} из ${res.length}`
-          log.info(status)
+          this.log.info(status)
           if (countObjects == res.length) {
-            log.info(chalk.green('успешная загрузка'))
+            this.log.info(chalk.green('успешная загрузка'))
           } else {
-            log.warn('не все файлы были обработаны успешно')
+            this.log.warn('не все файлы были обработаны успешно')
           }
           resolve(status)
         },
         (err) => {
           let msg = `непредвиденная ошибка в процессе обработки ${err}`
-          log.error(msg)
+          this.log.error(msg)
           resolve(msg)
         }
       )
@@ -167,18 +170,18 @@ class DbHelper {
     let obj = fileHelper.getJsonFromFile(filePath)
     obj.forEach((item, i, arr) => {
       if (i == 0) {
-        log.info(fromLonLat([56.004, 54.695]))
+        this.log.info(fromLonLat([56.004, 54.695]))
         let country = {
           iso: item['ISO3'],
           eng: item['NAME'],
           region: item['REGION'],
           subregion: item['SUBREGION'],
         }
-        log.info('iso: ' + item['ISO3'])
-        log.info(JSON.stringify(item))
+        this.log.info('iso: ' + item['ISO3'])
+        this.log.info(JSON.stringify(item))
       }
     })
-    log.info(obj.length)
+    this.log.info(obj.length)
   }
 
   getSamaraSource() {

@@ -1,6 +1,4 @@
-const log = require('../helper/logHelper')
 const strHelper = require('../helper/strHelper')
-const dateHelper = require('../helper/dateHelper')
 const assert = require('assert')
 
 describe('getNumber return number', () => {

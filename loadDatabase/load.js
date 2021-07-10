@@ -1,5 +1,7 @@
 const chalk = require('chalk')
-const log = require('../helper/logHelper')
+const Log = require('../helper/logHelper')
+
+log = Log.creat                      e('load.log')
 
 const DbHelper = require('../loadDatabase/dbHelper')
 const PersonsAggr = require('../loadDatabase/personsAggr')
@@ -11,14 +13,15 @@ const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
 const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
-const xlsGoogleParser = require('./xlsGoogleParser')
+const XlsGoogleParser = require('./xlsGoogleParser')
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 
 inetHelper.loadCoords(checkedCoordsPath)
 inetHelper.trimNames()
 
-const dbHelper = new DbHelper()
+const dbHelper = new DbHelper(undefined, log)
+const xlsGoogleParser = new XlsGoogleParser(log)
 const personsAggr = new PersonsAggr()
 
 Promise.resolve(true)

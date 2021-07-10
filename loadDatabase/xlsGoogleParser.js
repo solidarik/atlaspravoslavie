@@ -10,6 +10,10 @@ const ServiceModel = require('../models/serviceModel');
 
 class XlsGoogleParser {
 
+    constructor(log) {
+        this.log = log
+    }
+
     getCoords(placeForCoords, inputValue) {
         if (!placeForCoords && !inputValue) {
             throw new Error(`getCoords empty inputs: ${placeForCoords}, ${inputValue}`)
@@ -19,7 +23,7 @@ class XlsGoogleParser {
         if (coords) {
             const coordsStr = InetHelper.getLonLatSavedCoords(placeForCoords).reverse()
             if (!inputValue.includes('_')) {
-                log.warn(`Найдена координата для ${placeForCoords}: ${coordsStr.join('_')}`)
+                this.log.warn(`Найдена координата для ${placeForCoords}: ${coordsStr.join('_')}`)
             }
             return coords
         }
@@ -114,7 +118,7 @@ class XlsGoogleParser {
     }
 
     async loadData(input) {
-        log.info(`Start of processing Google sheet`)
+        this.log.info(`Start of processing Google sheet`)
 
         const sheets = google.sheets({ version: 'v4' });
         const sheetData = await sheets.spreadsheets.values.get({
@@ -123,12 +127,12 @@ class XlsGoogleParser {
             range: 'A1:R',
         })
 
-        if (!sheetData) return log.error('The Google API returned an error')
+        if (!sheetData) return this.log.error('The Google API returned an error')
 
         const rows = sheetData.data.values
-        if (!rows.length) return log.error('No data found')
+        if (!rows.length) return this.log.error('No data found')
 
-        log.info(`Сount rows ${rows.length} columns ${rows[0].length}`)
+        this.log.info(`Сount rows ${rows.length} columns ${rows[0].length}`)
         let pageUrls = []
 
         const headerColumns = this.fillHeaderColumns(rows[0])
@@ -142,9 +146,9 @@ class XlsGoogleParser {
 
             if (json.isChecked === '0' || json.isError) {
                 if (json.isError)
-                    log.error(`Пропуск строки ${row} ${json.name}: ${json.isError}`)
+                    this.log.error(`Пропуск строки ${row} ${json.name}: ${json.isError}`)
                 else
-                    log.info(`Пропуск строки ${json.name}`)
+                    this.log.info(`Пропуск строки ${json.name}`)
                 skipObjectCount += 1
                 continue
             }
@@ -164,9 +168,9 @@ class XlsGoogleParser {
         let res = await TemplesModel.insertMany(insertObjects)
 
         if (res) {
-            log.info(chalk.green(`Успешная загрузка: ${res.length}`))
+            this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
         } else {
-            log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
+            this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
         }
 
         const totalLinesCount = rows.length - 1
@@ -184,13 +188,13 @@ class XlsGoogleParser {
 
         res = await ServiceModel.insertMany(serviceObjects)
         if (res) {
-            log.info(chalk.green(`Успешное сохранение статуса`))
+            this.log.info(chalk.green(`Успешное сохранение статуса`))
         } else {
-            log.error(`Ошибка при сохранении статуса ${JSON.stringify(res)}`)
+            this.log.error(`Ошибка при сохранении статуса ${JSON.stringify(res)}`)
         }
 
         return true
     }
 }
 
-module.exports = new XlsGoogleParser()
+module.exports = XlsGoogleParser

@@ -1,4 +1,5 @@
-const log = require('../helper/logHelper')
+const Log = require('../helper/logHelper')
+const log = Log.create()
 const strHelper = require('../helper/strHelper')
 const dateHelper = require('../helper/dateHelper')
 const assert = require('assert')
@@ -92,7 +93,7 @@ describe('-1933 year = -XX', () => {
   })
 })
 
-describe('check roman to arabic', () =>{
+describe('check roman to arabic', () => {
   it('check century roman to arabic', () => {
     assert.deepStrictEqual(dateHelper.romanToArabic('II'), 2)
     assert.deepStrictEqual(dateHelper.romanToArabic('blablalba'), undefined)

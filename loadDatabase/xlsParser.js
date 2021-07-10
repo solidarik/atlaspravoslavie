@@ -1,4 +1,5 @@
-const log = require('../helper/logHelper')
+const Log = require('../helper/logHelper')
+const log = Log.create()
 const XLSX = require('xlsx')
 const chalk = require('chalk')
 const geoHelper = require('../helper/geoHelper')
@@ -8,7 +9,7 @@ const strHelper = require('../helper/strHelper')
 class XlsParser {
 
     getValue(sheet, row, col) {
-        const cell = sheet[XLSX.utils.encode_cell({r: row, c: col})];
+        const cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
         return cell ? cell.v.toString() : ''
     }
 
@@ -22,7 +23,7 @@ class XlsParser {
             throw new Error(`Неизвестный формат координат ${strValue}`)
         }
 
-        return geoHelper.fromLonLat(arr.reverse().map( item => Number(item)))
+        return geoHelper.fromLonLat(arr.reverse().map(item => Number(item)))
     }
 
     getDateValue(input) {

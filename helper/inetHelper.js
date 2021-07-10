@@ -1,11 +1,10 @@
-const log = require('../helper/logHelper')
+const Log = require('../helper/logHelper')
+const log = Log.create()
+
 const fileHelper = require('../helper/fileHelper')
 const geoHelper = require('../helper/geoHelper')
 const strHelper = require('../helper/strHelper')
-const config = require('config')
-const chalk = require('chalk')
 const axios = require('axios')
-const { info } = require('../helper/logHelper')
 
 class InetHelper {
   constructor() { }
