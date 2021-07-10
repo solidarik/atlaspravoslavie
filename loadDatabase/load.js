@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const Log = require('../helper/logHelper')
 
-log = Log.creat                      e('load.log')
+log = Log.create('load.log')
 
 const DbHelper = require('../loadDatabase/dbHelper')
 const PersonsAggr = require('../loadDatabase/personsAggr')
