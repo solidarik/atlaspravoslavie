@@ -7,6 +7,10 @@ const DateHelper = require('../helper/dateHelper')
 const StrHelper = require('../helper/strHelper')
 const TemplesModel = require('../models/templesModel');
 const ServiceModel = require('../models/serviceModel');
+const readline = require('readline');
+const fs = require('fs')
+
+const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 
 class XlsGoogleParser {
 
@@ -120,12 +124,64 @@ class XlsGoogleParser {
     async loadData(input) {
         this.log.info(`Start of processing Google sheet`)
 
+
+        const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_DRIVE_ID, process.env.GOOGLE_DRIVE_SECRET, 'http://localhost:3000')
+        let token = undefined
+
+        try {
+            token = fs.readFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE)
+            token = JSON.parse(token)
+        } catch (err) {
+            console.log(err)
+            return
+            const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
+            console.log('Authorize this app by visiting this url:', authUrl);
+            const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+            const promice = new Promise((res, rej) => {
+                rl.question('Enter the code from that page here: ', (code) => {
+                    try {
+                        token = oAuth2Client.getToken(code)
+                        fs.writeFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE, JSON.stringify(token))
+                    } catch (err) {
+                        console.error(`Error token authorization ${err}`)
+                        rej(false)
+                    }
+
+                    res(code)
+                })
+            })
+            token = await promice
+            rl.close();
+
+        }
+        if (!token) return
+        console.log(token)
+        const auth = oAuth2Client.setCredentials(token)
+        console.log(auth)
+        const drive = google.drive({ version: 'v3', auth: auth })
+        // console.log(drive)
+        const fileList = await drive.files.list({ pageSize: 10, fields: 'nextPageToken, files(id, name)' })
+        const files = fileList.data.files
+        if (files.length) {
+            console.log('Files:');
+            files.map((file) => {
+                console.log(`${file.name} (${file.id})`);
+            });
+        } else {
+            console.log('No files found.');
+        }
+        return
+
         const sheets = google.sheets({ version: 'v4' });
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
             key: process.env.GOOGLE_API_KEY,
-            range: 'A1:R',
+            // range: 'A1:R',
+            range: 'A1:A2',
         })
+
+        console.log(JSON.stringify(sheetData))
+        return
 
         if (!sheetData) return this.log.error('The Google API returned an error')
 

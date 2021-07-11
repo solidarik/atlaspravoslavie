@@ -33,7 +33,7 @@ Promise.resolve(true)
   //     source: 'dataSources/secretUsers.json',
   //     procdir: 'out/out_user_process',
   //     errdir: 'out/out_user_errors',
-  //     mediator: usersJsonMediator
+  //     mediztor: usersJsonMediator
   //   })
   // })
   // .then(() => {
@@ -59,10 +59,10 @@ Promise.resolve(true)
   //   })
   // })
   .then(() => {
-    return dbHelper.clearDb('temples')
+    // return dbHelper.clearDb('temples')
   })
   .then(() => {
-    return dbHelper.clearDb('service')
+    // return dbHelper.clearDb('service')
   })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
