@@ -80,7 +80,13 @@ function startApp() {
   window.showSlides = showSlides
   window.plusSlides = plusSlides
   window.currentSlide = currentSlide
-  churches.fillTable(temple);
+
+  if (temples && temples.length > 0) {
+    churches.fillTable(temple);
+  } else {
+    $('#churches-info-container').hide()
+    churches.showItem(temple)
+  }
 }
 
 $(document).ready(function () {

@@ -61,9 +61,6 @@ Promise.resolve(true)
   .then(() => {
     // return dbHelper.clearDb('temples')
   })
-  .then(() => {
-    // return dbHelper.clearDb('service')
-  })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
   //     source: 'python/out_temples',
@@ -79,7 +76,7 @@ Promise.resolve(true)
   //   })
   // })
   .then(() => {
-    return xlsGoogleParser.loadData()
+    return xlsGoogleParser.loadData(dbHelper)
   })
   // .then(() => {
   //   return dbHelper.clearDb('persons')

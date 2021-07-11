@@ -1,16 +1,18 @@
 const log = require('../helper/logHelper')
 const chalk = require('chalk')
-const { google } = require('googleapis');
+const { google } = require('googleapis')
 const InetHelper = require('../helper/inetHelper')
 const GeoHelper = require('../helper/geoHelper')
 const DateHelper = require('../helper/dateHelper')
 const StrHelper = require('../helper/strHelper')
-const TemplesModel = require('../models/templesModel');
-const ServiceModel = require('../models/serviceModel');
-const readline = require('readline');
+const TemplesModel = require('../models/templesModel')
+const ServiceModel = require('../models/serviceModel')
+
+const readline = require('readline')
 const fs = require('fs')
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+
 
 class XlsGoogleParser {
 
@@ -121,67 +123,95 @@ class XlsGoogleParser {
         return json
     }
 
-    async loadData(input) {
-        this.log.info(`Start of processing Google sheet`)
+    async getLastUpdateFromSheet() {
+        const sheets = google.sheets({ version: 'v4' });
+        const lastUpdateSheetData = await sheets.spreadsheets.values.get({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            key: process.env.GOOGLE_API_KEY,
+            range: 'Z1:Z1',
+        })
 
+        if (!lastUpdateSheetData) return false
 
+        return lastUpdateSheetData.data.values[0][0]
+    }
+
+    async getLastUpdateFromGoogleApi() {
         const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_DRIVE_ID, process.env.GOOGLE_DRIVE_SECRET, 'http://localhost:3000')
+
         let token = undefined
 
         try {
             token = fs.readFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE)
             token = JSON.parse(token)
         } catch (err) {
-            console.log(err)
-            return
+            // console.log(err)
+            // return
             const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
             console.log('Authorize this app by visiting this url:', authUrl);
             const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-            const promice = new Promise((res, rej) => {
+            const codePromise = new Promise(res => {
                 rl.question('Enter the code from that page here: ', (code) => {
-                    try {
-                        token = oAuth2Client.getToken(code)
-                        fs.writeFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE, JSON.stringify(token))
-                    } catch (err) {
-                        console.error(`Error token authorization ${err}`)
-                        rej(false)
-                    }
-
+                    console.log(code)
                     res(code)
                 })
             })
-            token = await promice
-            rl.close();
+            const code = await codePromise
+            token = await oAuth2Client.getToken(code)
+            fs.writeFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE, JSON.stringify(token))
+            rl.close()
+
 
         }
         if (!token) return
-        console.log(token)
-        const auth = oAuth2Client.setCredentials(token)
-        console.log(auth)
-        const drive = google.drive({ version: 'v3', auth: auth })
-        // console.log(drive)
-        const fileList = await drive.files.list({ pageSize: 10, fields: 'nextPageToken, files(id, name)' })
-        const files = fileList.data.files
-        if (files.length) {
-            console.log('Files:');
-            files.map((file) => {
-                console.log(`${file.name} (${file.id})`);
-            });
-        } else {
-            console.log('No files found.');
-        }
-        return
 
-        const sheets = google.sheets({ version: 'v4' });
+        oAuth2Client.setCredentials(token)
+
+        const drive = google.drive({ version: 'v3', auth: oAuth2Client });
+        const fileList = await drive.files.list({
+            pageSize: 10,
+            fields: 'nextPageToken, files(id, name, modifiedTime)',
+        })
+
+        console.log(JSON.stringify(fileList))
+
+        const files = fileList.data.files;
+        for (let ifile = 0; ifile < files.length; ifile++) {
+            const file = files[ifile]
+            if (file.id === process.env.GOOGLE_SHEET_ID) {
+                return DateHelper.dateTimeToStr(new Date(file.modifiedTime))
+            }
+        }
+
+        return false
+    }
+
+    async loadData(dbHelper) {
+        this.log.info(`Start of processing Google sheet`)
+
+        // обновляем время последней проверки
+        const checkedTime = DateHelper.dateTimeToStr(new Date())
+        let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+
+        // проверяем изменились ли данные
+        const last_update = await this.getLastUpdateFromGoogleApi()
+        console.log(last_update)
+        if (!last_update) {
+            return this.log.error('Don\'t found last update time from Google API')
+        }
+        res = await ServiceModel.find({ name: 'lastUpdateSheet' })
+        console.log(res)
+        if (res && res.length > 0 && res[0].value === last_update) {
+            this.log.info(`Don\'t update info from last loading: ${last_update}`)
+            return
+        }
+
+        //  обрабатываем данные
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
             key: process.env.GOOGLE_API_KEY,
-            // range: 'A1:R',
-            range: 'A1:A2',
+            range: 'A1:R'
         })
-
-        console.log(JSON.stringify(sheetData))
-        return
 
         if (!sheetData) return this.log.error('The Google API returned an error')
 
@@ -221,7 +251,7 @@ class XlsGoogleParser {
             }
         }
 
-        let res = await TemplesModel.insertMany(insertObjects)
+        res = await TemplesModel.insertMany(insertObjects)
 
         if (res) {
             this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
@@ -231,15 +261,18 @@ class XlsGoogleParser {
 
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
-        const loadedTime = DateHelper.dateTimeToStr(new Date()) + ' МСК'
         const statusText = [checkedObjectCount, skipObjectCount, totalLinesCount].join(' / ')
+
+        res = await dbHelper.clearDb('service')
+
         const serviceObjects = [
-            { 'name': 'checkedObjectCount', 'kind': 'detailStatus', 'value': checkedObjectCount },
-            { 'name': 'skipObjectCount', 'kind': 'detailStatus', 'value': skipObjectCount },
-            { 'name': 'savedCount', 'kind': 'detailStatus', 'value': savedCount },
-            { 'name': 'totalCount', 'kind': 'detailStatus', 'value': totalLinesCount },
-            { 'name': 'statusText', 'kind': 'status', 'value': statusText },
-            { 'name': 'loadedTime', 'kind': 'status', 'value': loadedTime }
+            { name: 'checkedObjectCount', kind: 'detailStatus', value: checkedObjectCount },
+            { name: 'skipObjectCount', kind: 'detailStatus', value: skipObjectCount },
+            { name: 'savedCount', kind: 'detailStatus', value: savedCount },
+            { name: 'totalCount', kind: 'detailStatus', value: totalLinesCount },
+            { name: 'statusText', kind: 'status', value: statusText },
+            { name: 'lastUpdateSheet', kind: 'status', value: last_update },
+            { name: 'checkedTime', kind: 'status', value: checkedTime }
         ]
 
         res = await ServiceModel.insertMany(serviceObjects)

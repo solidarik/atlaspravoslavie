@@ -91,9 +91,9 @@ getChurch = async function (ctx, next) {
   // churches = await redisClient.get('churches')
   // if (!churches) return
 
-  const churches = await TemplesModel.find({})
+  // const churches = await TemplesModel.find({})
 
-  ctx.state = { 'church': church[0], 'churches': churches }
+  ctx.state = { 'church': church[0], 'churches': [] }
   next()
 }
 

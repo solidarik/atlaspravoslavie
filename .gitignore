@@ -18,3 +18,5 @@ loadDatabase/out*
 *-copy.*
 * - copy.*
 .env
+*credentials*
+*token*
