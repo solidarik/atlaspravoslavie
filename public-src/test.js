@@ -3,7 +3,7 @@ const dateHelper = require('../helper/dateHelper')
 const inetHelper = require('../helper/inetHelper')
 const fileHelper = require('../helper/fileHelper')
 
-const res0 = dateHelper.getDateFromInput('5.07.1898')
+const res0 = dateHelper.dateTimeToStr(new Date())
 console.log(res0)
 
 return

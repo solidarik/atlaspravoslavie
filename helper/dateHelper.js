@@ -221,11 +221,11 @@ class DateHelper {
   }
 
   static convertTZ(date, tzString) {
-    return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", { timeZone: tzString }))
+    return (typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", { timeZone: tzString })
   }
 
   static dateTimeToStr(inputDate, timeZone = 'Europe/Moscow') {
-    const mskDateTime = DateHelper.convertTZ(inputDate, timeZone)
+    const mskDateTime = new Date(DateHelper.convertTZ(inputDate, timeZone))
     const day = ('0' + mskDateTime.getDate()).slice(-2)
     const month = ('0' + (mskDateTime.getMonth() + 1)).slice(-2)
     const year = mskDateTime.getFullYear()
