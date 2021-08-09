@@ -643,7 +643,7 @@ export class MapControl extends EventEmitter {
       }
     })
 
-    // console.log('timing, before add features')
+    console.log('timing, before add features')
     this.simpleSource.addFeatures(simpleSourceFeatures)
     this.clusterSource.getSource().addFeatures(clusterSourceFeatures)
 
@@ -653,7 +653,7 @@ export class MapControl extends EventEmitter {
       context.emit('completeShow', undefined)
     }, 10)
 
-    // console.log('timing, after add features')
+    console.log('timing, after add features')
   }
 
   showSavedPulse() {

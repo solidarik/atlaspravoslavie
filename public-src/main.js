@@ -67,9 +67,9 @@ function startApp() {
 
   protocol.subscribe('refreshInfo', (info) => {
     //сначала данные проходят через одноименный фильтр контрола легенды
-    // console.log('timing, get info from server')
+    console.log('timing, get info from server')
     legendControl.refreshInfo.call(legendControl, info)
-    // console.log('timing, finish processing data in legendcontrol')
+    console.log('timing, finish processing data in legendcontrol')
   })
 
   legendControl.subscribe('isLineClick', (isCheckArrLegend) => {
@@ -82,15 +82,16 @@ function startApp() {
 
   legendControl.subscribe('refreshInfo', (info) => {
     //...и потом поступают в контрол карты
-    // console.log('timing, recieve info from legend')
+    console.log('timing, recieve info from legend')
     mapControl.refreshInfo.call(mapControl, info)
-    // console.log('timing, finish processing data in mapcontrol')
+    console.log('timing, finish processing data in mapcontrol')
   })
 
   protocol.subscribe('onGetLoadStatus', (info) => {
     if (info.err) {
       console.error(`Ошибка получения статуса: ${info.err}`)
     } else {
+      console.log(`Статус загрузки ${JSON.stringify(info)}`)
       loadCounterControl.showStatus(info.statusText, info.loadedTime)
     }
   })

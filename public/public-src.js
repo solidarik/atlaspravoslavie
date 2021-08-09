@@ -83784,15 +83784,16 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
         if (_this7.activeItem && _this7.activeItem === item._id) {
           _this7.activeItem = ft;
         }
-      }); // console.log('timing, before add features')
-
+      });
+      console.log('timing, before add features');
       this.simpleSource.addFeatures(simpleSourceFeatures);
       this.clusterSource.getSource().addFeatures(clusterSourceFeatures);
       var context = this;
       setTimeout(function () {
         context.showSavedPulse();
         context.emit('completeShow', undefined);
-      }, 10); // console.log('timing, after add features')
+      }, 10);
+      console.log('timing, after add features');
     }
   }, {
     key: "showSavedPulse",
@@ -104965,8 +104966,9 @@ function startApp() {
   });
   protocol.subscribe('refreshInfo', function (info) {
     //сначала данные проходят через одноименный фильтр контрола легенды
-    // console.log('timing, get info from server')
-    legendControl.refreshInfo.call(legendControl, info); // console.log('timing, finish processing data in legendcontrol')
+    console.log('timing, get info from server');
+    legendControl.refreshInfo.call(legendControl, info);
+    console.log('timing, finish processing data in legendcontrol');
   });
   legendControl.subscribe('isLineClick', function (isCheckArrLegend) {
     stateControl.saveStateValue({
@@ -104980,13 +104982,15 @@ function startApp() {
   });
   legendControl.subscribe('refreshInfo', function (info) {
     //...и потом поступают в контрол карты
-    // console.log('timing, recieve info from legend')
-    mapControl.refreshInfo.call(mapControl, info); // console.log('timing, finish processing data in mapcontrol')
+    console.log('timing, recieve info from legend');
+    mapControl.refreshInfo.call(mapControl, info);
+    console.log('timing, finish processing data in mapcontrol');
   });
   protocol.subscribe('onGetLoadStatus', function (info) {
     if (info.err) {
       console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u044F \u0441\u0442\u0430\u0442\u0443\u0441\u0430: ".concat(info.err));
     } else {
+      console.log("\u0421\u0442\u0430\u0442\u0443\u0441 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 ".concat(JSON.stringify(info)));
       loadCounterControl.showStatus(info.statusText, info.loadedTime);
     }
   });
