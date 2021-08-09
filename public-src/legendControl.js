@@ -22,12 +22,12 @@ export class LegendControl extends EventEmitter {
     this.linesCount = 7
     this.isCheckArr = JsHelper.fillArray(true, this.linesCount)
 
-    this.items = []
+    this.items = JsHelper.fillArray([], this.linesCount)
     this.uniqueItems = {}
 
     window.legend = this
-    window.legendOnClick = (element) => {
-      window.legend.legendOnClick.call(window.legend, element)
+    window.legendOnLineClick = (element) => {
+      window.legend.legendOnLineClick.call(window.legend, element)
     }
   }
 
@@ -227,8 +227,6 @@ export class LegendControl extends EventEmitter {
     return maybeLine
   }
 
-  changeParentCheck() { }
-
   repaintLegend() {
     let html = `
     <h1>Легенда</h1>
@@ -244,23 +242,70 @@ export class LegendControl extends EventEmitter {
     this.legendDiv.innerHTML = html
   }
 
-  legendOnClick(span) {
-    //get attribute for tr element: span > td > tr
+  setActiveLines(isCheckArr) {
+    for (let iRow = 0; iRow < this.linesCount; iRow++) {
+      this.isCheckArr[iRow] = isCheckArr.includes(iRow)
+    }
+    this.repaintLegend()
+  }
+
+  legendOnLineClick(elem) {
 
     this.emit('legendClick', null)
 
-    const tr = span.parentElement.parentElement
+    let tr = elem
+    while (!tr.hasAttribute('data-href')) {
+      tr = tr.parentElement
+    }
+
     const rowId = parseInt(tr.getAttribute('data-href'))
     //const line = this.searchLinesById.call(this, rowId)
 
     this.isCheckArr[rowId] = !this.isCheckArr[rowId]
-    this.emit('isCheckArrLegend', this.isCheckArr)
+
+    let numbers = []
+    const localCheckArr = this.getActiveLines()
+    for (let iRow = 0; iRow < localCheckArr.length; iRow++) {
+      if (localCheckArr[iRow]) {
+        numbers.push(iRow)
+      }
+    }
+    this.emit('isLineClick', numbers)
+
     this.repaintLegend()
     this.filterInfo()
   }
 
   clickSpan(content) {
-    return `<span onclick=legendOnClick(this)>${content}</span>`
+    return `<span>${content}</span>`
+  }
+
+  getActiveLine(line, isCheckParent) {
+    let checkArr = []
+
+    checkArr.push(this.isCheckArr[line.id] && isCheckParent)
+
+    if (line.childs) {
+      line.childs.forEach((child) => {
+        if (!child.isHide) {
+          const localCheckArr = this.getActiveLine(
+            child, isCheckParent && this.isCheckArr[child.id]
+          )
+          checkArr = checkArr.concat(localCheckArr)
+        }
+      })
+    }
+    return checkArr
+  }
+
+  getActiveLines() {
+    let checkArr = []
+
+    this.lines.forEach((line) => {
+      const localCheckArr = this.getActiveLine(line, this.isCheckArr[line.id])
+      checkArr = checkArr.concat(localCheckArr)
+    })
+    return checkArr
   }
 
   getHTMLOneLineLegend(line, level, isCheckParent) {
@@ -275,7 +320,7 @@ export class LegendControl extends EventEmitter {
         ? ''
         : 'class="legend-filter-grayscale"'
 
-    html += `<tr data-href=${line.id} ${classTr}>
+    html += `<tr data-href=${line.id} ${classTr} onclick=legendOnLineClick(this)>
       <td ${leftImagePosition}>${this.clickSpan(this.getHTMLIcons(line))}</td>
       <td ${leftCaptionPosition}>${this.clickSpan(line.caption)}</td>
       <td>${this.items[line.id].length}</td>
@@ -296,7 +341,7 @@ export class LegendControl extends EventEmitter {
   }
 
   updateCounter(rawInfo) {
-    this.items = []
+    this.items = JsHelper.fillArray([], this.linesCount)
     this.uniqueItems = {}
     for (let id = 0; id < this.linesCount; id++) {
       const line = this.searchLinesById(id)

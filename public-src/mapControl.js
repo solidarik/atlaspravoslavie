@@ -3,7 +3,7 @@ import * as olStyle from 'ol/style'
 import * as olGeom from 'ol/geom'
 import { default as olFeature } from 'ol/Feature'
 import {
-  toLonLat,
+  toLonLat, fromLonLat,
   get as getProjection,
 } from 'ol/proj'
 import * as olControl from 'ol/control'
@@ -21,11 +21,13 @@ import { default as olFeatureAnimationZoom } from 'ol-ext/featureanimation/Zoom'
 import { easeOut } from 'ol/easing'
 import ClassHelper from '../helper/classHelper'
 import DateHelper from '../helper/dateHelper'
+import GeoHelper from '../helper/geoHelper'
 
 const MAP_PARAMS = {
   min_year: 1914,
   max_year: 1965,
   isEnableAnimate: false,
+  isEnableMoveAnimate: true,
   clusterDistance: 40
 }
 
@@ -52,9 +54,14 @@ export class MapControl extends EventEmitter {
     projection.setExtent(yaex)
 
     this.isEnableAnimate = MAP_PARAMS.isEnableAnimate
+    this.isEnableMoveAnimate = MAP_PARAMS.isEnableMoveAnimate
     this.clusterDistance = MAP_PARAMS.clusterDistance
     this.isDisableSavePermalink = true
     this.isDisableMoveend = false
+    this.isCheckPulse = false
+    this.activeItem = undefined
+    this.activeFeature = undefined
+    this.pulseCoord = false
     this.map = undefined
   }
 
@@ -217,41 +224,11 @@ export class MapControl extends EventEmitter {
 
       const coordinates = event.coordinate
       const lonLatCoords = new toLonLat(coordinates)
-      console.log(`clicked on map: ${coordinates}; WGS: ${lonLatCoords}`)
 
-      let featureEvent = undefined
-      const isHit = map.forEachFeatureAtPixel(
-        event.pixel,
-        (feature, _) => {
-          featureEvent = feature
-          return feature.get('kind')
-        },
-        { hitTolerance: 5 }
-      )
+      const fromLonLat = GeoHelper.fromLonLat(lonLatCoords)
 
-      if (!featureEvent) {
-        this.emit('mapEmptyClick', undefined)
-        return
-      }
-
-      if (this.isShowInfoMode) {
-        return
-      }
-
-      //simple feature
-      let features = featureEvent.get('features')
-      if (!features) {
-        features = []
-        features[0] = featureEvent
-      }
-
-      if (features.length > 0) {
-        this.emit('selectFeatures', features)
-      }
-
-      const featureCoord = featureEvent.getGeometry().getFirstCoordinate()
-      this.currentFeatureCoord = featureCoord
-      this.showPulse()
+      console.log(`clicked on map: ${coordinates}; WGS: ${lonLatCoords}; testCoord: ${fromLonLat}`)
+      this.onClickMap(event.pixel)
 
       return
     })
@@ -261,6 +238,13 @@ export class MapControl extends EventEmitter {
         this.isDisableMoveend = false
         return
       }
+
+      const state = {
+        zoom: this.view.getZoom(),
+        center: this.view.getCenter(),
+      }
+
+      this.emit('moveEnd', state)
       // window.map.savePermalink.call(window.map)
     })
 
@@ -287,6 +271,56 @@ export class MapControl extends EventEmitter {
 
   static create() {
     return new MapControl()
+  }
+
+  onClickMap(pixelCoord) {
+
+    let featureEvent = undefined
+    const isHit = this.map.forEachFeatureAtPixel(
+      pixelCoord,
+      (feature, _) => {
+        featureEvent = feature
+        return feature.get('kind')
+      },
+      { hitTolerance: 5 }
+    )
+
+    if (!featureEvent) {
+      this.emit('mapEmptyClick', undefined)
+      return
+    }
+
+    if (this.isShowInfoMode) {
+      return
+    }
+
+    //simple feature
+    let features = featureEvent.get('features')
+    if (!features) {
+      features = []
+      features[0] = featureEvent
+    }
+
+    const featureCoord = featureEvent.getGeometry().getFirstCoordinate()
+    this.currentFeatureCoord = featureCoord
+
+    if (features.length > 0) {
+      this.emit('selectFeatures', { 'items': features, 'pulseCoord': featureCoord })
+    }
+
+    this.showPulse()
+  }
+
+  setPulseCoord(state) {
+    console.log(`setPulseCoord: ${JSON.stringify(state)}`)
+    if (!['click', 'info'].includes(state.viewMode)) return
+
+    this.isCheckPulse = true
+    this.pulseCoord = state.pulse
+
+    if (state.viewMode == 'info' && state.item) {
+      this.activeItem = state.item
+    }
   }
 
   createGeom(mo) {
@@ -463,16 +497,16 @@ export class MapControl extends EventEmitter {
     if (this.map) this.map.updateSize()
   }
 
-  updateView() {
-    if (this.isEnableAnimate) {
+  updateView(center, zoom) {
+    if (this.isEnableMoveAnimate) {
       this.view.animate({
-        center: this.center,
-        zoom: this.zoom,
+        center: center,
+        zoom: zoom,
         duration: 200,
       })
     } else {
-      this.view.setCenter(this.center)
-      this.view.setZoom(this.zoom)
+      this.view.setCenter(center)
+      this.view.setZoom(zoom)
     }
   }
 
@@ -603,12 +637,37 @@ export class MapControl extends EventEmitter {
       } else {
         clusterSourceFeatures.push(ft)
       }
+
+      if (this.activeItem && this.activeItem === item._id) {
+        this.activeItem = ft
+      }
     })
 
-    console.log('timing, before add features')
+    // console.log('timing, before add features')
     this.simpleSource.addFeatures(simpleSourceFeatures)
     this.clusterSource.getSource().addFeatures(clusterSourceFeatures)
-    console.log('timing, after add features')
+
+    const context = this
+    setTimeout(() => {
+      context.showSavedPulse()
+      context.emit('completeShow', undefined)
+    }, 10)
+
+    // console.log('timing, after add features')
+  }
+
+  showSavedPulse() {
+    if (this.isCheckPulse) {
+      const pixel = this.map.getPixelFromCoordinate(this.pulseCoord)
+      this.onClickMap(pixel)
+      this.isCheckPulse = false
+
+      if (this.activeItem) {
+        this.emit('selectFeatures', { 'items': [this.activeItem], 'pulseCoord': this.pulseCoord })
+        this.activeItem = undefined
+      }
+
+    }
   }
 }
 

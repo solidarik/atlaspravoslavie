@@ -4184,6 +4184,12 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4218,18 +4224,22 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
 
     window.stateControl = _assertThisInitialized(_this);
     var year = new Date().getFullYear();
+    _this.enableFillUrl = false;
     _this.state = {
       'center': new _proj.fromLonLat([56.004, 54.695]),
       // ufa place 56.004,54.695
+      'pulse': undefined,
+      // координаты выбранного элемента
       'zoom': 5,
+      'item': undefined,
       'dateMode': 'year',
       // year | century
       'viewMode': 'map',
-      // map | info
+      // map | click | info
       'yearOrCentury': year,
       'isVisibleLegend': true,
       // true | false
-      'isCheckArrLegend': [0, 1, 2, 3, 4, 5, 6, 7] // 0,1,2,3,4,5,6,7
+      'isCheckArrLegend': [0, 1, 2, 3, 4, 5, 6, 7] // 0..7
 
     };
     setTimeout(function () {
@@ -4246,32 +4256,69 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
   }
 
   _createClass(StateControl, [{
-    key: "saveStateValue",
-    value: function saveStateValue(stateKey, value) {
-      this.state[stateKey] = value;
+    key: "applyPopState",
+    value: function applyPopState(state) {
+      var oldState = _objectSpread({}, this.state);
 
-      _cookieHelper.default.setCookie(stateKey, value);
+      this.fillStateFromUrl(state);
+      var newState = this.state;
+      this.emit('changeView', {
+        'oldState': oldState,
+        'newState': newState
+      });
+    }
+  }, {
+    key: "deleteFromState",
+    value: function deleteFromState(stateArr) {
+      var _this2 = this;
+
+      stateArr.forEach(function (item) {
+        if (_this2.state.hasOwnProperty(item)) delete _this2.state[item];
+      });
+    }
+  }, {
+    key: "saveStateValue",
+    value: function saveStateValue(stateObj) {
+      for (var stateKey in stateObj) {
+        var value = stateObj[stateKey];
+        this.state[stateKey] = value;
+      }
 
       this.renewStateUrl();
     }
   }, {
+    key: "setEnableFillUrl",
+    value: function setEnableFillUrl(value) {
+      this.enableFillUrl = value;
+    }
+  }, {
     key: "renewStateUrl",
     value: function renewStateUrl() {
+      if (!this.enableFillUrl) return;
       var state = '?';
       var delim = '';
 
       for (var stateKey in this.state) {
         var value = this.state[stateKey];
+        if (value === undefined) continue;
 
-        if (stateKey === 'center') {
-          value = new _proj.toLonLat(value).map(function (c) {
-            return c.toFixed(4);
-          });
+        switch (stateKey) {
+          case 'pulse':
+          case 'center':
+            value = new _proj.toLonLat(value).map(function (c) {
+              return c.toFixed(4);
+            });
+            break;
+
+          case 'isCheckArrLegend':
+            value = this.state[stateKey].join(',');
+            break;
+
+          default:
+            break;
         }
 
-        if (stateKey === 'isCheckArrLegend') {
-          value = this.state[stateKey].join(',');
-        }
+        _cookieHelper.default.setCookie(stateKey, value);
 
         state += "".concat(delim).concat(stateKey, "=").concat(value);
         delim = '&';
@@ -4295,6 +4342,13 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
       }
 
       console.log('Query variable %s not found', variable);
+    }
+  }, {
+    key: "fillStateText",
+    value: function fillStateText(stateKey, maybeValue) {
+      if (maybeValue) {
+        this.state[stateKey] = maybeValue;
+      }
     }
   }, {
     key: "fillStateInt",
@@ -4343,11 +4397,12 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
 
       switch (stateKey) {
         case 'zoom':
+        case 'yearOrCentury':
           this.fillStateInt(stateKey, maybeValue);
           break;
 
-        case 'yearOrCentury':
-          this.fillStateInt(stateKey, maybeValue);
+        case 'item':
+          this.fillStateText(stateKey, maybeValue);
           break;
 
         case 'dateMode':
@@ -4355,6 +4410,7 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
           break;
 
         case 'center':
+        case 'pulse':
           this.fillStateCenter(stateKey, maybeValue);
           break;
 
@@ -4369,16 +4425,22 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
           break;
 
         case 'viewMode':
-          this.fillStateMode(stateKey, maybeValue, ['viewMode', 'map']);
+          this.fillStateMode(stateKey, maybeValue, ['info', 'map', 'click']);
           break;
       }
     }
   }, {
     key: "fillStateFromUrl",
-    value: function fillStateFromUrl() {
-      var location = window.location;
-      if (location.search == '') return;
-      var searchParams = new URLSearchParams(location.search.slice(1));
+    value: function fillStateFromUrl(url) {
+      if (!url) {
+        var location = window.location;
+        if (location.search == '') return;
+        url = location.search.slice(1);
+      }
+
+      url = url.slice(1);
+      if (!url) return;
+      var searchParams = new URLSearchParams(url);
       if (!searchParams) return;
 
       for (var stateKey in this.state) {
@@ -4386,6 +4448,8 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
         var maybeValue = this.getQueryVariable(stateKey);
         this.fillStateMaybe(stateKey, maybeValue);
       }
+
+      console.log("state from url: ".concat(JSON.stringify(this.state)));
     }
   }, {
     key: "fillStateFromCookies",
@@ -4394,30 +4458,6 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
         var maybeValue = _cookieHelper.default.getCookie(stateKey);
 
         this.fillStateMaybe(stateKey, maybeValue);
-      }
-    }
-  }, {
-    key: "savePermalink",
-    value: function savePermalink() {
-      var center = this.view.getCenter();
-      var hash = '#map=' + Math.round(this.view.getZoom()) + '/' + Math.round(center[0] * 100) / 100 + '/' + Math.round(center[1] * 100) / 100;
-      var state = {
-        zoom: this.view.getZoom(),
-        center: this.view.getCenter()
-      };
-      window.history.pushState(state, 'map', hash);
-    }
-  }, {
-    key: "readViewFromPermalink",
-    value: function readViewFromPermalink() {
-      if (window.location.hash !== '') {
-        var hash = window.location.hash.replace('#map=', '');
-        var parts = hash.split('/');
-
-        if (parts.length === 3) {
-          this.zoom = parseInt(parts[0], 10);
-          this.center = [parseFloat(parts[1]), parseFloat(parts[2])];
-        }
       }
     }
   }], [{
@@ -4433,13 +4473,13 @@ var StateControl = /*#__PURE__*/function (_EventEmitter) {
 
 exports.StateControl = StateControl;
 
-window.onpopstate = function (event) {// const map = window.map
-  // map.isDisableSavePermalink = true
-  // map.isDisableMoveend = true
-  // event.state
-  //   ? map.readViewFromState.call(map, event.state)
-  //   : map.readViewFromPermalink.call(map)
-  // map.updateView.call(map)
+window.onpopstate = function (event) {
+  var stateControl = window.stateControl;
+
+  if (event.state) {
+    console.log(JSON.stringify(event.state));
+    stateControl.applyPopState(event.state);
+  }
 };
 },{"./eventEmitter":"STwH","./cookieHelper":"WAuT","ol/proj":"VAQc"}],"M1Cf":[function(require,module,exports) {
 "use strict";
@@ -82792,15 +82832,15 @@ var DateHelper = /*#__PURE__*/function () {
   }, {
     key: "convertTZ",
     value: function convertTZ(date, tzString) {
-      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", {
+      return (typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", {
         timeZone: tzString
-      }));
+      });
     }
   }, {
     key: "dateTimeToStr",
     value: function dateTimeToStr(inputDate) {
       var timeZone = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Europe/Moscow';
-      var mskDateTime = DateHelper.convertTZ(inputDate, timeZone);
+      var mskDateTime = new Date(DateHelper.convertTZ(inputDate, timeZone));
       var day = ('0' + mskDateTime.getDate()).slice(-2);
       var month = ('0' + (mskDateTime.getMonth() + 1)).slice(-2);
       var year = mskDateTime.getFullYear();
@@ -82960,7 +83000,6 @@ var DateHelper = /*#__PURE__*/function () {
     key: "getMiddleOfCentury",
     value: function getMiddleOfCentury(century) {
       var range = this.getCenturyRange(century);
-      console.log(range);
 
       if (century < 0) {
         return range[1] + (range[0] - range[1] - 1) / 2;
@@ -82993,7 +83032,95 @@ var DateHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = DateHelper;
-},{"../helper/strHelper":"IGBU","moment":"a2Bw"}],"p4qv":[function(require,module,exports) {
+},{"../helper/strHelper":"IGBU","moment":"a2Bw"}],"Ub54":[function(require,module,exports) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var GeoHelper = /*#__PURE__*/function () {
+  function GeoHelper() {
+    _classCallCheck(this, GeoHelper);
+  }
+
+  _createClass(GeoHelper, null, [{
+    key: "fromLonLat",
+    value: function fromLonLat(input) {
+      if (!input || input.length !== 2) {
+        return undefined;
+      }
+
+      var RADIUS = 6378137;
+      var HALF_SIZE = Math.PI * RADIUS;
+      var halfSize = HALF_SIZE;
+      var length = input.length;
+      var dimension = 2;
+      var output = [];
+
+      for (var i = 0; i < length; i += dimension) {
+        output[i] = halfSize * input[i] / 180;
+        var y = RADIUS * Math.log(Math.tan(Math.PI * (input[i + 1] + 90) / 360));
+
+        if (y > halfSize) {
+          y = halfSize;
+        } else if (y < -halfSize) {
+          y = -halfSize;
+        }
+
+        output[i + 1] = y;
+      }
+
+      return output;
+    }
+  }, {
+    key: "getCenterCoord",
+    value: function getCenterCoord(ft) {
+      var geom = ft.getGeometry();
+
+      switch (geom.getType()) {
+        case 'Point':
+          return geom.getCoordinates();
+          break;
+
+        case 'LineString':
+          return this.getMedianXY(geom.getCoordinates());
+          break;
+
+        case 'Polygon':
+          return this.getMedianXY(geom.getCoordinates()[0]);
+          break;
+      }
+
+      return kremlinLocation;
+    }
+  }, {
+    key: "getMedianXY",
+    value: function getMedianXY(coords) {
+      var valuesX = [];
+      var valuesY = [];
+      coords.forEach(function (coord) {
+        valuesX.push(coord[0]);
+        valuesY.push(coord[1]);
+      });
+      return [this.getMedian(valuesX), this.getMedian(valuesY)];
+    }
+  }, {
+    key: "getMedian",
+    value: function getMedian(values) {
+      values.sort(function (a, b) {
+        return a - b;
+      });
+      var half = Math.floor(values.length / 2);
+      if (values.length % 2) return values[half];else return (values[half - 1] + values[half]) / 2.0;
+    }
+  }]);
+
+  return GeoHelper;
+}();
+
+module.exports = GeoHelper;
+},{}],"p4qv":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -83039,6 +83166,8 @@ var _classHelper = _interopRequireDefault(require("../helper/classHelper"));
 
 var _dateHelper = _interopRequireDefault(require("../helper/dateHelper"));
 
+var _geoHelper = _interopRequireDefault(require("../helper/geoHelper"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -83071,6 +83200,7 @@ var MAP_PARAMS = {
   min_year: 1914,
   max_year: 1965,
   isEnableAnimate: false,
+  isEnableMoveAnimate: true,
   clusterDistance: 40
 };
 var yaex = [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244];
@@ -83095,9 +83225,14 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     var projection = (0, _proj.get)('EPSG:3395');
     projection.setExtent(yaex);
     _this.isEnableAnimate = MAP_PARAMS.isEnableAnimate;
+    _this.isEnableMoveAnimate = MAP_PARAMS.isEnableMoveAnimate;
     _this.clusterDistance = MAP_PARAMS.clusterDistance;
     _this.isDisableSavePermalink = true;
     _this.isDisableMoveend = false;
+    _this.isCheckPulse = false;
+    _this.activeItem = undefined;
+    _this.activeFeature = undefined;
+    _this.pulseCoord = false;
     _this.map = undefined;
     return _this;
   }
@@ -83253,41 +83388,12 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
 
         var coordinates = event.coordinate;
         var lonLatCoords = new _proj.toLonLat(coordinates);
-        console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords));
-        var featureEvent = undefined;
-        var isHit = map.forEachFeatureAtPixel(event.pixel, function (feature, _) {
-          featureEvent = feature;
-          return feature.get('kind');
-        }, {
-          hitTolerance: 5
-        });
 
-        if (!featureEvent) {
-          _this2.emit('mapEmptyClick', undefined);
+        var fromLonLat = _geoHelper.default.fromLonLat(lonLatCoords);
 
-          return;
-        }
+        console.log("clicked on map: ".concat(coordinates, "; WGS: ").concat(lonLatCoords, "; testCoord: ").concat(fromLonLat));
 
-        if (_this2.isShowInfoMode) {
-          return;
-        } //simple feature
-
-
-        var features = featureEvent.get('features');
-
-        if (!features) {
-          features = [];
-          features[0] = featureEvent;
-        }
-
-        if (features.length > 0) {
-          _this2.emit('selectFeatures', features);
-        }
-
-        var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
-        _this2.currentFeatureCoord = featureCoord;
-
-        _this2.showPulse();
+        _this2.onClickMap(event.pixel);
 
         return;
       });
@@ -83295,7 +83401,14 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
         if (_this2.isDisableMoveend) {
           _this2.isDisableMoveend = false;
           return;
-        } // window.map.savePermalink.call(window.map)
+        }
+
+        var state = {
+          zoom: _this2.view.getZoom(),
+          center: _this2.view.getCenter()
+        };
+
+        _this2.emit('moveEnd', state); // window.map.savePermalink.call(window.map)
 
       });
       map.on('pointermove', function (event) {
@@ -83314,6 +83427,58 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
       });
       this.map = map;
       this.view = view;
+    }
+  }, {
+    key: "onClickMap",
+    value: function onClickMap(pixelCoord) {
+      var featureEvent = undefined;
+      var isHit = this.map.forEachFeatureAtPixel(pixelCoord, function (feature, _) {
+        featureEvent = feature;
+        return feature.get('kind');
+      }, {
+        hitTolerance: 5
+      });
+
+      if (!featureEvent) {
+        this.emit('mapEmptyClick', undefined);
+        return;
+      }
+
+      if (this.isShowInfoMode) {
+        return;
+      } //simple feature
+
+
+      var features = featureEvent.get('features');
+
+      if (!features) {
+        features = [];
+        features[0] = featureEvent;
+      }
+
+      var featureCoord = featureEvent.getGeometry().getFirstCoordinate();
+      this.currentFeatureCoord = featureCoord;
+
+      if (features.length > 0) {
+        this.emit('selectFeatures', {
+          'items': features,
+          'pulseCoord': featureCoord
+        });
+      }
+
+      this.showPulse();
+    }
+  }, {
+    key: "setPulseCoord",
+    value: function setPulseCoord(state) {
+      console.log("setPulseCoord: ".concat(JSON.stringify(state)));
+      if (!['click', 'info'].includes(state.viewMode)) return;
+      this.isCheckPulse = true;
+      this.pulseCoord = state.pulse;
+
+      if (state.viewMode == 'info' && state.item) {
+        this.activeItem = state.item;
+      }
     }
   }, {
     key: "createGeom",
@@ -83489,16 +83654,16 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
     }
   }, {
     key: "updateView",
-    value: function updateView() {
-      if (this.isEnableAnimate) {
+    value: function updateView(center, zoom) {
+      if (this.isEnableMoveAnimate) {
         this.view.animate({
-          center: this.center,
-          zoom: this.zoom,
+          center: center,
+          zoom: zoom,
           duration: 200
         });
       } else {
-        this.view.setCenter(this.center);
-        this.view.setZoom(this.zoom);
+        this.view.setCenter(center);
+        this.view.setZoom(zoom);
       }
     }
   }, {
@@ -83596,6 +83761,8 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "refreshInfo",
     value: function refreshInfo(info) {
+      var _this7 = this;
+
       this.simpleSource.clear();
       this.clusterSource.getSource().clear();
       var simpleSourceFeatures = [];
@@ -83613,11 +83780,36 @@ var MapControl = /*#__PURE__*/function (_EventEmitter) {
         } else {
           clusterSourceFeatures.push(ft);
         }
-      });
-      console.log('timing, before add features');
+
+        if (_this7.activeItem && _this7.activeItem === item._id) {
+          _this7.activeItem = ft;
+        }
+      }); // console.log('timing, before add features')
+
       this.simpleSource.addFeatures(simpleSourceFeatures);
       this.clusterSource.getSource().addFeatures(clusterSourceFeatures);
-      console.log('timing, after add features');
+      var context = this;
+      setTimeout(function () {
+        context.showSavedPulse();
+        context.emit('completeShow', undefined);
+      }, 10); // console.log('timing, after add features')
+    }
+  }, {
+    key: "showSavedPulse",
+    value: function showSavedPulse() {
+      if (this.isCheckPulse) {
+        var pixel = this.map.getPixelFromCoordinate(this.pulseCoord);
+        this.onClickMap(pixel);
+        this.isCheckPulse = false;
+
+        if (this.activeItem) {
+          this.emit('selectFeatures', {
+            'items': [this.activeItem],
+            'pulseCoord': this.pulseCoord
+          });
+          this.activeItem = undefined;
+        }
+      }
     }
   }], [{
     key: "create",
@@ -83658,25 +83850,25 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
   var _super3 = _createSuper(YearControl);
 
   function YearControl(inputParams) {
-    var _this7;
+    var _this8;
 
     _classCallCheck(this, YearControl);
 
-    _this7 = _super3.call(this, inputParams);
+    _this8 = _super3.call(this, inputParams);
     var caption = inputParams.caption;
     var hint = inputParams.hint || caption;
-    _this7.century = inputParams.century;
-    _this7.year = inputParams.year;
-    _this7.kind = inputParams.kind;
-    _this7.handler = inputParams.handler;
+    _this8.century = inputParams.century;
+    _this8.year = inputParams.year;
+    _this8.kind = inputParams.kind;
+    _this8.handler = inputParams.handler;
     var yearInput = document.createElement('input');
     yearInput.className = 'input-without-focus';
     yearInput.title = hint;
     yearInput.setAttribute('id', 'year-input');
-    yearInput.value = _this7.kind == 'year' ? _this7.year : _dateHelper.default.intCenturyToStr(_this7.century);
+    yearInput.value = _this8.kind == 'year' ? _this8.year : _dateHelper.default.intCenturyToStr(_this8.century);
     yearInput.addEventListener('keyup', function (event) {
       if (event.keyCode == 13) {
-        _this7.inputKeyUp();
+        _this8.inputKeyUp();
 
         event.preventDefault();
       }
@@ -83684,25 +83876,25 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
     var yearLabel = document.createElement('label');
     yearLabel.setAttribute('id', 'year-label');
     yearLabel.addEventListener('click', function () {
-      _this7.yearCenturyClick();
+      _this8.yearCenturyClick();
     }, false);
-    _this7.yearInput = yearInput;
-    _this7.yearLabel = yearLabel;
-    _this7.kind == 'year' ? _this7.changeKind('year') : _this7.changeKind('century');
+    _this8.yearInput = yearInput;
+    _this8.yearLabel = yearLabel;
+    _this8.kind == 'year' ? _this8.changeKind('year') : _this8.changeKind('century');
     var yearLeftButton = document.createElement('button');
-    yearLeftButton.innerHTML = _this7.getBSIconHTML('mdi mdi-step-backward-2');
+    yearLeftButton.innerHTML = _this8.getBSIconHTML('mdi mdi-step-backward-2');
     yearLeftButton.title = 'Предыдущий год/век';
     yearLeftButton.setAttribute('id', 'year-left-button');
     yearLeftButton.addEventListener('click', function () {
-      _this7.leftButtonClick();
+      _this8.leftButtonClick();
     }, false); // yearLeftButton.addEventListener('touchstart', () => { this.leftButtonClick(); }, false);
 
     var yearRightButton = document.createElement('button');
-    yearRightButton.innerHTML = _this7.getBSIconHTML('mdi mdi-step-forward-2');
+    yearRightButton.innerHTML = _this8.getBSIconHTML('mdi mdi-step-forward-2');
     yearRightButton.title = 'Следующий год/век';
     yearRightButton.setAttribute('id', 'year-right-button');
     yearRightButton.addEventListener('click', function () {
-      _this7.rightButtonClick();
+      _this8.rightButtonClick();
     }, false); // yearRightButton.addEventListener('touchstart', () => { this.rightButtonClick(); }, false);
 
     var parentDiv = document.createElement('div');
@@ -83712,15 +83904,15 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
     parentDiv.appendChild(yearInput);
     parentDiv.appendChild(yearLabel);
     parentDiv.appendChild(yearRightButton);
-    _this7.element = parentDiv;
-    olControl.Control.call(_assertThisInitialized(_this7), {
+    _this8.element = parentDiv;
+    olControl.Control.call(_assertThisInitialized(_this8), {
       label: 'test',
       hint: 'test',
       tipLabel: caption,
       element: parentDiv // target: get(inputParams, "target")
 
     });
-    return _this7;
+    return _this8;
   }
 
   _createClass(YearControl, [{
@@ -83842,7 +84034,7 @@ var YearControl = /*#__PURE__*/function (_SuperCustomControl) {
 
   return YearControl;
 }(SuperCustomControl);
-},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq","../helper/dateHelper":"IrKG"}],"uf5M":[function(require,module,exports) {
+},{"ol":"tUV8","ol/style":"TZKB","ol/geom":"z54l","ol/Feature":"E2jd","ol/proj":"VAQc","ol/control":"bioX","ol/layer/Tile":"PqrZ","ol/layer/Vector":"AGre","ol/source":"Vrgk","ol/tilegrid":"gNrJ","ol/interaction":"wWIt","./eventEmitter":"STwH","proj4":"HchQ","ol/proj/proj4":"IEbX","ol-ext/layer/AnimatedCluster":"NY4m","ol-ext/featureanimation/Zoom":"p9rF","ol/easing":"k82w","../helper/classHelper":"LZLq","../helper/dateHelper":"IrKG","../helper/geoHelper":"Ub54"}],"uf5M":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -83877,6 +84069,13 @@ var JsHelper = /*#__PURE__*/function () {
       }
 
       return len;
+    }
+  }, {
+    key: "arrayEquals",
+    value: function arrayEquals(a, b) {
+      return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (val, index) {
+        return val === b[index];
+      });
     }
   }, {
     key: "isNaN",
@@ -84485,12 +84684,12 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
     _this.lines = _this.addLines();
     _this.linesCount = 7;
     _this.isCheckArr = _jsHelper.default.fillArray(true, _this.linesCount);
-    _this.items = [];
+    _this.items = _jsHelper.default.fillArray([], _this.linesCount);
     _this.uniqueItems = {};
     window.legend = _assertThisInitialized(_this);
 
-    window.legendOnClick = function (element) {
-      window.legend.legendOnClick.call(window.legend, element);
+    window.legendOnLineClick = function (element) {
+      window.legend.legendOnLineClick.call(window.legend, element);
     };
 
     return _this;
@@ -84700,9 +84899,6 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       return maybeLine;
     }
   }, {
-    key: "changeParentCheck",
-    value: function changeParentCheck() {}
-  }, {
     key: "repaintLegend",
     value: function repaintLegend() {
       var _this3 = this;
@@ -84715,38 +84911,93 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
       this.legendDiv.innerHTML = html;
     }
   }, {
-    key: "legendOnClick",
-    value: function legendOnClick(span) {
-      //get attribute for tr element: span > td > tr
+    key: "setActiveLines",
+    value: function setActiveLines(isCheckArr) {
+      for (var iRow = 0; iRow < this.linesCount; iRow++) {
+        this.isCheckArr[iRow] = isCheckArr.includes(iRow);
+      }
+
+      this.repaintLegend();
+    }
+  }, {
+    key: "legendOnLineClick",
+    value: function legendOnLineClick(elem) {
       this.emit('legendClick', null);
-      var tr = span.parentElement.parentElement;
+      var tr = elem;
+
+      while (!tr.hasAttribute('data-href')) {
+        tr = tr.parentElement;
+      }
+
       var rowId = parseInt(tr.getAttribute('data-href')); //const line = this.searchLinesById.call(this, rowId)
 
       this.isCheckArr[rowId] = !this.isCheckArr[rowId];
-      this.emit('isCheckArrLegend', this.isCheckArr);
+      var numbers = [];
+      var localCheckArr = this.getActiveLines();
+
+      for (var iRow = 0; iRow < localCheckArr.length; iRow++) {
+        if (localCheckArr[iRow]) {
+          numbers.push(iRow);
+        }
+      }
+
+      this.emit('isLineClick', numbers);
       this.repaintLegend();
       this.filterInfo();
     }
   }, {
     key: "clickSpan",
     value: function clickSpan(content) {
-      return "<span onclick=legendOnClick(this)>".concat(content, "</span>");
+      return "<span>".concat(content, "</span>");
+    }
+  }, {
+    key: "getActiveLine",
+    value: function getActiveLine(line, isCheckParent) {
+      var _this4 = this;
+
+      var checkArr = [];
+      checkArr.push(this.isCheckArr[line.id] && isCheckParent);
+
+      if (line.childs) {
+        line.childs.forEach(function (child) {
+          if (!child.isHide) {
+            var localCheckArr = _this4.getActiveLine(child, isCheckParent && _this4.isCheckArr[child.id]);
+
+            checkArr = checkArr.concat(localCheckArr);
+          }
+        });
+      }
+
+      return checkArr;
+    }
+  }, {
+    key: "getActiveLines",
+    value: function getActiveLines() {
+      var _this5 = this;
+
+      var checkArr = [];
+      this.lines.forEach(function (line) {
+        var localCheckArr = _this5.getActiveLine(line, _this5.isCheckArr[line.id]);
+
+        checkArr = checkArr.concat(localCheckArr);
+      });
+      return checkArr;
     }
   }, {
     key: "getHTMLOneLineLegend",
     value: function getHTMLOneLineLegend(line, level, isCheckParent) {
-      var _this4 = this;
+      var _this6 = this;
 
       var html = '';
       var leftImagePosition = level > 0 ? "style=\"left: ".concat(level * 5, "px;z-index: ").concat(level, "\"") : '';
       var leftCaptionPosition = level > 0 ? "style=\"padding-left: ".concat(level * 30, "px\"") : '';
       var classTr = this.isCheckArr[line.id] && isCheckParent ? '' : 'class="legend-filter-grayscale"';
-      html += "<tr data-href=".concat(line.id, " ").concat(classTr, ">\n      <td ").concat(leftImagePosition, ">").concat(this.clickSpan(this.getHTMLIcons(line)), "</td>\n      <td ").concat(leftCaptionPosition, ">").concat(this.clickSpan(line.caption), "</td>\n      <td>").concat(this.items[line.id].length, "</td>\n    </tr>");
+      html += "<tr data-href=".concat(line.id, " ").concat(classTr, " onclick=legendOnLineClick(this)>\n      <td ").concat(leftImagePosition, ">").concat(this.clickSpan(this.getHTMLIcons(line)), "</td>\n      <td ").concat(leftCaptionPosition, ">").concat(this.clickSpan(line.caption), "</td>\n      <td>").concat(this.items[line.id].length, "</td>\n    </tr>");
 
       if (line.childs) {
         line.childs.forEach(function (child) {
           if (!child.isHide) {
-            html += _this4.getHTMLOneLineLegend(child, level + 1, isCheckParent && _this4.isCheckArr[child.id]);
+            html += _this6.getHTMLOneLineLegend(child, level + 1, isCheckParent && _this6.isCheckArr[child.id]);
           }
         });
       }
@@ -84756,28 +85007,28 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "updateCounter",
     value: function updateCounter(rawInfo) {
-      var _this5 = this;
+      var _this7 = this;
 
-      this.items = [];
+      this.items = _jsHelper.default.fillArray([], this.linesCount);
       this.uniqueItems = {};
 
       var _loop = function _loop(id) {
-        var line = _this5.searchLinesById(id); //injection classFeature property to every item
+        var line = _this7.searchLinesById(id); //injection classFeature property to every item
 
 
-        var fillResult = line.fillFunction.call(_this5, rawInfo, line.fillFunctionKind);
-        _this5.items[id] = [];
+        var fillResult = line.fillFunction.call(_this7, rawInfo, line.fillFunctionKind);
+        _this7.items[id] = [];
 
         if (fillResult) {
-          fillResult = _this5.pointFilter(fillResult);
-          _this5.items[id] = fillResult.map(function (elem) {
+          fillResult = _this7.pointFilter(fillResult);
+          _this7.items[id] = fillResult.map(function (elem) {
             return _objectSpread(_objectSpread({}, elem), {}, {
               classFeature: line.classFeature
             });
           });
 
-          _this5.items[id].forEach(function (item) {
-            _this5.uniqueItems[item._id] = item;
+          _this7.items[id].forEach(function (item) {
+            _this7.uniqueItems[item._id] = item;
           });
         } else {
           console.log("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0438\u043D\u0438\u0446\u0438\u0430\u043B\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043C\u0430\u0441\u0441\u0438\u0432 \u0434\u043B\u044F ".concat(line.caption));
@@ -84791,7 +85042,7 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "filterInfo",
     value: function filterInfo() {
-      var _this6 = this;
+      var _this8 = this;
 
       var visible = {};
 
@@ -84801,9 +85052,9 @@ var LegendControl = /*#__PURE__*/function (_EventEmitter) {
 
 
       var _loop2 = function _loop2(_id) {
-        var isVisibleLayer = _this6.isCheckArr[_id];
+        var isVisibleLayer = _this8.isCheckArr[_id];
 
-        _this6.items[_id].forEach(function (item) {
+        _this8.items[_id].forEach(function (item) {
           visible[item._id] = visible[item._id] && isVisibleLayer;
         });
       };
@@ -93557,8 +93808,6 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       var _this7 = this;
 
       this.socket.emit('clGetLoadStatus', JSON.stringify({}), function (msg) {
-        console.log(msg);
-
         _this7.emit('onGetLoadStatus', JSON.parse(msg));
       });
     }
@@ -104649,6 +104898,8 @@ var _clientProtocol = _interopRequireDefault(require("./clientProtocol"));
 
 var _infoControl = require("./infoControl");
 
+var _jsHelper = _interopRequireDefault(require("../helper/jsHelper"));
+
 var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -104656,7 +104907,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.app = {};
 
 function fixMapHeight() {
-  console.log('fixMapHeight');
+  // console.log('fixMapHeight')
   var mapHeight = (0, _jquery.default)(window).height() - 1;
   var navbar = (0, _jquery.default)("nav[data-role='navbar']:visible:visible");
   var mapDiv = (0, _jquery.default)("div[data-role='map']:visible:visible");
@@ -104685,31 +104936,52 @@ function startApp() {
   var loadCounterControl = _loadCounterControl.LoadCounterControl.create();
 
   stateControl.subscribe('fillState', function (state) {
+    console.log("hello from fillstate: ".concat(JSON.stringify(state)));
     mapControl.showMap(state.center, state.zoom);
     mapControl.showYearControl(state.yearOrCentury, state.dateMode);
+    mapControl.setPulseCoord(state);
     legendControl.showHideLegend(state.isVisibleLegend);
+    legendControl.setActiveLines(state.isCheckArrLegend);
+  });
+  stateControl.subscribe('changeView', function (states) {
+    var oldState = states.oldState;
+    var newState = states.newState;
+    mapControl.updateView(newState.center, newState.zoom);
+
+    if (oldState.yearOrCentury != newState.yearOrCentury && oldState.dateMode != newState.dateMode) {
+      mapControl.showYearControl(newState.yearOrCentury, newState.dateMode);
+    }
+
+    if (!_jsHelper.default.arrayEquals(oldState.pulse, newState.pulse)) {
+      mapControl.setPulseCoord(newState);
+      mapControl.showSavedPulse();
+    }
+
+    legendControl.showHideLegend(newState.isVisibleLegend);
+    legendControl.setActiveLines(newState.isCheckArrLegend);
   });
   protocol.subscribe('setCurrentYear', function (obj) {
     mapControl.setCurrentYearFromServer(obj);
   });
   protocol.subscribe('refreshInfo', function (info) {
     //сначала данные проходят через одноименный фильтр контрола легенды
-    console.log('timing, get info from server');
-    legendControl.refreshInfo.call(legendControl, info);
-    console.log('timing, finish processing data in legendcontrol');
+    // console.log('timing, get info from server')
+    legendControl.refreshInfo.call(legendControl, info); // console.log('timing, finish processing data in legendcontrol')
   });
   legendControl.subscribe('isLineClick', function (isCheckArrLegend) {
-    stateControl.saveStateValue('isCheckArrLegend', isCheckArrLegend);
+    stateControl.saveStateValue({
+      'isCheckArrLegend': isCheckArrLegend
+    });
   });
   legendControl.subscribe('isVisibleClick', function (isVisible) {
-    stateControl.saveStateValue('isVisibleLegend', isVisible);
+    stateControl.saveStateValue({
+      'isVisibleLegend': isVisible
+    });
   });
   legendControl.subscribe('refreshInfo', function (info) {
     //...и потом поступают в контрол карты
-    console.log('timing, recieve info from legend');
-    mapControl.refreshInfo.call(mapControl, info);
-    console.log('timing, finish processing data in mapcontrol');
-    protocol.getLoadStatus();
+    // console.log('timing, recieve info from legend')
+    mapControl.refreshInfo.call(mapControl, info); // console.log('timing, finish processing data in mapcontrol')
   });
   protocol.subscribe('onGetLoadStatus', function (info) {
     if (info.err) {
@@ -104725,8 +104997,17 @@ function startApp() {
   mapControl.subscribe('changeYear', function (dateObject) {
     protocol.getDataByYear(dateObject);
     infoControl.hide();
+    console.log("changeYear: ".concat(JSON.stringify(dateObject)));
+    var yearOrCentury = dateObject.kind == 'year' ? dateObject.year : dateObject.century;
+    stateControl.saveStateValue({
+      'dateMode': dateObject.kind,
+      'yearOrCentury': yearOrCentury
+    });
   });
-  mapControl.subscribe('clickItem', function (item) {});
+  mapControl.subscribe('moveEnd', function (state) {
+    console.log("state on moveend: ".concat(JSON.stringify(state)));
+    stateControl.saveStateValue(state);
+  });
   infoControl.subscribe('hide', function () {
     mapControl.returnNormalMode();
     mapControl.hidePulse();
@@ -104738,16 +105019,35 @@ function startApp() {
     console.log('mapEmptyClick');
     mapControl.returnNormalMode();
     infoControl.hide();
+    stateControl.deleteFromState(['pulse', 'item']);
+    stateControl.saveStateValue({
+      'viewMode': 'map'
+    });
   });
   protocol.subscribe('onGetInfoItem', function (info) {
+    stateControl.saveStateValue({
+      'viewMode': 'info',
+      'item': info._id
+    });
     infoControl.showItemInfo(info);
     mapControl.showAdditionalInfo(info);
     loadCounterControl.switchOff();
   });
-  mapControl.subscribe('selectFeatures', function (items) {
+  mapControl.subscribe('selectFeatures', function (info) {
+    var items = info.items;
+    var pulseCoord = info.pulseCoord;
+
     if (1 == items.length) {
+      stateControl.saveStateValue({
+        'pulse': pulseCoord,
+        'viewMode': 'info'
+      });
       protocol.getInfoItem(items[0]);
     } else {
+      stateControl.saveStateValue({
+        'pulse': pulseCoord,
+        'viewMode': 'click'
+      });
       infoControl.showItemList(items);
       loadCounterControl.switchOff();
     }
@@ -104760,10 +105060,15 @@ function startApp() {
     legendControl.switchOn();
     loadCounterControl.switchOn();
   });
+  mapControl.subscribe('completeShow', function () {
+    console.log('complete show');
+    protocol.getLoadStatus();
+    stateControl.setEnableFillUrl(true);
+  });
   (0, _jquery.default)(document.getElementsByClassName('ol-attribution ol-unselectable ol-control ol-collapsed')).remove();
   changeWindowSize();
 }
-},{"./stateControl":"jfAu","./mapControl":"p4qv","./legendControl":"pD6K","./loadCounterControl":"TXLU","./clientProtocol":"VmvZ","./infoControl":"s1dy","jquery":"juYr"}],"Focm":[function(require,module,exports) {
+},{"./stateControl":"jfAu","./mapControl":"p4qv","./legendControl":"pD6K","./loadCounterControl":"TXLU","./clientProtocol":"VmvZ","./infoControl":"s1dy","../helper/jsHelper":"uf5M","jquery":"juYr"}],"Focm":[function(require,module,exports) {
 "use strict";
 
 var _main = require("./main.js");

@@ -363,7 +363,6 @@ class DateHelper {
 
   static getMiddleOfCentury(century) {
     const range = this.getCenturyRange(century)
-    console.log(range)
     if (century < 0) {
       return range[1] + (range[0] - range[1] - 1) / 2
     } else {

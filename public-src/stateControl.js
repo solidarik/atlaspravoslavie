@@ -14,14 +14,18 @@ export class StateControl extends EventEmitter {
 
     const year = new Date().getFullYear()
 
+    this.enableFillUrl = false
+
     this.state = {
       'center': new fromLonLat([56.004, 54.695]), // ufa place 56.004,54.695
+      'pulse': undefined, // координаты выбранного элемента
       'zoom': 5,
+      'item': undefined,
       'dateMode': 'year', // year | century
-      'viewMode': 'map', // map | info
+      'viewMode': 'map', // map | click | info
       'yearOrCentury': year,
       'isVisibleLegend': true, // true | false
-      'isCheckArrLegend': [0, 1, 2, 3, 4, 5, 6, 7] // 0,1,2,3,4,5,6,7
+      'isCheckArrLegend': [0, 1, 2, 3, 4, 5, 6, 7] // 0..7
     }
 
     setTimeout(() => {
@@ -35,29 +39,64 @@ export class StateControl extends EventEmitter {
 
   }
 
-  saveStateValue(stateKey, value) {
-    this.state[stateKey] = value
-    CookieHelper.setCookie(stateKey, value)
+  applyPopState(state) {
+    const oldState = { ...this.state }
+    this.fillStateFromUrl(state)
+    const newState = this.state
+
+    this.emit('changeView', { 'oldState': oldState, 'newState': newState })
+  }
+
+  deleteFromState(stateArr) {
+    stateArr.forEach((item) => {
+      if (this.state.hasOwnProperty(item))
+        delete this.state[item]
+    })
+  }
+
+  saveStateValue(stateObj) {
+    for (const stateKey in stateObj) {
+      let value = stateObj[stateKey]
+      this.state[stateKey] = value
+    }
+
     this.renewStateUrl()
   }
 
+  setEnableFillUrl(value) {
+    this.enableFillUrl = value
+  }
+
   renewStateUrl() {
+
+    if (!this.enableFillUrl) return
+
     let state = '?'
     let delim = ''
     for (const stateKey in this.state) {
       let value = this.state[stateKey]
 
-      if (stateKey === 'center') {
-        value = (new toLonLat(value)).map(c => c.toFixed(4))
+      if (value === undefined)
+        continue
+
+      switch (stateKey) {
+        case 'pulse':
+        case 'center':
+          value = (new toLonLat(value)).map(c => c.toFixed(4))
+          break
+        case 'isCheckArrLegend':
+          value = this.state[stateKey].join(',')
+          break
+        default:
+          break;
       }
 
-      if (stateKey === 'isCheckArrLegend') {
-        value = this.state[stateKey].join(',')
-      }
+      CookieHelper.setCookie(stateKey, value)
 
       state += `${delim}${stateKey}=${value}`
       delim = '&'
     }
+
     window.history.pushState(state, 'map', state)
     console.log(`renew Url with state ${JSON.stringify(this.state)}`)
   }
@@ -72,6 +111,12 @@ export class StateControl extends EventEmitter {
       }
     }
     console.log('Query variable %s not found', variable);
+  }
+
+  fillStateText(stateKey, maybeValue) {
+    if (maybeValue) {
+      this.state[stateKey] = maybeValue
+    }
   }
 
   fillStateInt(stateKey, maybeValue) {
@@ -99,6 +144,7 @@ export class StateControl extends EventEmitter {
   }
 
   fillStateArray(stateKey, maybeValue, allowValues) {
+
     let numbers = maybeValue.split(',')
     numbers = numbers.map(n => parseInt(n))
     numbers = numbers.filter(n => allowValues.includes(n))
@@ -112,11 +158,12 @@ export class StateControl extends EventEmitter {
 
     switch (stateKey) {
       case 'zoom':
+      case 'yearOrCentury':
         this.fillStateInt(stateKey, maybeValue)
         break
 
-      case 'yearOrCentury':
-        this.fillStateInt(stateKey, maybeValue)
+      case 'item':
+        this.fillStateText(stateKey, maybeValue)
         break
 
       case 'dateMode':
@@ -124,6 +171,7 @@ export class StateControl extends EventEmitter {
         break
 
       case 'center':
+      case 'pulse':
         this.fillStateCenter(stateKey, maybeValue)
         break
 
@@ -137,16 +185,24 @@ export class StateControl extends EventEmitter {
         break
 
       case 'viewMode':
-        this.fillStateMode(stateKey, maybeValue, ['viewMode', 'map'])
+        this.fillStateMode(stateKey, maybeValue, ['info', 'map', 'click'])
         break
     }
   }
 
-  fillStateFromUrl() {
+  fillStateFromUrl(url) {
 
-    const location = window.location
-    if (location.search == '') return
-    const searchParams = new URLSearchParams(location.search.slice(1));
+    if (!url) {
+      const location = window.location
+      if (location.search == '') return
+      url = location.search.slice(1)
+    }
+
+    url = url.slice(1)
+    if (!url) return
+
+    const searchParams = new URLSearchParams(url);
+
     if (!searchParams) return
 
     for (const stateKey in this.state) {
@@ -155,40 +211,14 @@ export class StateControl extends EventEmitter {
       const maybeValue = this.getQueryVariable(stateKey)
       this.fillStateMaybe(stateKey, maybeValue)
     }
+
+    console.log(`state from url: ${JSON.stringify(this.state)}`)
   }
 
   fillStateFromCookies() {
     for (const stateKey in this.state) {
       const maybeValue = CookieHelper.getCookie(stateKey)
       this.fillStateMaybe(stateKey, maybeValue)
-    }
-  }
-
-  savePermalink() {
-    const center = this.view.getCenter()
-    const hash =
-      '#map=' +
-      Math.round(this.view.getZoom()) +
-      '/' +
-      Math.round(center[0] * 100) / 100 +
-      '/' +
-      Math.round(center[1] * 100) / 100
-    const state = {
-      zoom: this.view.getZoom(),
-      center: this.view.getCenter(),
-    }
-
-    window.history.pushState(state, 'map', hash)
-  }
-
-  readViewFromPermalink() {
-    if (window.location.hash !== '') {
-      var hash = window.location.hash.replace('#map=', '')
-      var parts = hash.split('/')
-      if (parts.length === 3) {
-        this.zoom = parseInt(parts[0], 10)
-        this.center = [parseFloat(parts[1]), parseFloat(parts[2])]
-      }
     }
   }
 
@@ -199,11 +229,9 @@ export class StateControl extends EventEmitter {
 }
 
 window.onpopstate = (event) => {
-  // const map = window.map
-  // map.isDisableSavePermalink = true
-  // map.isDisableMoveend = true
-  // event.state
-  //   ? map.readViewFromState.call(map, event.state)
-  //   : map.readViewFromPermalink.call(map)
-  // map.updateView.call(map)
+  const stateControl = window.stateControl
+  if (event.state) {
+    console.log(JSON.stringify(event.state))
+    stateControl.applyPopState(event.state)
+  }
 }
