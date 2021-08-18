@@ -57,6 +57,7 @@ class XlsGoogleParser {
             'place': 'место',
             'start': 'дата основа',
             'longBrief': 'описание',
+            'dedicated': 'посвящен',
             'abbots': 'настоятели',
             'eparhy': 'митропология',
             'templesUrl': 'ссылка на храм',
@@ -101,6 +102,7 @@ class XlsGoogleParser {
 
             json.start = DateHelper.getDateFromInput(dateInput)
             json.longBrief = row[headerColumns.longBrief]
+            json.dedicated = row[headerColumns.dedicated]
             json.abbots = row[headerColumns.abbots]
             json.eparhy = row[headerColumns.eparhy]
             json.templesUrl = row[headerColumns.templesUrl]

@@ -1,5 +1,6 @@
 import ClientProtocol from '../public-src/clientProtocol.js'
 import EventEmitter from '../public-src/eventEmitter.js'
+import DateHelper from '../helper/dateHelper.js'
 
 export default class addChurches extends EventEmitter {
 
@@ -10,6 +11,14 @@ export default class addChurches extends EventEmitter {
 
     this.protocol = ClientProtocol.create()
     this.protocol.subscribe('onGetTempleItem', (item) => this.showItem(item))
+
+    window.setActiveElement = (elem, b) => {
+      const c = 'hover-on-text'
+      if (!elem) return
+      b
+        ? elem.parentElement.classList.add(c)
+        : elem.parentElement.classList.remove(c)
+    }
   }
 
   showItem(item) {
@@ -18,12 +27,18 @@ export default class addChurches extends EventEmitter {
     $('#name').html(
       cur.name
     )
-    $('#startDateStr').html(
+    $('#start').html(
       '<b>Дата основания</b> - ' +
-      cur.start.dateStr
+      DateHelper.ymdToStr(cur.start)
     )
     $('#place').html(
       '<b>Место расположения</b> - ' + cur.place
+    )
+    $('#city').html(
+      '<b>Город расположения</b> - ' + cur.city
+    )
+    $('#dedicated').html(
+      '<b>Кому посвящен</b> - ' + cur.dedicated
     )
     $('#eparchyUrl').html(
       '<b>Епархия</b> - ' +
@@ -184,6 +199,9 @@ export default class addChurches extends EventEmitter {
   rowTableClickHandler(thisThis, thisTr) {
     // console.log("clicked " + $(thisTr).attr('id'));
     var _id = $(thisTr).attr('id');
+
+    if (!_id) return
+
     var cur = thisThis.data[_id];
     window.currentTr = thisTr
     this.protocol.getTempleItem(cur._id)
@@ -191,52 +209,47 @@ export default class addChurches extends EventEmitter {
 
   addDataToTable(currChurch) {
     //console.log("addDataTotable");
-    //console.log(JSON.stringify(this.data));
     var obj = this.data;
+
     this.clearTable();
     var table = $('#' + this.idTable);
     //table[0].border = "1";
-    var columns = Object.keys(obj[0]);
-    var columnCount = columns.length
-    var row = $(table[0].insertRow(-1))
-    for (var i = 0; i < columnCount; i++) {
-      //if (i == 5 || i == 7 || i == 8 )
-      {
-        if (columns[i] == 'name') {
-          var headerCell = $('<th />')
-          headerCell.html('Название')
-          row.append(headerCell)
-        } else if (columns[i] == 'startYear') {
-          var headerCell = $('<th />')
-          headerCell.html('Основание')
-          row.append(headerCell)
-        } else if (columns[i] == 'place') {
-          var headerCell = $('<th />')
-          headerCell.html('Расположение')
-          row.append(headerCell)
-        } else {
-          //headerCell.html('N/A')
-        }
 
-      }
+    var row = $(table[0].insertRow(-1))
+    const applyColumns = {
+      'name': 'Название',
+      'start': 'Дата основания',
+      'place': 'Расположение',
+      'city': 'Город',
+      'dedicated': 'Кому посвящен'
     }
+    const applyColumnNames = Object.keys(applyColumns)
+
+    for (var i = 0; i < applyColumnNames.length; i++) {
+      const columnName = applyColumnNames[i]
+      const columnCaption = applyColumns[columnName]
+      let headerCell = $('<th />')
+      headerCell.html(columnCaption)
+      row.append(headerCell)
+    }
+
     var curId = -1;
     for (var i = 0; i < obj.length; i++) {
       row = $(table[0].insertRow(-1))
       row.addClass('hand-cursor')
       row.attr('id', i)
-      for (var j = 0; j < columnCount; j++) {
-        //if (j == 5 || j == 7 || j == 8)
-        if (columns[j] == 'name' || columns[j] == 'startYear' || columns[j] == 'place') {
-          var cell = $('<td />')
-          if (columns[j] == 'startYear' && obj[i][columns[j]] == -999) {
-            cell.html(obj[i]['startCentury'] * 100 - 100)
-          }
-          else {
-            cell.html(obj[i][columns[j]])
-          }
-          row.append(cell)
+      for (var j = 0; j < applyColumnNames.length; j++) {
+        const columnName = applyColumnNames[j]
+        let columnValue = obj[i][columnName]
+        let cell = $(`<td
+          onmouseenter="window.setActiveElement(this, true);"
+          onmouseleave="window.setActiveElement(this, false);">
+        />`)
+        if (columnName == 'start') {
+          columnValue = DateHelper.ymdToStr(columnValue)
         }
+        cell.html(columnValue)
+        row.append(cell)
       }
       // console.log(currChurch);
       if (currChurch != undefined && currChurch.pageUrl == obj[i]['pageUrl']) {

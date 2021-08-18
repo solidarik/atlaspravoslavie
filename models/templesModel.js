@@ -22,7 +22,6 @@ var templesSchema = new mongoose.Schema(
       isOnlyCentury: Boolean,
       century: Number
     },
-
     name: String,
     place: String,
     city: String,
@@ -37,6 +36,7 @@ var templesSchema = new mongoose.Schema(
     templesUrl: String,
     eparchyUrl: String,
     longBrief: String,
+    dedicated: String,
     abbots: String,
   },
   {

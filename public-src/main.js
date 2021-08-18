@@ -36,29 +36,61 @@ function startApp() {
 
   stateControl.subscribe('fillState', (state) => {
     console.log(`hello from fillstate: ${JSON.stringify(state)}`)
+
+    console.log('timing, start showMap')
     mapControl.showMap(state.center, state.zoom)
+    console.log('timing, finish showMap')
+
+    console.log('timing, start showYearControl')
     mapControl.showYearControl(state.yearOrCentury, state.dateMode)
+    console.log('timing, finish showYearControl')
+
+    console.log('timing, start setPulseCoord')
     mapControl.setPulseCoord(state)
+    console.log('timing, finish setPulseCoord')
+
+    console.log('timing, start showHideLegend')
     legendControl.showHideLegend(state.isVisibleLegend)
+    console.log('timing, finish showHideLegend')
+
+    console.log('timing, start setActiveLegendLines')
     legendControl.setActiveLines(state.isCheckArrLegend)
+    console.log('timing, finish setActiveLegendLines')
   })
 
   stateControl.subscribe('changeView', (states) => {
     const oldState = states.oldState
     const newState = states.newState
 
+    stateControl.setEnableFillUrl(false)
+
     mapControl.updateView(newState.center, newState.zoom)
     if (oldState.yearOrCentury != newState.yearOrCentury && oldState.dateMode != newState.dateMode) {
       mapControl.showYearControl(newState.yearOrCentury, newState.dateMode)
     }
 
-    if (!JsHelper.arrayEquals(oldState.pulse, newState.pulse)) {
-      mapControl.setPulseCoord(newState)
-      mapControl.showSavedPulse()
+    if (!newState.hasOwnProperty('pulse')) {
+      mapControl.hidePulse()
+    } else {
+      if (!JsHelper.arrayEquals(oldState.pulse, newState.pulse)) {
+        mapControl.setPulseCoord(newState)
+        mapControl.showSavedPulse()
+      }
     }
 
-    legendControl.showHideLegend(newState.isVisibleLegend)
-    legendControl.setActiveLines(newState.isCheckArrLegend)
+    if (newState.viewMode == 'map') {
+      infoControl.hide()
+    }
+
+    if (oldState.isVisibleLegend != newState.isVisibleLegend) {
+      legendControl.showHideLegend(newState.isVisibleLegend)
+    }
+
+    if (!JsHelper.arrayEquals(oldState.isCheckArrLegend, newState.isCheckArrLegend)) {
+      legendControl.setActiveLines(newState.isCheckArrLegend)
+    }
+
+    stateControl.setEnableFillUrl(true)
   })
 
   protocol.subscribe('setCurrentYear', (obj) => {
@@ -119,6 +151,8 @@ function startApp() {
   infoControl.subscribe('hide', () => {
     mapControl.returnNormalMode()
     mapControl.hidePulse()
+    stateControl.deleteFromState(['pulse', 'item'])
+    stateControl.saveStateValue({ 'viewMode': 'map' })
   })
 
   infoControl.subscribe('showItem', (item) => {

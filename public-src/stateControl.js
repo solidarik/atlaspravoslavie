@@ -98,6 +98,7 @@ export class StateControl extends EventEmitter {
     }
 
     window.history.pushState(state, 'map', state)
+
     console.log(`renew Url with state ${JSON.stringify(this.state)}`)
   }
 
@@ -231,7 +232,7 @@ export class StateControl extends EventEmitter {
 window.onpopstate = (event) => {
   const stateControl = window.stateControl
   if (event.state) {
-    console.log(JSON.stringify(event.state))
+    console.log(`Restore popstate from Url: ${JSON.stringify(event.state)}`)
     stateControl.applyPopState(event.state)
   }
 }

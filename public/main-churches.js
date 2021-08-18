@@ -127,11 +127,11 @@ function showSlides(n) {
     slides[i].className = slides[i].className.replace(" show", "");
   }
   for (i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
+    dots[i].className = dots[i].className.replace(" active-slide", "");
   }
   slides[slideIndex - 1].style.display = "block";
   slides[slideIndex - 1].className += " show";
-  dots[slideIndex - 1].className += " active";
+  dots[slideIndex - 1].className += " active-slide";
 }
 
 function addEvent(evnt, elem, func) {

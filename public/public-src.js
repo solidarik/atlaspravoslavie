@@ -4477,7 +4477,7 @@ window.onpopstate = function (event) {
   var stateControl = window.stateControl;
 
   if (event.state) {
-    console.log(JSON.stringify(event.state));
+    console.log("Restore popstate from Url: ".concat(JSON.stringify(event.state)));
     stateControl.applyPopState(event.state);
   }
 };
@@ -84427,7 +84427,7 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
 
       var templeUrl = "church/".concat(info.pageUrl);
       window.CURRENT_ITEM = info;
-      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(info.longBrief, "</p>\n      <div class=\"source-info\">\n        <a rel='noopener noreferrer' href=\"").concat(templeUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(_strHelper.default.ellipseLongString(info.longBrief, 500), "</p>\n      <div class=\"source-info\">\n        <a rel='noopener noreferrer' href=\"").concat(templeUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {
@@ -104938,28 +104938,54 @@ function startApp() {
 
   stateControl.subscribe('fillState', function (state) {
     console.log("hello from fillstate: ".concat(JSON.stringify(state)));
+    console.log('timing, start showMap');
     mapControl.showMap(state.center, state.zoom);
+    console.log('timing, finish showMap');
+    console.log('timing, start showYearControl');
     mapControl.showYearControl(state.yearOrCentury, state.dateMode);
+    console.log('timing, finish showYearControl');
+    console.log('timing, start setPulseCoord');
     mapControl.setPulseCoord(state);
+    console.log('timing, finish setPulseCoord');
+    console.log('timing, start showHideLegend');
     legendControl.showHideLegend(state.isVisibleLegend);
+    console.log('timing, finish showHideLegend');
+    console.log('timing, start setActiveLegendLines');
     legendControl.setActiveLines(state.isCheckArrLegend);
+    console.log('timing, finish setActiveLegendLines');
   });
   stateControl.subscribe('changeView', function (states) {
     var oldState = states.oldState;
     var newState = states.newState;
+    stateControl.setEnableFillUrl(false);
     mapControl.updateView(newState.center, newState.zoom);
 
     if (oldState.yearOrCentury != newState.yearOrCentury && oldState.dateMode != newState.dateMode) {
       mapControl.showYearControl(newState.yearOrCentury, newState.dateMode);
     }
 
-    if (!_jsHelper.default.arrayEquals(oldState.pulse, newState.pulse)) {
-      mapControl.setPulseCoord(newState);
-      mapControl.showSavedPulse();
+    if (!newState.hasOwnProperty('pulse')) {
+      mapControl.hidePulse();
+    } else {
+      if (!_jsHelper.default.arrayEquals(oldState.pulse, newState.pulse)) {
+        mapControl.setPulseCoord(newState);
+        mapControl.showSavedPulse();
+      }
     }
 
-    legendControl.showHideLegend(newState.isVisibleLegend);
-    legendControl.setActiveLines(newState.isCheckArrLegend);
+    if (newState.viewMode == 'map') {
+      infoControl.hide();
+    }
+
+    if (oldState.isVisibleLegend != newState.isVisibleLegend) {
+      legendControl.showHideLegend(newState.isVisibleLegend);
+    }
+
+    if (!_jsHelper.default.arrayEquals(oldState.isCheckArrLegend, newState.isCheckArrLegend)) {
+      legendControl.setActiveLines(newState.isCheckArrLegend);
+    }
+
+    stateControl.setEnableFillUrl(true);
   });
   protocol.subscribe('setCurrentYear', function (obj) {
     mapControl.setCurrentYearFromServer(obj);
@@ -105015,6 +105041,10 @@ function startApp() {
   infoControl.subscribe('hide', function () {
     mapControl.returnNormalMode();
     mapControl.hidePulse();
+    stateControl.deleteFromState(['pulse', 'item']);
+    stateControl.saveStateValue({
+      'viewMode': 'map'
+    });
   });
   infoControl.subscribe('showItem', function (item) {
     protocol.getInfoItem(item);

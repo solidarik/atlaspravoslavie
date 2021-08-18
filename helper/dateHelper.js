@@ -70,7 +70,7 @@ class DateHelper {
     if (inputDate.isOnlyCentury) return inputDate.century + ' в.'
     if (inputDate.year == -999) return ''
 
-    res = '' + inputDate.year
+    let res = '' + inputDate.year
     if (inputDate.month != -1) {
       res = ('0' + inputDate.month).slice(-2) + delim + res
     }

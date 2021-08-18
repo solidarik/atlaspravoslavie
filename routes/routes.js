@@ -39,7 +39,7 @@ router.get('/video', require('./page-video'))
 router.get('/events', require('./page-events'))
 router.get('/logout', require('./logout').get)
 
-const defaultSelectParam = { 'name': 1, 'point': 1, 'start': 1, 'place': 1, 'pageUrl': 1 }
+const defaultSelectParam = { 'name': 1, 'point': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
 
 getUsers = async function (ctx, next) {
   // persons = await redisClient.get('persons')

@@ -33,7 +33,7 @@ class TemplesFeature extends SuperFeature {
       <h1>${info.name}</h1>
       <h2>${info.place}</h2>
       <h2>${DateHelper.ymdToStr(info.start)}</h2>
-      <p>${info.longBrief}</p>
+      <p>${StrHelper.ellipseLongString(info.longBrief, 500)}</p>
       <div class="source-info">
         <a rel='noopener noreferrer' href="${templeUrl}">Подробнее</a>
       </div>

@@ -6,7 +6,7 @@ block head
   script(src='/libs/main-churches.js')
 
 block content
-    +header('churches')
+    +header('church')
     div.content(role='content' id='content' dragable='true')
         .row.churches-cont
             .col-md-6
@@ -17,9 +17,13 @@ block content
                         blockquote
                             h5(id='name')
                             small
-                                cite(id='startDateStr' title='Дата основания')
+                                cite(id='start' title='Дата основания')
                                 br
                                 cite(id='place' title='Место расположения')
+                                br
+                                cite(id='city' title='Город расположения')
+                                br
+                                cite(id='dedicated' title='Кому посвящен')
                                 br
                                 cite(id='eparchyUrl' title='Епархия')
                                 i.icon-map-marker
