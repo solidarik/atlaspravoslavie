@@ -865,3 +865,9 @@ input.form-control {
   max-width: auto;
   /* max-height: 600px; */
 }
+
+.imageFeatureInfo {
+  margin-top: 5px;
+  width: 200px;
+  height: 200px;
+}

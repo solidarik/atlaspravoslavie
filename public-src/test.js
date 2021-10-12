@@ -1,73 +1,41 @@
-const strHelper = require('../helper/strHelper')
-const dateHelper = require('../helper/dateHelper')
+
+const Log = require('../helper/logHelper')
+const ImageHelper = require('../helper/imageHelper')
+log = Log.create('load.log')
+
+const ImageSaver = require('../loadDatabase/loadImagesIldar')
+const DbHelper = require('../loadDatabase/dbHelper')
+
+const imageSaver = new ImageSaver()
+const dbHelper = new DbHelper(undefined, log)
+const imagesFolder = '../loadDatabase/out/out_storage/persons'
+
+const PersonsModel = require('../models/personsModel')
+const TemplesModel = require('../models/templesModel')
+const StrHelper = require('../helper/strHelper')
+
 const inetHelper = require('../helper/inetHelper')
-const fileHelper = require('../helper/fileHelper')
 
-const res0 = dateHelper.dateTimeToStr(new Date())
-console.log(res0)
+// const testUrl = 'https://balashovblag.ru/images/019_2017_9_6_22_10_32_1795892298.jpg'
+// ImageHelper.loadImageToFile(testUrl, imagesFolder, 'test')
+//   .then(res => console.log(`test is finished ${res}`))
+//   .catch(err => {
+//     console.log(`Error in loadImageToFile ${err}`)
+//   })
+// return
 
-return
-
-let input = 'Храм в честь иконы Пресвятой Богородицы "Всех скорбящих Радость" Омск, Омская обл.'
-
-const res1 = strHelper.removeShortStrings(input, '', true)
-const res2 = strHelper.removeShortStrings(input, '', false)
-
-const checkedCoordsPath = fileHelper.composePath('..\\loadDatabase\\dataSources\\checkedCoords.json')
-
-inetHelper.loadCoords(checkedCoordsPath)
-const res3 = inetHelper.getSavedCoords(input)
-
-console.log(checkedCoordsPath)
-console.log(`res1 ${JSON.stringify(res1)}`)
-console.log(`res2 ${JSON.stringify(res2)}`)
-console.log(`res3 ${JSON.stringify(res3)}`)
+inetHelper.getWikiPageId('Агапит Печерский').then(
+  res => console.log(res)
+)
 
 return
 
-const dbHelper = new DbHelper()
-
-  ; (async function f() {
-    let temples = await TemplesModel.find({})
-    for (let temple in temples) {
-      console.log('')
+imageSaver.start(PersonsModel, imagesFolder)
+  .then(
+    () => {
+      console.log('finish')
+      dbHelper.free()
     }
-    dbHelper.free()
-  })()
+  )
 
 return
-
-const urlValue = '1,34,abc'
-let numbers = urlValue.split(',')
-
-const allowNumbers = [...Array(7).keys()];
-console.log(allowNumbers)
-numbers = numbers.map(n => parseInt(n))
-numbers = numbers.filter(n => allowNumbers.includes(n))
-console.log(numbers)
-return numbers
-
-const testValue = StrHelper.replaceEnd('hello my world', '_12345678')
-console.log(testValue)
-
-return
-
-const InetHelper = require('../helper/inetHelper')
-
-function deleteAbbrev(place) {
-  if (!place)
-    return undefined
-
-  place = place.replace(',', '').replace('"', '')
-  //по сути это контекст return place.replace(/^\S{1,2}[.]+\s/g, '')
-  return place
-}
-
-
-
-InetHelper.getLocalCoordsForName(deleteAbbrev('Фессалия'))
-  .then(res => {
-    console.log(`result  ${res}`)
-  })
-  .catch(err => console.log(`error ${err}`))
-

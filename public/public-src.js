@@ -82675,7 +82675,7 @@ var DateHelper = /*#__PURE__*/function () {
       if (inputDate.isOnlyYear) return inputDate.year + '';
       if (inputDate.isOnlyCentury) return inputDate.century + ' в.';
       if (inputDate.year == -999) return '';
-      res = '' + inputDate.year;
+      var res = '' + inputDate.year;
 
       if (inputDate.month != -1) {
         res = ('0' + inputDate.month).slice(-2) + delim + res;
@@ -84426,8 +84426,15 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
       }
 
       var templeUrl = "church/".concat(info.pageUrl);
+      var imgUrls = info.imgUrls;
+      var imgHtml = '';
+
+      if (imgUrls && imgUrls.length > 0) {
+        imgHtml = "<img src=\"".concat(imgUrls[0], "\" class=\"rounded float-start imageFeatureInfo\"></img>");
+      }
+
       window.CURRENT_ITEM = info;
-      var html = "<div class=\"temples-info panel-info\">\n      <h1>".concat(info.name, "</h1>\n      <h2>").concat(info.place, "</h2>\n      <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n      <p>").concat(_strHelper.default.ellipseLongString(info.longBrief, 500), "</p>\n      <div class=\"source-info\">\n        <a rel='noopener noreferrer' href=\"").concat(templeUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div>\n    ");
+      var html = "<div class=\"temples-info panel-info\">\n      <div class=\"row\">\n        <div class=\"col-md-auto\">\n          ".concat(imgHtml, "\n        </div>\n        <div class=\"col\">\n          <h1>").concat(info.name, "</h1>\n          <h2>").concat(info.place, "</h2>\n          <h2>").concat(_dateHelper.default.ymdToStr(info.start), "</h2>\n          <p>").concat(_strHelper.default.ellipseLongString(info.longBrief, 500), "</p>\n          <div class=\"source-info\">\n            <a rel='noopener noreferrer' href=\"").concat(templeUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n          </div>\n        </div>\n      </div>\n    </div>\n    ");
       return html;
     }
   }, {

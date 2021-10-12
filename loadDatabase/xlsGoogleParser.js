@@ -195,20 +195,23 @@ class XlsGoogleParser {
         const checkedTime = DateHelper.dateTimeToStr(new Date())
         let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
+        const sheets = google.sheets({ version: 'v4' })
+
         // проверяем изменились ли данные
-        const last_update = await this.getLastUpdateFromGoogleApi()
-        console.log(last_update)
-        if (!last_update) {
-            return this.log.error('Don\'t found last update time from Google API')
-        }
-        res = await ServiceModel.find({ name: 'lastUpdateSheet' })
-        console.log(res)
-        if (res && res.length > 0 && res[0].value === last_update) {
-            this.log.info(`Don\'t update info from last loading: ${last_update}`)
-            return
-        }
+        // const last_update = await this.getLastUpdateFromGoogleApi()
+        // console.log(last_update)
+        // if (!last_update) {
+        //     return this.log.error('Don\'t found last update time from Google API')
+        // }
+        // res = await ServiceModel.find({ name: 'lastUpdateSheet' })
+        // console.log(res)
+        // if (res && res.length > 0 && res[0].value === last_update) {
+        //     this.log.info(`Don\'t update info from last loading: ${last_update}`)
+        //     return
+        // }
 
         //  обрабатываем данные
+
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
             key: process.env.GOOGLE_API_KEY,
@@ -273,7 +276,7 @@ class XlsGoogleParser {
             { name: 'savedCount', kind: 'detailStatus', value: savedCount },
             { name: 'totalCount', kind: 'detailStatus', value: totalLinesCount },
             { name: 'statusText', kind: 'status', value: statusText },
-            { name: 'lastUpdateSheet', kind: 'status', value: last_update },
+            // { name: 'lastUpdateSheet', kind: 'status', value: last_update },
             { name: 'checkedTime', kind: 'status', value: checkedTime }
         ]
 

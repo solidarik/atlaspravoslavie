@@ -105,4 +105,6 @@ var personsSchema = new mongoose.Schema(
 
 personsSchema.statics.publicFields = ['surname', 'name', 'middlename']
 
+// personsSchema.statics.getUrl
+
 module.exports = mongoose.model('personsReligion', personsSchema)
