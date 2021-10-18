@@ -49,24 +49,34 @@ class PersonFeature extends SuperFeature {
       monkname = `<h1>Имя в монашестве: ${info.monkname}</h1>`
     }
 
+    let imgHtml = ''
+    if (info.photoUrl) {
+      imgHtml = `<img src="${info.photoUrl}" class="rounded float-start imageFeatureInfo"></img>`
+    }
+
     let html = `<div class="person-info panel-info">
-      <h1>${outerInfo.caption}</h1>
-      ${monkname}
-      <h2>${info.status}</h2>
-      <table id='person-table' class='table table-borderless'>
-        <thead>
-          <tr>
-            <th scope='col'></th>
-            <th scope='col'>Место</th>
-            <th scope='col'>Дата</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope='row'>Рождение</th>
-            <td>${info.birth.place}</td>
-            <td>${DateHelper.ymdToStr(info.birth)}</td>
-          </tr>`
+      <div class="row">
+        <div class="col-md-auto">
+          ${imgHtml}
+        </div>
+        <div class="col">
+          <h1>${outerInfo.caption}</h1>
+          ${monkname}
+          <h2>${info.status}</h2>
+          <table id='person-table' class='table table-borderless'>
+            <thead>
+              <tr>
+                <th scope='col'></th>
+                <th scope='col'>Место</th>
+                <th scope='col'>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope='row'>Рождение</th>
+                <td>${info.birth.place}</td>
+                <td>${DateHelper.ymdToStr(info.birth)}</td>
+              </tr>`
 
     info.achievements.forEach(achiev => {
       if (achiev.dateStr) {
@@ -103,7 +113,7 @@ class PersonFeature extends SuperFeature {
       <div class="source-info">
         <a rel='noopener noreferrer' href="${personUrl}">Подробнее</a>
       </div>
-    </div>
+    </div></div></div>
     `
     return html
   }
@@ -124,7 +134,7 @@ class PersonFeature extends SuperFeature {
     let res = []
     if (!info.persons) return res
 
-    res = info.persons.filter( item => { return item.kindAndStatus == kind })
+    res = info.persons.filter(item => { return item.kindAndStatus == kind })
     res = res.map((elem) => {
       return {
         ...elem,
