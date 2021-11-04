@@ -27,9 +27,8 @@ class ChronosFeature extends SuperFeature {
       <p>${info.shortBrief}</p>
       ${info.longBrief ? '<p>' + info.longBrief + '</p>' : ''}
       <div class="source-info">
-        <a target='_blank' rel='noopener noreferrer' href=${
-          info.srcUrl
-        }>Источник информации</a>
+        <a target='_blank' rel='noopener noreferrer' href=${info.srcUrl
+      }>Источник информации</a>
       </div>
     </div>
     `

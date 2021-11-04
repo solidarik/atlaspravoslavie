@@ -107,10 +107,11 @@ class HolyProtocol extends ServerProtocol {
       // db.getCollection('personsreligions').find({"achievements": {"$elemMatch": {"start.century": 19}}})
 
       const defaultSelectParam = { 'name': 1, 'point': 1 }
+      const shortBriefSearchParam = { ...defaultSelectParam, 'shortBrief': 1 }
 
       const promices = [
-        ChronosModel.find(defaultSearchParam).select(defaultSelectParam),
-        ChronosChurchModel.find(defaultSearchParam).select(defaultSelectParam),
+        ChronosModel.find(defaultSearchParam).select(shortBriefSearchParam),
+        ChronosChurchModel.find(defaultSearchParam).select(shortBriefSearchParam),
         TemplesModel.find(gteSearchParam).select(defaultSelectParam),
         PersonsAggrModel.find(personSearchParam)
 
