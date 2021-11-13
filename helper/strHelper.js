@@ -55,7 +55,7 @@ class StrHelper {
 
   static generatePageUrl(input, len = 50) {
     if (Array.isArray(input)) {
-      input = input.join('_')
+      input = input.filter((elem) => elem.trim().length > 0).join('_')
     }
 
     let output = this.toTranslitStr(input)

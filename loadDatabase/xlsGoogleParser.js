@@ -13,7 +13,6 @@ const fs = require('fs')
 
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 
-
 class XlsGoogleParser {
 
     constructor(log) {

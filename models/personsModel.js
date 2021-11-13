@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 var personsSchema = new mongoose.Schema(
   {
     pageId: Number,
+
     surname: String,
     name: String,
     middlename: String,

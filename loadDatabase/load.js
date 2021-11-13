@@ -14,6 +14,7 @@ const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
 const XlsGoogleParser = require('./xlsGoogleParser')
+const XlsGoogleParserPersons = require('./xlsGoogleParserPersons')
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 
@@ -22,6 +23,7 @@ inetHelper.trimNames()
 
 const dbHelper = new DbHelper(undefined, log)
 const xlsGoogleParser = new XlsGoogleParser(log)
+const xlsGoogleParserPersons = new XlsGoogleParserPersons(log)
 const personsAggr = new PersonsAggr()
 
 Promise.resolve(true)
@@ -79,23 +81,26 @@ Promise.resolve(true)
   //   return xlsGoogleParser.loadData(dbHelper)
   // })
   .then(() => {
-    return dbHelper.clearDb('persons')
+    return xlsGoogleParserPersons.loadData(dbHelper)
   })
-  .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_persons',
-      procdir: 'out/out_person_process',
-      errdir: 'out/out_person_errors',
-      mediator: personsJsonMediator,
-    })
-  })
-  .then(() => {
-    return dbHelper.clearDb('personsAggr')
-  })
-  .then(() => {
-    log.info('аггрегация данных по персоналиям')
-    return personsAggr.start()
-  })
+  // .then(() => {
+  //   return dbHelper.clearDb('persons')
+  // })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_persons',
+  //     procdir: 'out/out_person_process',
+  //     errdir: 'out/out_person_errors',
+  //     mediator: personsJsonMediator,
+  //   })
+  // })
+  // .then(() => {
+  //   return dbHelper.clearDb('personsAggr')
+  // })
+  // .then(() => {
+  //   log.info('аггрегация данных по персоналиям')
+  //   return personsAggr.start()
+  // })
   .then(() => {
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()
