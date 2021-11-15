@@ -76753,7 +76753,9 @@ var StrHelper = /*#__PURE__*/function () {
       var len = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 50;
 
       if (Array.isArray(input)) {
-        input = input.join('_');
+        input = input.filter(function (elem) {
+          return elem.trim().length > 0;
+        }).join('_');
       }
 
       var output = this.toTranslitStr(input);

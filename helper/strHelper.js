@@ -46,7 +46,8 @@ class StrHelper {
 
   static removeShortStrings(inputText, regstring, onlyEnd = true) {
     if (!regstring) {
-      const shortRegExp = onlyEnd ? `[а-я]{1,2}[.]$` : `[а-я]{1,2}[.]`
+      const shortRegExp = onlyEnd ? `[а-яa-z]{1,2}[.]$` : `[а-яa-z]{1,2}[.]`
+      //[а-яa-z]{1,2}[.]*\s
       regstring = new RegExp(shortRegExp, 'g')
     }
     return inputText.replace(regstring, '').trim()
@@ -166,7 +167,7 @@ class StrHelper {
     let result = []
     let m
     while ((m = r.exec(input)) != null) {
-      result.push(m[0])
+      (m[0] != '.') && result.push(m[0])
     }
     // let result = input.match(regexp) || []
     return result
@@ -193,6 +194,10 @@ class StrHelper {
 
   static varToString(varObj) {
     return Object.keys(varObj)[0]
+  }
+
+  static capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
   }
 }
 

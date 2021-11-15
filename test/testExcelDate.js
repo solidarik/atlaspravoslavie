@@ -17,7 +17,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 283)
         assert.strictEqual(res["ymd"][1], -1)
         assert.strictEqual(res["ymd"][2], -1)
-        assert.strictEqual(res["outputStr"], '283')
+        assert.strictEqual(res["dateStr"], '283')
         assert.strictEqual(res["isOnlyYear"], true)
     })
 
@@ -40,7 +40,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1330)
         assert.strictEqual(res["ymd"][1], 7)
         assert.strictEqual(res["ymd"][2], 24)
-        assert.strictEqual(res["outputStr"], '24.07.1330')
+        assert.strictEqual(res["dateStr"], '24.07.1330')
     })
 
     it('19/02/1878', () => {
@@ -48,7 +48,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1878)
         assert.strictEqual(res["ymd"][1], 2)
         assert.strictEqual(res["ymd"][2], 19)
-        assert.strictEqual(res["outputStr"], '19.02.1878')
+        assert.strictEqual(res["dateStr"], '19.02.1878')
     })
 
     it('1924', () => {
@@ -56,7 +56,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1924)
         assert.strictEqual(res["ymd"][1], -1)
         assert.strictEqual(res["ymd"][2], -1)
-        assert.strictEqual(res["outputStr"], '1924')
+        assert.strictEqual(res["dateStr"], '1924')
         assert.strictEqual(res["isOnlyYear"], true)
     })
 

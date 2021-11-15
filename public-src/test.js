@@ -24,6 +24,29 @@ const inetHelper = require('../helper/inetHelper')
 //   })
 // return
 
+getCoord = (input) => {
+  let output = input.replace(/[°]/g, '.')
+  output = output.replace(/[′]/g, '')
+  output = output.replace(/[″]/g, '')
+
+  console.log(output)
+
+  let numbers = StrHelper.getAllNumbers(output)
+  if (output.includes('ю. ш.') || output.includes('S')) {
+    numbers[0] = -numbers[0]
+  }
+  if (output.includes('з. д.') || output.includes('W')) {
+    numbers[1] = -numbers[1]
+  }
+
+  return [parseFloat(numbers[0]), parseFloat(numbers[1])]
+}
+
+log.info(JSON.stringify(getCoord('37°47′11″ ю. ш. 29°15′35″ з. д.')))
+
+dbHelper.free()
+return
+
 inetHelper.getWikiPageId('Агапит Печерский').then(
   res => console.log(res)
 )

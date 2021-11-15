@@ -25,7 +25,7 @@ class XlsGoogleParserPersons {
         const coords = InetHelper.getSavedCoords(inputPlace)
         if (coords) {
             const coordsStr = InetHelper.getLonLatSavedCoords(inputPlace).reverse()
-            if (!inputCoords.includes('_')) {
+            if (!inputCoords || !inputCoords.includes('_')) {
                 this.log.warn(`Найдена координата для ${inputPlace}: ${coordsStr.join('_')}`)
             }
             return coords
@@ -114,11 +114,11 @@ class XlsGoogleParserPersons {
 
             const birthday = row[headerColumns.birthday]
             if (!birthday) {
-                throw new Error('Пропуск пустой даты рождения')
+                throw new Error('Пропуск пустого места рождения')
             }
             json.birth = DateHelper.getDateFromInput(birthday)
             const birthPlace = row[headerColumns.birthPlace]
-            if (!birthPlace) {
+            if (!birthPlace || birthPlace == 'неизвестно') {
                 throw new Error('Пропуск пустого места рождения')
             }
             json.birth['place'] = birthPlace
@@ -166,20 +166,19 @@ class XlsGoogleParserPersons {
             json.pageUrl = ''
 
             const deathDate = row[headerColumns.deathDate]
-            if (!deathDate) {
-                throw new Error('Пропуск пустой даты смерти')
-            }
-            json.death = DateHelper.getDateFromInput(deathDate)
-            const deathPlace = row[headerColumns.deathPlace]
-            if (deathPlace) {
-                json.death['place'] = deathPlace
-                json.death['placeCoord'] = this.getCoords(deathPlace, row[headerColumns.deathCoord])
+            if (deathDate) {
+                json.death = DateHelper.getDateFromInput(deathDate)
+                const deathPlace = row[headerColumns.deathPlace]
+                if (deathPlace && deathPlace != 'неизвестно') {
+                    json.death['place'] = deathPlace
+                    json.death['placeCoord'] = this.getCoords(deathPlace, row[headerColumns.deathCoord])
+                }
             }
 
             json.isError = undefined
 
         } catch (e) {
-            json.isError = e
+            json.isError = '' + e
         }
 
         return json
@@ -214,16 +213,21 @@ class XlsGoogleParserPersons {
         let skipObjectCount = 0
 
         //start from row = 1, because we skip a header row
-        for (let row = 1; row < 2; row++) {
+        for (let row = 1; row < rows.length; row++) {
             const json = this.getJsonFromRow(headerColumns, rows[row])
 
             if (json.isChecked === '0' || json.isError) {
-                // if (json.isError)
-                //     this.log.error(`Пропуск строки ${row} ${json.name}: ${json.isError}`)
-                // else
-                //     this.log.info(`Пропуск строки ${json.name}`)
+                if (json.isError)
+                    this.log.error(`Пропуск строки ${row} ${JSON.stringify(json)}: ${json.isError}`)
+                else
+                    this.log.info(`Пропуск строки ${json.name}`)
                 skipObjectCount += 1
-                continue
+                //continue soli
+                console.log(json.isError)
+                if (json.isError == 'Error: Пропуск пустого места рождения') {
+                    continue
+                }
+                break
             }
 
             let pageUrlArr = json.sitename ? json.sitename : [json.surname, json.name, json.middlename]
@@ -236,9 +240,8 @@ class XlsGoogleParserPersons {
 
             if (json.isChecked.trim() != '') {
                 checkedObjectCount += 1
-            }
 
-            console.log(JSON.stringify(json))
+            }
         }
 
         const totalLinesCount = rows.length - 1

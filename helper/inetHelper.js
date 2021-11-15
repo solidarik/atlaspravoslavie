@@ -20,9 +20,26 @@ class InetHelper {
       ? fileHelper.getJsonFromFile(filename)
       : {}
     console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
+    let itemNames = []
+    for (let coordName in this.coords) {
+      itemNames.push(coordName)
+    }
+    itemNames.sort()
+    let newCoords = []
+    for (let i = 0; i < itemNames.length; i++) {
+      const itemName = itemNames[i].toLowerCase().trim()
+      const itemCoords = this.coords[itemNames[i]]
+      if (!newCoords[itemName]) {
+        newCoords[itemName] = { 'lat': itemCoords.lat, 'lon': itemCoords.lon }
+      }
+    }
+
+    this.coords = { ...newCoords }
+    // console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
   }
 
   saveCoords(filename) {
+    // console.log(`Before saving coords... Length: ${Object.keys(this.coords).length}`)
     fileHelper.saveJsonToFileSync(this.coords, filename)
   }
 
@@ -80,7 +97,7 @@ class InetHelper {
   }
 
   getLonLatSavedCoords(input) {
-    input = input.replace(',', '')
+    input = input.replace(',', '').trim().toLowerCase().replace(/"/g, '')
     let testNames = [input]
 
     let name = strHelper.shrinkStringBeforeDelim(input)
@@ -89,7 +106,9 @@ class InetHelper {
     testNames.push(strHelper.removeShortStrings(name, '', true).replace('  ', ' '))
     testNames.push(strHelper.removeShortStrings(name, '', false).replace('  ', ' '))
 
-    // console.log(testNames)
+    testNames = testNames.filter((value, index, self) => self.indexOf(value) === index)
+
+    console.log(`>>>>>>>> ${testNames}`)
 
     for (let i = 0; i < testNames.length; i++) {
       const name = testNames[i]
