@@ -24,6 +24,12 @@ class StrHelper {
     return output.replace(/[_]+/g, '_')
   }
 
+  static isExistNumber(input) {
+    if (!input || input == '') return false
+    const numbers = StrHelper.getAllNumbers(input)
+    return numbers.length > 0
+  }
+
   static strToEngSymbols(input) {
     if (!input || input == '') return ''
 

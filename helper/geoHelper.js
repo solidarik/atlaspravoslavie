@@ -1,3 +1,5 @@
+const StrHelper = require('./strHelper')
+
 class GeoHelper {
   static fromLonLat(input) {
     if (!input || input.length !== 2) {
@@ -22,6 +24,30 @@ class GeoHelper {
       output[i + 1] = y
     }
     return output
+  }
+
+  static getCoordsFromHumanCoords(input) {
+
+
+    //сначала проверяем на координаты типа x_y
+    const arr = input.split('_')
+    if (arr.length == 2) {
+      return arr.reverse().map(item => Number(item))
+    }
+
+    let output = input.replace(/[°]/g, '.')
+    output = output.replace(/[′]/g, '')
+    output = output.replace(/[″]/g, '')
+
+    let numbers = StrHelper.getAllNumbers(output)
+    if (output.includes('ю. ш.') || output.includes('S')) {
+      numbers[0] = -numbers[0]
+    }
+    if (output.includes('з. д.') || output.includes('W')) {
+      numbers[1] = -numbers[1]
+    }
+
+    return [parseFloat(numbers[0]), parseFloat(numbers[1])].reverse()
   }
 
   static getCenterCoord(ft) {

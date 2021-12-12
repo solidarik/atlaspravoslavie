@@ -20,6 +20,8 @@ var personsSchema = new mongoose.Schema(
       century: Number,
       place: String,
       placeCoord: [],
+      isIndirectDate: Boolean,
+      isIndirectPlace: Boolean
     },
 
     death: {
@@ -27,11 +29,13 @@ var personsSchema = new mongoose.Schema(
       month: Number,
       day: Number,
       dateStr: String,
-      isOnlyYear: Boolean,
-      isOnlyCentury: Boolean,
       century: Number,
       place: String,
       placeCoord: [],
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      isIndirectDate: Boolean,
+      isIndirectPlace: Boolean
     },
 
     achievements: [{

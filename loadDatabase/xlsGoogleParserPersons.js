@@ -11,36 +11,44 @@ const ServiceModel = require('../models/serviceModel')
 const readline = require('readline')
 const fs = require('fs')
 
+const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
+InetHelper.loadCoords(checkedCoordsPath)
+
+const dateStopWords = ['посередине', 'середина', 'между', 'или',
+    '—', '-', '—', 'первая', 'вторая', 'ранее', 'традиции', 'тексту', 'мира',
+    'неизвестно', 'монастырь']
+
 class XlsGoogleParserPersons {
 
     constructor(log) {
         this.log = log
     }
 
-    getCoords(inputPlace, inputCoords) {
+    async getCoords(inputPlace, inputCoords) {
+
         if (!inputPlace && !inputCoords) {
-            throw new Error(`getCoords empty inputs: ${inputPlace}, ${inputCoords}`)
+            return false
         }
 
-        const coords = InetHelper.getSavedCoords(inputPlace)
+        let coords = null
+
+        if (inputCoords) {
+            coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
+            return GeoHelper.fromLonLat(coords)
+        }
+
+        coords = InetHelper.getLonLatSavedCoords(inputPlace)
         if (coords) {
-            const coordsStr = InetHelper.getLonLatSavedCoords(inputPlace).reverse()
-            if (!inputCoords || !inputCoords.includes('_')) {
-                this.log.warn(`Найдена координата для ${inputPlace}: ${coordsStr.join('_')}`)
-            }
-            return coords
+            return GeoHelper.fromLonLat(coords)
         }
 
-        if (!inputCoords) {
-            throw new Error(`Не заполнена координата inputPlace ${inputPlace}`)
-        }
+        // const res = await InetHelper.getCoordsForCityOrCountry(inputPlace)
+        // if (res && res.length > 0) {
+        //     coords = res[0]
+        //     return GeoHelper.fromLonLat(coords)
+        // }
 
-        const arr = inputCoords.split('_')
-        if (arr.length == 0 || arr.length > 2) {
-            throw new Error(`Неизвестный формат координат ${inputCoords}`)
-        }
-
-        return GeoHelper.fromLonLat(arr.reverse().map(item => Number(item)))
+        return false
     }
 
     fillHeaderColumns(headerRow) {
@@ -54,7 +62,7 @@ class XlsGoogleParserPersons {
             'monkname': 'имя в монашестве',
             'name': 'имя',
 
-            'birthday': 'дата рождения',
+            'birthDay': 'дата рождения',
             'birthPlace': 'место рождения',
             'birthCoord': 'координаты места рождения',
 
@@ -81,7 +89,7 @@ class XlsGoogleParserPersons {
             'srcUrl': 'источник',
             'imgUrl': 'ссылка на фото',
 
-            'deathDate': 'дата смерти',
+            'deathDay': 'дата смерти',
             'deathPlace': 'похоронен / умер',
             'deathCoord': 'координаты смерти'
         }
@@ -98,8 +106,11 @@ class XlsGoogleParserPersons {
         return headerColumns
     }
 
-    getJsonFromRow(headerColumns, row) {
+    async getJsonFromRow(headerColumns, row) {
         let json = {}
+
+        json.isError = false
+        json.errorArr = []
 
         try {
 
@@ -112,17 +123,90 @@ class XlsGoogleParserPersons {
             json.sitename = row[headerColumns.sitename]
             json.monkname = row[headerColumns.monkname]
 
-            const birthday = row[headerColumns.birthday]
-            if (!birthday) {
-                throw new Error('Пропуск пустого места рождения')
+            const birthDay = row[headerColumns.birthDay]
+            const deathDay = row[headerColumns.deathDay]
+            if (!birthDay && !deathDay) {
+                json.errorArr.push('Пропуск пустых дат рождения и смерти')
+            } else {
+                let maybeBirthDate = false
+                let maybeDeathDate = false
+                if (birthDay != '') {
+                    maybeBirthDate = DateHelper.getDateFromInput(birthDay, dateStopWords)
+                    if (maybeBirthDate) {
+                        json.birth = maybeBirthDate
+                        json.birth['isIndirectDate'] = false
+                    } else {
+                        json.errorArr.push(`Не определена дата рождения ${birthDay}`)
+                    }
+                }
+
+                if (deathDay != '') {
+                    maybeDeathDate = DateHelper.getDateFromInput(deathDay, dateStopWords)
+                    if (maybeDeathDate) {
+                        json.death = maybeDeathDate
+                        json.death['isIndirectDate'] = false
+                    }
+                    else {
+                        json.errorArr.push(`Не определена дата смерти ${deathDay}`)
+                    }
+                }
+
+                if (maybeBirthDate && !maybeDeathDate) {
+                    json.death = { ...json.birth }
+                    json.death['year'] += 100
+                    json.death['century'] += 1
+                    json.death['isIndirectDate'] = true
+                }
+
+                if (!maybeBirthDate && maybeDeathDate) {
+                    json.birth = { ...json.death }
+                    json.birth['year'] -= 100
+                    json.birth['century'] -= 1
+                    json.birth['isIndirectDate'] = true
+                }
             }
-            json.birth = DateHelper.getDateFromInput(birthday)
-            const birthPlace = row[headerColumns.birthPlace]
-            if (!birthPlace || birthPlace == 'неизвестно') {
-                throw new Error('Пропуск пустого места рождения')
+
+            let birthPlace = row[headerColumns.birthPlace]
+            let deathPlace = row[headerColumns.deathPlace]
+
+            if (birthPlace)
+                birthPlace = birthPlace.trim().toLowerCase()
+
+            if (deathPlace)
+                deathPlace = deathPlace.trim().toLowerCase()
+
+            if ((!birthPlace || birthPlace == 'неизвестно')
+                && (!deathPlace || deathPlace == 'неизвестно')) {
+                json.errorArr.push('Пропуск пустых мест рождения и смерти')
+            } else {
+                json.birth['isIndirectPlace'] = false
+                json.death['isIndirectPlace'] = false
+
+                if (birthPlace && (!deathPlace || deathPlace == 'неизвестно')) {
+                    deathPlace = birthPlace
+                    json.death['isIndirectPlace'] = true
+                } else
+                    if (deathPlace && (!birthPlace || birthPlace == 'неизвестно')) {
+                        birthPlace = deathPlace
+                        json.birth['isIndirectPlace'] = true
+                    }
+
+                json.birth['place'] = birthPlace
+                let birthCoord = await this.getCoords(birthPlace, row[headerColumns.birthCoord])
+                if (birthCoord) {
+                    json.birth["placeCoord"] = birthCoord
+                } else {
+                    json.errorArr.push(`Не определена координата рождения для "${birthPlace}"`)
+                }
+
+                json.death['place'] = deathPlace
+                let deathCoord = await this.getCoords(deathPlace, row[headerColumns.deathCoord])
+                if (deathCoord) {
+                    json.death['placeCoord'] = deathCoord
+                } else {
+                    json.errorArr.push(`Не определена координата смерти для "${deathPlace}"`)
+                }
             }
-            json.birth['place'] = birthPlace
-            json.birth["placeCoord"] = this.getCoords(birthPlace, row[headerColumns.birthCoord])
 
             const achievs = [
                 {
@@ -148,9 +232,49 @@ class XlsGoogleParserPersons {
                 if (achiev.place == '' || achiev.date == '')
                     continue
                 let achievModel = {}
-                achievModel.place = achiev.place
-                achievModel.placeCoord = this.getCoords(achiev.place, achiev.coord)
-                achievModel.start = DateHelper.getDateFromInput(achiev.date)
+
+                if (achiev.place != '') {
+                    achievModel.place = achiev.place
+                    const achievPlaceCoord = await this.getCoords(achiev.place, achiev.coord)
+                    if (achievPlaceCoord) {
+                        achievModel.placeCoord = achievPlaceCoord
+                    } else {
+                        json.errorArr.push(`Не определена координата подвига для "${achiev.place}"`)
+                    }
+                }
+
+                if (achiev.date != '') {
+                    if (achiev.date.includes('-')) {
+                        const arrDates = achiev.date.split('-')
+                        const startDate = DateHelper.getDateFromInput(arrDates[0], dateStopWords)
+                        const endDate = DateHelper.getDateFromInput(arrDates[1], dateStopWords)
+                        if (startDate && endDate) {
+                            achievModel.start = startDate
+                            achievModel.end = endDate
+                        } else {
+                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
+                        }
+                    }
+                    else if (achiev.date.includes('—')) {
+                        const arrDates = achiev.date.split('—')
+                        const startDate = DateHelper.getDateFromInput(arrDates[0], dateStopWords)
+                        const endDate = DateHelper.getDateFromInput(arrDates[1], dateStopWords)
+                        if (startDate && endDate) {
+                            achievModel.start = startDate
+                            achievModel.end = endDate
+                        } else {
+                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
+                        }
+                    } else {
+                        const startDate = DateHelper.getDateFromInput(achiev.date, dateStopWords)
+                        if (startDate) {
+                            achievModel.start = startDate
+                        } else {
+                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
+                        }
+                    }
+                }
+
                 json.achievements.push(achievModel)
             }
 
@@ -165,20 +289,11 @@ class XlsGoogleParserPersons {
             json.imgUrl = row[headerColumns.imgUrl]
             json.pageUrl = ''
 
-            const deathDate = row[headerColumns.deathDate]
-            if (deathDate) {
-                json.death = DateHelper.getDateFromInput(deathDate)
-                const deathPlace = row[headerColumns.deathPlace]
-                if (deathPlace && deathPlace != 'неизвестно') {
-                    json.death['place'] = deathPlace
-                    json.death['placeCoord'] = this.getCoords(deathPlace, row[headerColumns.deathCoord])
-                }
-            }
-
-            json.isError = undefined
+            json.isError = json.errorArr.length > 0
 
         } catch (e) {
-            json.isError = '' + e
+            json.isError = true
+            json.errorArr.push('' + e)
         }
 
         return json
@@ -196,7 +311,7 @@ class XlsGoogleParserPersons {
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.GOOGLE_SHEET_ID_PERSON,
             key: process.env.GOOGLE_API_KEY,
-            range: 'A1:AE'
+            range: 'A1:AF'
         })
 
         if (!sheetData) return this.log.error('The Google API returned an error')
@@ -212,23 +327,43 @@ class XlsGoogleParserPersons {
         let checkedObjectCount = 0
         let skipObjectCount = 0
 
+        let errorTypes = {}
+
         //start from row = 1, because we skip a header row
         for (let row = 1; row < rows.length; row++) {
-            const json = this.getJsonFromRow(headerColumns, rows[row])
+            const json = await this.getJsonFromRow(headerColumns, rows[row])
 
-            if (json.isChecked === '0' || json.isError) {
-                if (json.isError)
-                    this.log.error(`Пропуск строки ${row} ${JSON.stringify(json)}: ${json.isError}`)
-                else
-                    this.log.info(`Пропуск строки ${json.name}`)
-                skipObjectCount += 1
-                //continue soli
-                console.log(json.isError)
-                if (json.isError == 'Error: Пропуск пустого места рождения') {
-                    continue
-                }
-                break
+            if (json.isChecked == '0') {
+                this.log.info(`${row + 1}: Skipped`)
             }
+            else if (json.isError) {
+                this.log.info(`${row + 1}: ${json.errorArr.join('; ')}`)
+            } else {
+                this.log.info(`${row + 1}: Success`)
+            }
+
+            // if (json.isChecked === '0' || json.isError) {
+            //     // if (json.isError)
+            //     //     this.log.error(`Пропуск строки ${row} ${JSON.stringify(json)}: ${json.isError}`)
+            //     // else
+            //     //     this.log.info(`Пропуск строки ${json.name}`)
+            //     skipObjectCount += 1
+
+            //     if (errorTypes.hasOwnProperty(json.isError))
+            //         errorTypes[json.isError] += 1
+            //     else
+            //         errorTypes[json.isError] = 1
+
+
+            //     // if (json.isError == 'Error: Пропуск пустого места рождения') {
+            //     //     continue
+            //     // }
+            //     // if (json.isError.includes('координата')) {
+            //     //     continue
+            //     // }
+            //     // break
+            //     continue
+            // }
 
             let pageUrlArr = json.sitename ? json.sitename : [json.surname, json.name, json.middlename]
             json.pageUrl = StrHelper.generatePageUrl(pageUrlArr)
@@ -240,14 +375,16 @@ class XlsGoogleParserPersons {
 
             if (json.isChecked.trim() != '') {
                 checkedObjectCount += 1
-
             }
         }
 
+        // this.log.error(`hi >>>>>>>>> ${JSON.stringify(errorTypes)}`)
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
         const statusText = [checkedObjectCount, skipObjectCount, totalLinesCount].join(' / ')
-        console.log(statusText)
+        this.log.info(statusText)
+
+        InetHelper.saveCoords(checkedCoordsPath)
 
         return true
 

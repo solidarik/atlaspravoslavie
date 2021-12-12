@@ -76681,7 +76681,7 @@ var ClassHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = ClassHelper;
-},{}],"IGBU":[function(require,module,exports) {
+},{}],"COrk":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -76716,6 +76716,13 @@ var StrHelper = /*#__PURE__*/function () {
       return output.replace(/[_]+/g, '_');
     }
   }, {
+    key: "isExistNumber",
+    value: function isExistNumber(input) {
+      if (!input || input == '') return false;
+      var numbers = StrHelper.getAllNumbers(input);
+      return numbers.length > 0;
+    }
+  }, {
     key: "strToEngSymbols",
     value: function strToEngSymbols(input) {
       if (!input || input == '') return '';
@@ -76741,7 +76748,8 @@ var StrHelper = /*#__PURE__*/function () {
       var onlyEnd = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
       if (!regstring) {
-        var shortRegExp = onlyEnd ? "[\u0430-\u044F]{1,2}[.]$" : "[\u0430-\u044F]{1,2}[.]";
+        var shortRegExp = onlyEnd ? "[\u0430-\u044Fa-z]{1,2}[.]$" : "[\u0430-\u044Fa-z]{1,2}[.]"; //[а-яa-z]{1,2}[.]*\s
+
         regstring = new RegExp(shortRegExp, 'g');
       }
 
@@ -76886,7 +76894,7 @@ var StrHelper = /*#__PURE__*/function () {
       var m;
 
       while ((m = r.exec(input)) != null) {
-        result.push(m[0]);
+        m[0] != '.' && result.push(m[0]);
       } // let result = input.match(regexp) || []
 
 
@@ -76917,6 +76925,11 @@ var StrHelper = /*#__PURE__*/function () {
     key: "varToString",
     value: function varToString(varObj) {
       return Object.keys(varObj)[0];
+    }
+  }, {
+    key: "capitalizeFirstLetter",
+    value: function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     }
   }]);
 
@@ -82605,7 +82618,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var strHelper = require('../helper/strHelper');
+var StrHelper = require('../helper/StrHelper');
 
 var moment = require('moment');
 
@@ -82623,16 +82636,16 @@ var DateHelper = /*#__PURE__*/function () {
         return input;
       }
 
-      var procDate = strHelper.shrinkStringBeforeDelim(input);
-      procDate = strHelper.ignoreEqualsValue(input);
-      procDate = strHelper.ignoreSpaces(procDate);
+      var procDate = StrHelper.shrinkStringBeforeDelim(input);
+      procDate = StrHelper.ignoreEqualsValue(input);
+      procDate = StrHelper.ignoreSpaces(procDate);
       procDate = procDate.replace(/-/g, '.');
 
       if (procDate.length == 4) {
         procDate = "01.01.".concat(procDate);
       } else if (procDate.split('.').length !== 3) {
         var months = ['янв', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-        var year = strHelper.getMaxLenNumber(input);
+        var year = StrHelper.getMaxLenNumber(input);
         var month = 1;
         year = year.length == 2 ? '19' + year : year;
 
@@ -82706,8 +82719,25 @@ var DateHelper = /*#__PURE__*/function () {
   }, {
     key: "getDateFromInput",
     value: function getDateFromInput(input) {
-      if (!input) return;
+      var stopWords = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      if (!input) return false;
       var inputText = ('' + input).trim();
+      inputText = inputText.replace(/ /g, ''); //убираем примерные слова
+
+      inputText = inputText.replace('ок.', '');
+      inputText = inputText.replace('около', '');
+      inputText = inputText.replace('начало', '');
+      inputText = inputText.replace('конец', '');
+      inputText = inputText.trim(); //грохаем все, что между скобками
+
+      inputText = inputText.replace(/[(][^(]*[)]/g, ''); //ищем стоп-слова, если находим - вылетаем со свистом
+
+      for (var word = 0; word < stopWords.length; word++) {
+        if (input.includes(stopWords)) {
+          return false;
+        }
+      }
+
       var outputStr = '';
       var isUserText = false;
       var isOnlyYear = false;
@@ -82721,21 +82751,38 @@ var DateHelper = /*#__PURE__*/function () {
       var testStr = '';
 
       if (!isFound && inputText.includes('в')) {
-        date_groups = strHelper.getSearchGroupsInRegexp('(\\d+)[в]', inputText);
+        var isNegative = inputText.includes('-'); //если нет цирф 1..9, то конвертируем римские цифры в арабские
+
+        if (!StrHelper.isExistNumber(input)) {
+          //преобразуем все возможную кириллицу в англ. язык (для римских цифр)
+          inputText = inputText.replace('X', 'X'); //преобразуем римские цифры в арабские
+
+          date_groups = StrHelper.getSearchGroupsInRegexp('[-]*(\\S+)[в]', inputText);
+
+          if (date_groups && date_groups.length > 0) {
+            inputText = DateHelper.romanToArabic(date_groups[0]) + 'в';
+          }
+        }
+
+        date_groups = StrHelper.getSearchGroupsInRegexp('[-]*(\\d+)[в]', inputText);
 
         if (date_groups && date_groups.length > 0) {
           century = parseInt(date_groups[0]);
           isOnlyCentury = true;
           isFound = true;
-          date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText);
+          date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*).*до.*н.*', inputText);
           if (date_groups && date_groups.length > 0) century = -century;
+        }
+
+        if (isNegative) {
+          century = -century;
         }
       }
 
       if (!isFound) {
         inputText = inputText.replace('г.', '').replace('гг.', '');
         inputText = inputText.replace('гг', '');
-        inputText = strHelper.removeByRegExp('г$', inputText);
+        inputText = StrHelper.removeByRegExp('г$', inputText);
       }
 
       if (!isFound && !inputText.includes('.')) {
@@ -82751,7 +82798,7 @@ var DateHelper = /*#__PURE__*/function () {
 
 
       if (!isFound) {
-        date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText);
+        date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*).*до.*н.*', inputText);
 
         if (date_groups && date_groups.length > 0) {
           y = parseInt(date_groups[0]);
@@ -82776,7 +82823,7 @@ var DateHelper = /*#__PURE__*/function () {
 
 
       if (!isFound) {
-        date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText);
+        date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText);
 
         if (date_groups && date_groups.length > 0) {
           y = parseInt(date_groups[0]);
@@ -82788,7 +82835,7 @@ var DateHelper = /*#__PURE__*/function () {
 
 
       if (!isFound) {
-        date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText);
+        date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText);
 
         if (date_groups && date_groups.length === 3) {
           d = parseInt(date_groups[0]);
@@ -82816,7 +82863,18 @@ var DateHelper = /*#__PURE__*/function () {
       }
 
       if (!isUserText && !isOnlyYear && !isOnlyCentury) {
-        outputStr = "".concat(strHelper.pad(d, 2), ".").concat(strHelper.pad(m, 2), ".").concat(y);
+        outputStr = "".concat(StrHelper.pad(d, 2), ".").concat(StrHelper.pad(m, 2), ".").concat(y);
+      }
+
+      if (isOnlyCentury) {
+        m = 1;
+        d = 1;
+
+        if (century >= 0) {
+          y = (century - 1) * 100;
+        } else {
+          y = (century + 1) * 100;
+        }
       }
 
       return {
@@ -82918,7 +82976,7 @@ var DateHelper = /*#__PURE__*/function () {
       var romanize = DateHelper.arabicToRoman(intCentury);
 
       if (isMinus) {
-        return "- ".concat(romanize, " ");
+        return "-".concat(romanize);
       }
 
       return romanize;
@@ -83034,12 +83092,14 @@ var DateHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = DateHelper;
-},{"../helper/strHelper":"IGBU","moment":"a2Bw"}],"Ub54":[function(require,module,exports) {
+},{"../helper/StrHelper":"COrk","moment":"a2Bw"}],"Ub54":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var StrHelper = require('./strHelper');
 
 var GeoHelper = /*#__PURE__*/function () {
   function GeoHelper() {
@@ -83074,6 +83134,33 @@ var GeoHelper = /*#__PURE__*/function () {
       }
 
       return output;
+    }
+  }, {
+    key: "getCoordsFromHumanCoords",
+    value: function getCoordsFromHumanCoords(input) {
+      //сначала проверяем на координаты типа x_y
+      var arr = input.split('_');
+
+      if (arr.length == 2) {
+        return arr.reverse().map(function (item) {
+          return Number(item);
+        });
+      }
+
+      var output = input.replace(/[°]/g, '.');
+      output = output.replace(/[′]/g, '');
+      output = output.replace(/[″]/g, '');
+      var numbers = StrHelper.getAllNumbers(output);
+
+      if (output.includes('ю. ш.') || output.includes('S')) {
+        numbers[0] = -numbers[0];
+      }
+
+      if (output.includes('з. д.') || output.includes('W')) {
+        numbers[1] = -numbers[1];
+      }
+
+      return [parseFloat(numbers[0]), parseFloat(numbers[1])].reverse();
     }
   }, {
     key: "getCenterCoord",
@@ -83122,7 +83209,7 @@ var GeoHelper = /*#__PURE__*/function () {
 }();
 
 module.exports = GeoHelper;
-},{}],"p4qv":[function(require,module,exports) {
+},{"./strHelper":"COrk"}],"p4qv":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -84259,7 +84346,7 @@ var ChronosFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = ChronosFeature;
-},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"ewPj":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/strHelper":"COrk","../../helper/dateHelper":"IrKG"}],"ewPj":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));
@@ -84351,7 +84438,7 @@ var ChronosChurchFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = ChronosChurchFeature;
-},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"WMTm":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/strHelper":"COrk","../../helper/dateHelper":"IrKG"}],"WMTm":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));
@@ -84455,7 +84542,7 @@ var TemplesFeature = /*#__PURE__*/function (_SuperFeature) {
 }(_superFeature.default);
 
 module.exports = TemplesFeature;
-},{"./superFeature":"hPGt","../../helper/strHelper":"IGBU","../../helper/dateHelper":"IrKG"}],"oL5g":[function(require,module,exports) {
+},{"./superFeature":"hPGt","../../helper/strHelper":"COrk","../../helper/dateHelper":"IrKG"}],"oL5g":[function(require,module,exports) {
 "use strict";
 
 var _superFeature = _interopRequireDefault(require("./superFeature"));

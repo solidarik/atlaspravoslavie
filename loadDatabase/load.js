@@ -1,6 +1,10 @@
 const chalk = require('chalk')
 const Log = require('../helper/logHelper')
+const FileHelper = require('../helper/fileHelper')
 
+if (FileHelper.isFileExists('load.log')) {
+  FileHelper.deleteFile('load.log')
+}
 log = Log.create('load.log')
 
 const DbHelper = require('../loadDatabase/dbHelper')
@@ -105,11 +109,11 @@ Promise.resolve(true)
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()
     dbHelper.free()
-    inetHelper.saveCoords(checkedCoordsPath)
+    // inetHelper.saveCoords(checkedCoordsPath)
   })
   .catch((err) => {
     personsAggr.free()
     dbHelper.free()
-    inetHelper.saveCoords(checkedCoordsPath)
+    // inetHelper.saveCoords(checkedCoordsPath)
     log.error(`Ошибка загрузки данных: ${err}`)
   })
