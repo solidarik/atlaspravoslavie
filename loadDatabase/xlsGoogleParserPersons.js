@@ -352,7 +352,9 @@ class XlsGoogleParserPersons {
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]
-            json.imgUrl = row[headerColumns.imgUrl]
+            json.imgUrl = row[headerColumns.imgUrl].split('http').map(item => {
+                return `http${item}`
+            })
             json.pageUrl = ''
 
             json.isError = json.errorArr.length > 0

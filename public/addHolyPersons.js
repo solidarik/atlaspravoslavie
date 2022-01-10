@@ -82,6 +82,8 @@ export default class addHolyPersons {
       ((typeof thisThis.data[id].profession !== 'undefined') ? thisThis.data[id].profession : '')
     )
 
+    console.log(JSON.stringify(thisThis.data[id]))
+
     $('#imgPerson').src = thisThis.data[id].photoUrl
     $('#imgPerson').attr('src', thisThis.data[id].photoUrl)
     // $('#description').html(
@@ -166,7 +168,7 @@ export default class addHolyPersons {
         }
         //}
       }
-      if(currPerson!=undefined&&currPerson.pageUrl==obj[i]['pageUrl']){
+      if (currPerson != undefined && currPerson.pageUrl == obj[i]['pageUrl']) {
         curId = i;
       }
     }
@@ -215,10 +217,10 @@ export default class addHolyPersons {
       })
     )
 
-    if(currPerson!=undefined){
-      var str = '#'+curId;
+    if (currPerson != undefined) {
+      var str = '#' + curId;
       $(str).click();
-    }else{
+    } else {
       $('#0').click();
     }
   }

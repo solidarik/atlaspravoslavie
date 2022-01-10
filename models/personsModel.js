@@ -102,7 +102,7 @@ var personsSchema = new mongoose.Schema(
     isShowOnMap: Boolean,
 
     srcUrl: String,
-    photoUrl: String,
+    imgUrls: [String],
     linkUrl: String,
   },
   {

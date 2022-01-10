@@ -52,9 +52,10 @@ class PersonFeature extends SuperFeature {
       monkname = `<h1>Имя в монашестве: ${info.monkname}</h1>`
     }
 
+    const imgUrls = info.imgUrls
     let imgHtml = ''
-    if (info.photoUrl) {
-      imgHtml = `<img src="${info.photoUrl}" class="rounded float-start imageFeatureInfo"></img>`
+    if (imgUrls && imgUrls.length > 0) {
+      imgHtml = `<img src="${imgUrls[0]}" class="rounded float-start imageFeatureInfo"></img>`
     }
 
     let html = `<div class="person-info panel-info">
