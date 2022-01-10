@@ -128,7 +128,7 @@ class InetHelper {
       return isExistCoords
     }
 
-    console.log(`Не найдены предустановленные координаты для ${input}`)
+    // console.log(`Не найдены предустановленные координаты для ${input}`)
 
     input = input.replace(',', '')
     let name = strHelper.shrinkStringBeforeDelim(input)

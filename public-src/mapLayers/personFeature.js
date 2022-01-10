@@ -41,8 +41,11 @@ class PersonFeature extends SuperFeature {
     let info = outerInfo.info
     window.CURRENT_ITEM = info
 
-    let worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания'
-    worshipStr += ': ' + info.worshipDays.map((item) => item.dateStr).join(', ')
+    let worshipStr = ''
+    if (info.worshipDays.length > 0) {
+      worshipStr = info.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания'
+      worshipStr += ': ' + info.worshipDays.map((item) => item.dateStr).join(', ')
+    }
 
     let monkname = ''
     if (info.monkname) {
@@ -98,18 +101,26 @@ class PersonFeature extends SuperFeature {
       `
     }
 
+    if (info.canonizationDate && info.canonizationDate.dateStr) {
+      html += `<tr><th scope='row'>Канонизация</th>
+        <td></td>
+        <td>${DateHelper.ymdToStr(info.canonizationDate)}</td>
+      </tr>`
+    }
+
     html += '</tbody></table>'
 
-    html += `<h2 class='worship-days'>${worshipStr}</h2>`
-
-    if (info.canonizationDate && info.canonizationDate.dateStr) {
-      html += `<h2>Дата канонизации: ${DateHelper.ymdToStr(info.canonizationDate)}</h2>`
+    if (worshipStr) {
+      html += `<h2 class='worship-days'>${worshipStr}</h2>`
     }
 
     const personUrl = `person/${info.pageUrl}`
 
+    if (outerInfo.shortDescription) {
+      html += `<p>${outerInfo.shortDescription}</p>`
+    }
+
     html += `
-      <p>${outerInfo.shortDescription}</p>
       <div class="source-info">
         <a rel='noopener noreferrer' href="${personUrl}">Подробнее</a>
       </div>

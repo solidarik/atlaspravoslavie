@@ -30,6 +30,21 @@ class StrHelper {
     return numbers.length > 0
   }
 
+  static isRussianLetter(input) {
+    return input.length === 1 && /[А-Яа-я]/i.test(input)
+  }
+
+  static isEnglishLetter(input) {
+    return input.length === 1 && /[A-Za-z]/i.test(input)
+  }
+
+  static isNumeric(input) {
+    input = input + ''
+    //https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
+    return !isNaN(input) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+      !isNaN(parseFloat(input)) // ...and ensure strings of whitespace fail
+  }
+
   static strToEngSymbols(input) {
     if (!input || input == '') return ''
 
@@ -160,6 +175,19 @@ class StrHelper {
       }
     }
     return res
+  }
+
+  static getAllIntegerNumbers(input) {
+    // К примеру, есть строка: '123 adsf asdf  234324 22'
+    // Получаем из нее массив строковых чисел: ['123', '234324', '22']"""
+    input = input.replace('\n', '')
+    const r = new RegExp(`[0-9]+`, 'g')
+    let result = []
+    let m
+    while ((m = r.exec(input)) != null) {
+      (m[0] != '.') && result.push(m[0])
+    }
+    return result
   }
 
   static getAllNumbers(input, floatDelim = '.') {

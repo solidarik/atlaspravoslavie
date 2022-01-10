@@ -64,7 +64,7 @@ var personsSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      required: 'Статус святости обязателен для заполнения',
+      // required: 'Статус святости обязателен для заполнения',
     },
 
     groupStatus: {

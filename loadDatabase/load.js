@@ -85,11 +85,11 @@ Promise.resolve(true)
   //   return xlsGoogleParser.loadData(dbHelper)
   // })
   .then(() => {
+    return dbHelper.clearDb('persons')
+  })
+  .then(() => {
     return xlsGoogleParserPersons.loadData(dbHelper)
   })
-  // .then(() => {
-  //   return dbHelper.clearDb('persons')
-  // })
   // .then(() => {
   //   return dbHelper.saveFilesFrom({
   //     source: 'python/out_persons',
@@ -98,13 +98,13 @@ Promise.resolve(true)
   //     mediator: personsJsonMediator,
   //   })
   // })
-  // .then(() => {
-  //   return dbHelper.clearDb('personsAggr')
-  // })
-  // .then(() => {
-  //   log.info('аггрегация данных по персоналиям')
-  //   return personsAggr.start()
-  // })
+  .then(() => {
+    return dbHelper.clearDb('personsAggr')
+  })
+  .then(() => {
+    log.info('аггрегация данных по персоналиям')
+    return personsAggr.start()
+  })
   .then(() => {
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()

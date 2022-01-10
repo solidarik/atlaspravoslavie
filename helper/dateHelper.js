@@ -97,6 +97,40 @@ class DateHelper {
     return -1
   }
 
+  /**
+   * Возвращает имя месяца по его номеру
+   * @param {int} num Номер месяца
+   */
+  static getTextOfMonth(num) {
+
+    if (num < 1 || num > 12) {
+      throw `Странный месяц ${num}`
+    }
+
+    const months = [
+      'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август',
+      'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
+    ]
+    return months[num - 1]
+  }
+
+  /**
+   * Возвращает склоняемое имя месяца по его номеру
+   * @param {int} num Номер месяца
+   */
+  static getInducementTextOfMonth(num) {
+
+    if (num < 1 || num > 12) {
+      throw `Странный месяц ${num}`
+    }
+
+    const months = [
+      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа',
+      'сентября', 'октября', 'ноября', 'декабря'
+    ]
+    return months[num - 1]
+  }
+
   static getDateFromInput(input, stopWords = []) {
 
     if (!input) return false
@@ -105,6 +139,7 @@ class DateHelper {
     inputText = inputText.replace(/ /g, '')
 
     //убираем примерные слова
+    inputText = inputText.replace('Дата:', '')
     inputText = inputText.replace('ок.', '')
     inputText = inputText.replace('около', '')
     inputText = inputText.replace('начало', '')
@@ -183,7 +218,7 @@ class DateHelper {
 
     // если год до н.э.
     if (!isFound) {
-      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*).*до.*н.*', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d+).*до.*н.*', inputText)
       if (date_groups && date_groups.length > 0) {
         y = parseInt(date_groups[0])
         y = -y
@@ -209,7 +244,9 @@ class DateHelper {
       date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
       if (date_groups && date_groups.length > 0) {
         y = parseInt(date_groups[0])
-        d = parseInt(date_groups[1])
+        if (date_groups[1] != '') {
+          d = parseInt(date_groups[1])
+        }
         m = parseInt(DateHelper.getMonthNum(date_groups[2]))
         isFound = true
       }
@@ -219,7 +256,9 @@ class DateHelper {
     if (!isFound) {
       date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText)
       if (date_groups && date_groups.length === 3) {
-        d = parseInt(date_groups[0])
+        if (date_groups[0] != '') {
+          d = parseInt(date_groups[0])
+        }
         m = parseInt(DateHelper.getMonthNum(date_groups[1]))
         y = parseInt(date_groups[2])
         isFound = (y > 0)
@@ -256,7 +295,7 @@ class DateHelper {
       }
     }
 
-    return {
+    const res = {
       "ymd": [y, m, d],
       "year": y,
       "month": m,
@@ -267,6 +306,8 @@ class DateHelper {
       "isOnlyCentury": isOnlyCentury,
       "isUserText": isUserText
     }
+
+    return res
   }
 
   static convertTZ(date, tzString) {

@@ -1,6 +1,6 @@
 
 const Log = require('../helper/logHelper')
-const dateHelper = require('../helper/dateHelper')
+const DateHelper = require('../helper/dateHelper')
 const ImageHelper = require('../helper/imageHelper')
 log = Log.create('load.log')
 
@@ -16,13 +16,13 @@ const TemplesModel = require('../models/templesModel')
 const StrHelper = require('../helper/strHelper')
 const GeoHelper = require('../helper/geoHelper')
 const InetHelper = require('../helper/inetHelper')
+const JsHelper = require('../helper/jsHelper')
 
 
-inputText = '7 декабря 43 до н. э. ( -043-12-07 ) (63 года)'
-inputText = inputText.replace(/[(][^(]*[)]/g, '')
-console.log(inputText)
+const input = 'По еврейской традиции: 3138—2773 до н. э. По православной: 4387—4022 до н. э.'
+const res = DateHelper.getDateFromInput(input)
+console.log(res)
 return
-
 
 
 //"lat": 54.73333,
@@ -59,13 +59,6 @@ const testAsync = async function testAsync() {
 testAsync()
 setTimeout(() => InetHelper.saveCoords(checkedCoordsPath), 2000)
 return
-
-const input = '-2 век'
-const res = dateHelper.getDateFromInput(input)
-console.log(res)
-return
-
-const inetHelper = require('../helper/inetHelper')
 
 // const testUrl = 'https://balashovblag.ru/images/019_2017_9_6_22_10_32_1795892298.jpg'
 // ImageHelper.loadImageToFile(testUrl, imagesFolder, 'test')

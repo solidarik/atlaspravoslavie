@@ -4,12 +4,10 @@ const { google } = require('googleapis')
 const InetHelper = require('../helper/inetHelper')
 const GeoHelper = require('../helper/geoHelper')
 const DateHelper = require('../helper/dateHelper')
+const JsHelper = require('../helper/jsHelper')
 const StrHelper = require('../helper/strHelper')
 const PersonModel = require('../models/personsModel')
 const ServiceModel = require('../models/serviceModel')
-
-const readline = require('readline')
-const fs = require('fs')
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 InetHelper.loadCoords(checkedCoordsPath)
@@ -42,13 +40,68 @@ class XlsGoogleParserPersons {
             return GeoHelper.fromLonLat(coords)
         }
 
+        // start search coordinates in wiki
         // const res = await InetHelper.getCoordsForCityOrCountry(inputPlace)
         // if (res && res.length > 0) {
         //     coords = res[0]
         //     return GeoHelper.fromLonLat(coords)
         // }
+        // end search
 
         return false
+    }
+
+    getWorshipDates(input) {
+        let worshipDates = []
+        if (!input) {
+            return worshipDates
+        }
+
+        input = StrHelper.ignoreSpaces(input)
+        let prevWordPos = 0
+        for (let pos = 1; pos < input.length; pos++) {
+            const prevLetter = input[pos - 1]
+            const currLetter = input[pos]
+            if ((currLetter === '/') ||
+                (StrHelper.isRussianLetter(prevLetter)
+                    && StrHelper.isNumeric(currLetter))) {
+                worshipDates.push(input.substring(prevWordPos, pos))
+                prevWordPos = (currLetter === '/') ? pos + 1 : pos
+            }
+        }
+
+        //last word
+        worshipDates.push(input.substring(prevWordPos, input.length))
+
+        worshipDates = JsHelper.onlyUniqueInArray(worshipDates)
+
+        let worships = []
+
+        worshipDates.forEach((worship) => {
+            const numbers = StrHelper.getAllIntegerNumbers(worship)
+
+            if (numbers.length < 1 || numbers.length > 2) {
+                throw `Неожиданный формат даты канонизации ${worship}`
+            }
+
+            let day = numbers[0]
+            let month = -1
+            if (numbers.length == 1) {
+                month = DateHelper.getMonthNum(worship)
+            } else if (numbers.length == 2) {
+                month = numbers[1]
+            }
+            if (month == -1) {
+                throw `Неожиданный формат даты канонизации ${worship}`
+            }
+            worships.push({
+                "day": day,
+                "month": month,
+                "dateStr": `${Number(day)} ${DateHelper.getInducementTextOfMonth(month)}`
+            })
+        })
+
+        return worships
     }
 
     fillHeaderColumns(headerRow) {
@@ -110,6 +163,7 @@ class XlsGoogleParserPersons {
         let json = {}
 
         json.isError = false
+        json.isCatchError = false
         json.errorArr = []
 
         try {
@@ -278,11 +332,23 @@ class XlsGoogleParserPersons {
                 json.achievements.push(achievModel)
             }
 
-            json.canonizationDate = row[headerColumns.canonizationDate]
+            const canonizationDate = DateHelper.getDateFromInput(row[headerColumns.canonizationDate], dateStopWords)
+            if (canonizationDate) {
+                json.canonizationDate = canonizationDate
+            }
+
             json.status = row[headerColumns.status]
             json.groupStatus = row[headerColumns.groupStatus]
 
-            json.worships = row[headerColumns.worshipDays]
+            if (json.groupStatus.includes('муч'))
+                json.groupStatus = 'мученик'
+            else if (json.groupStatus.includes('свят'))
+                json.groupStatus = 'святой'
+            else if (json.groupStatus.includes('препод'))
+                json.groupStatus = 'преподобный'
+            else json.groupStatus = 'святой'
+
+            json.worships = this.getWorshipDates(row[headerColumns.worshipDays])
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]
@@ -293,6 +359,7 @@ class XlsGoogleParserPersons {
 
         } catch (e) {
             json.isError = true
+            json.isCatchError = true
             json.errorArr.push('' + e)
         }
 
@@ -324,46 +391,34 @@ class XlsGoogleParserPersons {
 
         const headerColumns = this.fillHeaderColumns(rows[0])
         let insertObjects = []
-        let checkedObjectCount = 0
+        let successObjectCount = 0
         let skipObjectCount = 0
 
         let errorTypes = {}
 
         //start from row = 1, because we skip a header row
         for (let row = 1; row < rows.length; row++) {
+            // for (let row = 1; row < 1500; row++) {
             const json = await this.getJsonFromRow(headerColumns, rows[row])
 
-            if (json.isChecked == '0') {
+            json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
+
+            if (json.isChecked == '0' || json.isCatchError) {
+                skipObjectCount += 1
                 this.log.info(`${row + 1}: Skipped`)
+                continue
             }
             else if (json.isError) {
                 this.log.info(`${row + 1}: ${json.errorArr.join('; ')}`)
+
+                if (errorTypes.hasOwnProperty(json.isError))
+                    errorTypes[json.isError] += 1
+                else
+                    errorTypes[json.isError] = 1
             } else {
+                successObjectCount += 1
                 this.log.info(`${row + 1}: Success`)
             }
-
-            // if (json.isChecked === '0' || json.isError) {
-            //     // if (json.isError)
-            //     //     this.log.error(`Пропуск строки ${row} ${JSON.stringify(json)}: ${json.isError}`)
-            //     // else
-            //     //     this.log.info(`Пропуск строки ${json.name}`)
-            //     skipObjectCount += 1
-
-            //     if (errorTypes.hasOwnProperty(json.isError))
-            //         errorTypes[json.isError] += 1
-            //     else
-            //         errorTypes[json.isError] = 1
-
-
-            //     // if (json.isError == 'Error: Пропуск пустого места рождения') {
-            //     //     continue
-            //     // }
-            //     // if (json.isError.includes('координата')) {
-            //     //     continue
-            //     // }
-            //     // break
-            //     continue
-            // }
 
             let pageUrlArr = json.sitename ? json.sitename : [json.surname, json.name, json.middlename]
             json.pageUrl = StrHelper.generatePageUrl(pageUrlArr)
@@ -372,21 +427,14 @@ class XlsGoogleParserPersons {
             }
             pageUrls.push(json.pageUrl)
             insertObjects.push(json)
-
-            if (json.isChecked.trim() != '') {
-                checkedObjectCount += 1
-            }
         }
 
-        // this.log.error(`hi >>>>>>>>> ${JSON.stringify(errorTypes)}`)
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
-        const statusText = [checkedObjectCount, skipObjectCount, totalLinesCount].join(' / ')
+        const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
         this.log.info(statusText)
 
         InetHelper.saveCoords(checkedCoordsPath)
-
-        return true
 
         res = await PersonModel.insertMany(insertObjects)
 
@@ -396,16 +444,18 @@ class XlsGoogleParserPersons {
             this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
         }
 
+        return true
+
         res = await dbHelper.clearDb('service')
 
         const serviceObjects = [
-            { name: 'checkedObjectCount', kind: 'detailStatus', value: checkedObjectCount },
-            { name: 'skipObjectCount', kind: 'detailStatus', value: skipObjectCount },
-            { name: 'savedCount', kind: 'detailStatus', value: savedCount },
-            { name: 'totalCount', kind: 'detailStatus', value: totalLinesCount },
-            { name: 'statusText', kind: 'status', value: statusText },
+            { name: 'successObjectCountPersons', kind: 'detailStatus', value: successObjectCount },
+            { name: 'skipObjectCountPersons', kind: 'detailStatus', value: skipObjectCount },
+            { name: 'savedCountPersons', kind: 'detailStatus', value: savedCount },
+            { name: 'totalCountPersons', kind: 'detailStatus', value: totalLinesCount },
+            { name: 'statusTextPersons', kind: 'status', value: statusText },
             // { name: 'lastUpdateSheet', kind: 'status', value: last_update },
-            { name: 'checkedTime', kind: 'status', value: checkedTime }
+            { name: 'checkedTimePersons', kind: 'status', value: checkedTime }
         ]
 
         res = await ServiceModel.insertMany(serviceObjects)
