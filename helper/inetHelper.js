@@ -20,9 +20,26 @@ class InetHelper {
       ? fileHelper.getJsonFromFile(filename)
       : {}
     console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
+    let itemNames = []
+    for (let coordName in this.coords) {
+      itemNames.push(coordName)
+    }
+    itemNames.sort()
+    let newCoords = []
+    for (let i = 0; i < itemNames.length; i++) {
+      const itemName = itemNames[i].toLowerCase().trim()
+      const itemCoords = this.coords[itemNames[i]]
+      if (!newCoords[itemName]) {
+        newCoords[itemName] = { 'lat': itemCoords.lat, 'lon': itemCoords.lon }
+      }
+    }
+
+    this.coords = { ...newCoords }
+    // console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
   }
 
   saveCoords(filename) {
+    console.log(`Before saving coords... Length: ${Object.keys(this.coords).length}`)
     fileHelper.saveJsonToFileSync(this.coords, filename)
   }
 
@@ -34,7 +51,7 @@ class InetHelper {
           resolve(response.data)
         })
         .catch((error) => {
-          log.error(`Error! axios was broken: ${error}`)
+          log.error(`Error! axios was broken: ${error} ${url}`)
           reject(error)
         })
     })
@@ -80,7 +97,7 @@ class InetHelper {
   }
 
   getLonLatSavedCoords(input) {
-    input = input.replace(',', '')
+    input = input.replace(',', '').trim().toLowerCase().replace(/"/g, '')
     let testNames = [input]
 
     let name = strHelper.shrinkStringBeforeDelim(input)
@@ -89,7 +106,7 @@ class InetHelper {
     testNames.push(strHelper.removeShortStrings(name, '', true).replace('  ', ' '))
     testNames.push(strHelper.removeShortStrings(name, '', false).replace('  ', ' '))
 
-    // console.log(testNames)
+    testNames = testNames.filter((value, index, self) => self.indexOf(value) === index)
 
     for (let i = 0; i < testNames.length; i++) {
       const name = testNames[i]
@@ -102,33 +119,25 @@ class InetHelper {
     return false
   }
 
-  getSavedCoords(input) {
-
-    const lonLat = this.getLonLatSavedCoords(input)
-    if (lonLat && lonLat.length == 2)
-      return geoHelper.fromLonLat(lonLat)
-
-    return false
-  }
-
   async getLocalCoordsForName(input) {
 
     if (!input) return null
 
-    const isExistCoords = this.getSavedCoords(input)
+    const isExistCoords = this.getLonLatSavedCoords(input)
     if (isExistCoords) {
       return isExistCoords
     }
 
-    console.log(`Не найдены предустановленные координаты для ${input}`)
+    // console.log(`Не найдены предустановленные координаты для ${input}`)
 
     input = input.replace(',', '')
     let name = strHelper.shrinkStringBeforeDelim(input)
     name = strHelper.removeShortStrings(name)
 
+    let coords = null
+
     try {
-      const coords = await this.getCoordsFromWiki(name)
-      return coords ? geoHelper.fromLonLat([coords.lon, coords.lat]) : null
+      coords = await this.getCoordsFromWiki(name)
 
       //const isRus = /[а-яА-ЯЁё]/.test(name)
       //if (isRus) {
@@ -139,13 +148,15 @@ class InetHelper {
       //  if (coords) return coords
       //}
     } catch (error) {
-      throw new Error(`Ошибка получения данных из Wiki ${error}`)
+      log.error(`Ошибка получения данных из Wiki ${error}`)
     } finally {
-      if (this.coords && !isExistCoords && coords) {
+      if (coords && this.coords) {
         this.coords[name] = coords
-        log.info(`новая координата ${JSON.stringify(coords)} для места ${name}`)
+        log.info(`Новая координата ${JSON.stringify(coords)} для места ${name}`)
       }
     }
+
+    return coords ? geoHelper.fromLonLat([coords.lon, coords.lat]) : null
   }
 
   async getCoordsByPageId(pageId, isRus) {
@@ -161,7 +172,7 @@ class InetHelper {
     const json = await this.getDataFromUrl(url)
     const coords = json['query']['pages'][pageId]['coordinates']
     return coords && coords.length > 0
-      ? { lon: coords[0].lon, lat: coords[0].lat }
+      ? { lat: coords[0].lat, lon: coords[0].lon }
       : null
   }
 
@@ -327,8 +338,7 @@ class InetHelper {
               generator: 'prefixsearch',
               prop: encodeURI('pageprops|description'),
               ppprop: 'displaytitle',
-              gpssearch: encodeURI(stringSearch),
-              gpslimit: 6,
+              gpssearch: encodeURI(stringSearch)
             },
             isRus
           )
@@ -336,6 +346,12 @@ class InetHelper {
           this.getDataFromUrl(url)
             .then((json) => {
               //если используется другая библиотека может понадобится JSON.parse
+              if (!json.hasOwnProperty('query') ||
+                !json['query'].hasOwnProperty('pages')) {
+                resolve(null)
+                return null
+              }
+
               const pages = json['query']['pages']
               resolve(Object.keys(pages)[0])
             })

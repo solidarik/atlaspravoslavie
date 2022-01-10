@@ -24,6 +24,27 @@ class StrHelper {
     return output.replace(/[_]+/g, '_')
   }
 
+  static isExistNumber(input) {
+    if (!input || input == '') return false
+    const numbers = StrHelper.getAllNumbers(input)
+    return numbers.length > 0
+  }
+
+  static isRussianLetter(input) {
+    return input.length === 1 && /[А-Яа-я]/i.test(input)
+  }
+
+  static isEnglishLetter(input) {
+    return input.length === 1 && /[A-Za-z]/i.test(input)
+  }
+
+  static isNumeric(input) {
+    input = input + ''
+    //https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
+    return !isNaN(input) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+      !isNaN(parseFloat(input)) // ...and ensure strings of whitespace fail
+  }
+
   static strToEngSymbols(input) {
     if (!input || input == '') return ''
 
@@ -46,7 +67,8 @@ class StrHelper {
 
   static removeShortStrings(inputText, regstring, onlyEnd = true) {
     if (!regstring) {
-      const shortRegExp = onlyEnd ? `[а-я]{1,2}[.]$` : `[а-я]{1,2}[.]`
+      const shortRegExp = onlyEnd ? `[а-яa-z]{1,2}[.]$` : `[а-яa-z]{1,2}[.]`
+      //[а-яa-z]{1,2}[.]*\s
       regstring = new RegExp(shortRegExp, 'g')
     }
     return inputText.replace(regstring, '').trim()
@@ -55,7 +77,7 @@ class StrHelper {
 
   static generatePageUrl(input, len = 50) {
     if (Array.isArray(input)) {
-      input = input.join('_')
+      input = input.filter((elem) => elem.trim().length > 0).join('_')
     }
 
     let output = this.toTranslitStr(input)
@@ -155,6 +177,19 @@ class StrHelper {
     return res
   }
 
+  static getAllIntegerNumbers(input) {
+    // К примеру, есть строка: '123 adsf asdf  234324 22'
+    // Получаем из нее массив строковых чисел: ['123', '234324', '22']"""
+    input = input.replace('\n', '')
+    const r = new RegExp(`[0-9]+`, 'g')
+    let result = []
+    let m
+    while ((m = r.exec(input)) != null) {
+      (m[0] != '.') && result.push(m[0])
+    }
+    return result
+  }
+
   static getAllNumbers(input, floatDelim = '.') {
     // К примеру, есть строка: '123 adsf asdf  234324 22'
     // Получаем из нее массив строковых чисел: ['123', '234324', '22']"""
@@ -166,7 +201,7 @@ class StrHelper {
     let result = []
     let m
     while ((m = r.exec(input)) != null) {
-      result.push(m[0])
+      (m[0] != '.') && result.push(m[0])
     }
     // let result = input.match(regexp) || []
     return result
@@ -193,6 +228,10 @@ class StrHelper {
 
   static varToString(varObj) {
     return Object.keys(varObj)[0]
+  }
+
+  static capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
   }
 }
 

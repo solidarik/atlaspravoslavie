@@ -11,7 +11,8 @@ class Log {
     constructor(fileName = undefined) {
 
         const myFormat = printf(info => {
-            return `${moment().format('YYYY-MM-DD hh:mm:ss').trim()} ${info.level}: ${info.message}`;
+            // return `${moment().format('YYYY-MM-DD hh:mm:ss').trim()} ${info.level}: ${info.message}`;
+            return `${info.message}`;
         });
 
         let logTransports = [new transports.Console()]

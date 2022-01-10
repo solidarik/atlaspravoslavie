@@ -14,10 +14,7 @@ module.exports = {
     uri: process.env.MONGODB_URI || 'mongodb://localhost/app',
     options: {
       keepAlive: 1,
-      poolSize: 5,
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
+      maxPoolSize: 5
     },
   },
   crypto: {

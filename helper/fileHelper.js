@@ -38,6 +38,10 @@ class FileHelper {
     return fs.existsSync(path)
   }
 
+  deleteFile(path) {
+    return fs.unlinkSync(path)
+  }
+
   getFileNameFromPath(filePath) {
     return path.basename(filePath)
   }

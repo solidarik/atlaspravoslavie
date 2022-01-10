@@ -1,6 +1,10 @@
 const chalk = require('chalk')
 const Log = require('../helper/logHelper')
+const FileHelper = require('../helper/fileHelper')
 
+if (FileHelper.isFileExists('load.log')) {
+  FileHelper.deleteFile('load.log')
+}
 log = Log.create('load.log')
 
 const DbHelper = require('../loadDatabase/dbHelper')
@@ -14,6 +18,7 @@ const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator
 const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
 const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
 const XlsGoogleParser = require('./xlsGoogleParser')
+const XlsGoogleParserPersons = require('./xlsGoogleParserPersons')
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 
@@ -22,6 +27,7 @@ inetHelper.trimNames()
 
 const dbHelper = new DbHelper(undefined, log)
 const xlsGoogleParser = new XlsGoogleParser(log)
+const xlsGoogleParserPersons = new XlsGoogleParserPersons(log)
 const personsAggr = new PersonsAggr()
 
 Promise.resolve(true)
@@ -82,13 +88,16 @@ Promise.resolve(true)
     return dbHelper.clearDb('persons')
   })
   .then(() => {
-    return dbHelper.saveFilesFrom({
-      source: 'python/out_persons',
-      procdir: 'out/out_person_process',
-      errdir: 'out/out_person_errors',
-      mediator: personsJsonMediator,
-    })
+    return xlsGoogleParserPersons.loadData(dbHelper)
   })
+  // .then(() => {
+  //   return dbHelper.saveFilesFrom({
+  //     source: 'python/out_persons',
+  //     procdir: 'out/out_person_process',
+  //     errdir: 'out/out_person_errors',
+  //     mediator: personsJsonMediator,
+  //   })
+  // })
   .then(() => {
     return dbHelper.clearDb('personsAggr')
   })
@@ -100,11 +109,11 @@ Promise.resolve(true)
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()
     dbHelper.free()
-    inetHelper.saveCoords(checkedCoordsPath)
+    // inetHelper.saveCoords(checkedCoordsPath)
   })
   .catch((err) => {
     personsAggr.free()
     dbHelper.free()
-    inetHelper.saveCoords(checkedCoordsPath)
+    // inetHelper.saveCoords(checkedCoordsPath)
     log.error(`Ошибка загрузки данных: ${err}`)
   })

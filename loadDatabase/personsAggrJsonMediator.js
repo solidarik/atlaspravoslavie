@@ -30,15 +30,16 @@ class PersonsAggrJsonMediator extends SuperJsonMediator {
       let promises = [
         InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.place)),
       ]
-      
+
       Promise.all(promises)
         .then((coords) => {
-          const coords = coords[0]
+          coords = coords[0]
 
           if (coords && coords.length == 0)
-              resolve({
-                error: `не удалось определить координаты`,
-                errorPlace: json.place })
+            resolve({
+              error: `не удалось определить координаты`,
+              errorPlace: json.place
+            })
 
           json = {
             ...json,

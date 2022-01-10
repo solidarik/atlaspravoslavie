@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 var personsSchema = new mongoose.Schema(
   {
     pageId: Number,
+
     surname: String,
     name: String,
     middlename: String,
@@ -19,6 +20,8 @@ var personsSchema = new mongoose.Schema(
       century: Number,
       place: String,
       placeCoord: [],
+      isIndirectDate: Boolean,
+      isIndirectPlace: Boolean
     },
 
     death: {
@@ -26,11 +29,13 @@ var personsSchema = new mongoose.Schema(
       month: Number,
       day: Number,
       dateStr: String,
-      isOnlyYear: Boolean,
-      isOnlyCentury: Boolean,
       century: Number,
       place: String,
       placeCoord: [],
+      isOnlyYear: Boolean,
+      isOnlyCentury: Boolean,
+      isIndirectDate: Boolean,
+      isIndirectPlace: Boolean
     },
 
     achievements: [{
@@ -59,7 +64,7 @@ var personsSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      required: 'Статус святости обязателен для заполнения',
+      // required: 'Статус святости обязателен для заполнения',
     },
 
     groupStatus: {
@@ -94,6 +99,8 @@ var personsSchema = new mongoose.Schema(
       required: 'Не определена уникальная ссылка',
     },
 
+    isShowOnMap: Boolean,
+
     srcUrl: String,
     photoUrl: String,
     linkUrl: String,
@@ -102,6 +109,12 @@ var personsSchema = new mongoose.Schema(
     timestamps: false,
   }
 )
+
+personsSchema.pre('save', function (next) {
+  this.isShowOnMap = this.birth && this.birth.place && this.birth.placeCoord
+    && this.death && this.death.place && this.death.placeCoord
+  next();
+});
 
 personsSchema.statics.publicFields = ['surname', 'name', 'middlename']
 

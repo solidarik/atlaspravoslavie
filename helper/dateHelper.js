@@ -1,4 +1,4 @@
-const strHelper = require('../helper/strHelper')
+const StrHelper = require('../helper/StrHelper')
 const moment = require('moment')
 
 const ROMAN_KEYS = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
@@ -10,9 +10,9 @@ class DateHelper {
     if (!input) {
       return input
     }
-    let procDate = strHelper.shrinkStringBeforeDelim(input)
-    procDate = strHelper.ignoreEqualsValue(input)
-    procDate = strHelper.ignoreSpaces(procDate)
+    let procDate = StrHelper.shrinkStringBeforeDelim(input)
+    procDate = StrHelper.ignoreEqualsValue(input)
+    procDate = StrHelper.ignoreSpaces(procDate)
     procDate = procDate.replace(/-/g, '.')
     if (procDate.length == 4) {
       procDate = `01.01.${procDate}`
@@ -31,7 +31,7 @@ class DateHelper {
         'ноя',
         'дек',
       ]
-      let year = strHelper.getMaxLenNumber(input)
+      let year = StrHelper.getMaxLenNumber(input)
       let month = 1
       year = year.length == 2 ? '19' + year : year
       for (let i = 0; i < months.length; i++) {
@@ -97,10 +97,64 @@ class DateHelper {
     return -1
   }
 
-  static getDateFromInput(input) {
+  /**
+   * Возвращает имя месяца по его номеру
+   * @param {int} num Номер месяца
+   */
+  static getTextOfMonth(num) {
 
-    if (!input) return
+    if (num < 1 || num > 12) {
+      throw `Странный месяц ${num}`
+    }
+
+    const months = [
+      'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август',
+      'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
+    ]
+    return months[num - 1]
+  }
+
+  /**
+   * Возвращает склоняемое имя месяца по его номеру
+   * @param {int} num Номер месяца
+   */
+  static getInducementTextOfMonth(num) {
+
+    if (num < 1 || num > 12) {
+      throw `Странный месяц ${num}`
+    }
+
+    const months = [
+      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа',
+      'сентября', 'октября', 'ноября', 'декабря'
+    ]
+    return months[num - 1]
+  }
+
+  static getDateFromInput(input, stopWords = []) {
+
+    if (!input) return false
+
     let inputText = ('' + input).trim()
+    inputText = inputText.replace(/ /g, '')
+
+    //убираем примерные слова
+    inputText = inputText.replace('Дата:', '')
+    inputText = inputText.replace('ок.', '')
+    inputText = inputText.replace('около', '')
+    inputText = inputText.replace('начало', '')
+    inputText = inputText.replace('конец', '')
+    inputText = inputText.trim()
+
+    //грохаем все, что между скобками
+    inputText = inputText.replace(/[(][^(]*[)]/g, '')
+
+    //ищем стоп-слова, если находим - вылетаем со свистом
+    for (let word = 0; word < stopWords.length; word++) {
+      if (input.includes(stopWords)) {
+        return false
+      }
+    }
 
     let outputStr = ''
     let isUserText = false
@@ -115,22 +169,41 @@ class DateHelper {
     let testStr = ''
 
     if (!isFound && inputText.includes('в')) {
-      date_groups = strHelper.getSearchGroupsInRegexp('(\\d+)[в]', inputText)
+
+      const isNegative = inputText.includes('-')
+
+      //если нет цирф 1..9, то конвертируем римские цифры в арабские
+      if (!StrHelper.isExistNumber(input)) {
+        //преобразуем все возможную кириллицу в англ. язык (для римских цифр)
+        inputText = inputText.replace('X', 'X')
+
+        //преобразуем римские цифры в арабские
+        date_groups = StrHelper.getSearchGroupsInRegexp('[-]*(\\S+)[в]', inputText)
+        if (date_groups && date_groups.length > 0) {
+          inputText = DateHelper.romanToArabic(date_groups[0]) + 'в'
+        }
+      }
+
+      date_groups = StrHelper.getSearchGroupsInRegexp('[-]*(\\d+)[в]', inputText)
       if (date_groups && date_groups.length > 0) {
         century = parseInt(date_groups[0])
         isOnlyCentury = true
         isFound = true
 
-        date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText)
+        date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*).*до.*н.*', inputText)
         if (date_groups && date_groups.length > 0)
           century = -century
+      }
+
+      if (isNegative) {
+        century = -century
       }
     }
 
     if (!isFound) {
       inputText = inputText.replace('г.', '').replace('гг.', '')
       inputText = inputText.replace('гг', '')
-      inputText = strHelper.removeByRegExp('г$', inputText)
+      inputText = StrHelper.removeByRegExp('г$', inputText)
     }
 
     if (!isFound && !inputText.includes('.')) {
@@ -145,7 +218,7 @@ class DateHelper {
 
     // если год до н.э.
     if (!isFound) {
-      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*).*до н.*', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d+).*до.*н.*', inputText)
       if (date_groups && date_groups.length > 0) {
         y = parseInt(date_groups[0])
         y = -y
@@ -168,10 +241,12 @@ class DateHelper {
 
     // если дата типа "1984, 1 мая"
     if (!isFound) {
-      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
       if (date_groups && date_groups.length > 0) {
         y = parseInt(date_groups[0])
-        d = parseInt(date_groups[1])
+        if (date_groups[1] != '') {
+          d = parseInt(date_groups[1])
+        }
         m = parseInt(DateHelper.getMonthNum(date_groups[2]))
         isFound = true
       }
@@ -179,13 +254,15 @@ class DateHelper {
 
     // если дата типа "15 июня 1389 (года)"
     if (!isFound) {
-      date_groups = strHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText)
       if (date_groups && date_groups.length === 3) {
-        d = parseInt(date_groups[0])
+        if (date_groups[0] != '') {
+          d = parseInt(date_groups[0])
+        }
         m = parseInt(DateHelper.getMonthNum(date_groups[1]))
         y = parseInt(date_groups[2])
         isFound = (y > 0)
-        console.log(isFound, d, m, y, inputText)
+        //soli console.log(isFound, d, m, y, inputText)
       }
     }
 
@@ -205,9 +282,20 @@ class DateHelper {
     }
 
     if (!isUserText && !isOnlyYear && !isOnlyCentury) {
-      outputStr = `${strHelper.pad(d, 2)}.${strHelper.pad(m, 2)}.${y}`
+      outputStr = `${StrHelper.pad(d, 2)}.${StrHelper.pad(m, 2)}.${y}`
     }
-    return {
+
+    if (isOnlyCentury) {
+      m = 1
+      d = 1
+      if (century >= 0) {
+        y = (century - 1) * 100
+      } else {
+        y = (century + 1) * 100
+      }
+    }
+
+    const res = {
       "ymd": [y, m, d],
       "year": y,
       "month": m,
@@ -218,6 +306,8 @@ class DateHelper {
       "isOnlyCentury": isOnlyCentury,
       "isUserText": isUserText
     }
+
+    return res
   }
 
   static convertTZ(date, tzString) {
@@ -303,7 +393,7 @@ class DateHelper {
     }
     const romanize = DateHelper.arabicToRoman(intCentury)
     if (isMinus) {
-      return `- ${romanize} `
+      return `-${romanize}`
     }
     return romanize
   }

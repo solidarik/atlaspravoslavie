@@ -17,7 +17,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 283)
         assert.strictEqual(res["ymd"][1], -1)
         assert.strictEqual(res["ymd"][2], -1)
-        assert.strictEqual(res["outputStr"], '283')
+        assert.strictEqual(res["dateStr"], '283')
         assert.strictEqual(res["isOnlyYear"], true)
     })
 
@@ -40,7 +40,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1330)
         assert.strictEqual(res["ymd"][1], 7)
         assert.strictEqual(res["ymd"][2], 24)
-        assert.strictEqual(res["outputStr"], '24.07.1330')
+        assert.strictEqual(res["dateStr"], '24.07.1330')
     })
 
     it('19/02/1878', () => {
@@ -48,7 +48,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1878)
         assert.strictEqual(res["ymd"][1], 2)
         assert.strictEqual(res["ymd"][2], 19)
-        assert.strictEqual(res["outputStr"], '19.02.1878')
+        assert.strictEqual(res["dateStr"], '19.02.1878')
     })
 
     it('1924', () => {
@@ -56,7 +56,7 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["ymd"][0], 1924)
         assert.strictEqual(res["ymd"][1], -1)
         assert.strictEqual(res["ymd"][2], -1)
-        assert.strictEqual(res["outputStr"], '1924')
+        assert.strictEqual(res["dateStr"], '1924')
         assert.strictEqual(res["isOnlyYear"], true)
     })
 
@@ -70,13 +70,46 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["isUserText"], true)
     })
 
-    it('5в', () => {
-        const res = func('5в')
-        assert.strictEqual(res['ymd'][0], -999)
+    it(' -100  ', () => {
+        const res = func('-100 ')
+        assert.strictEqual(res["ymd"][0], -100)
+        assert.strictEqual(res["century"], -2)
         assert.strictEqual(res["ymd"][1], -1)
         assert.strictEqual(res["ymd"][2], -1)
+        assert.strictEqual(res["isOnlyYear"], true)
+    })
+
+    it('5в', () => {
+        const res = func('5в')
+        assert.strictEqual(res['ymd'][0], 400)
+        assert.strictEqual(res["ymd"][1], 1)
+        assert.strictEqual(res["ymd"][2], 1)
         assert.strictEqual(res["isOnlyCentury"], true)
         assert.strictEqual(res["century"], 5)
+    })
+
+    it('5 век', () => {
+        const res = func('5 век')
+        assert.strictEqual(res['ymd'][0], 400)
+        assert.strictEqual(res["ymd"][1], 1)
+        assert.strictEqual(res["ymd"][2], 1)
+        assert.strictEqual(res["isOnlyCentury"], true)
+        assert.strictEqual(res["century"], 5)
+    })
+
+
+    it('-IV в', () => {
+        const res = func('-IV в')
+        assert.strictEqual(res['ymd'][0], -300)
+        assert.strictEqual(res['isOnlyCentury'], true)
+        assert.strictEqual(res['century'], -4)
+    })
+
+    it('-4 в', () => {
+        const res = func('-IV в')
+        assert.strictEqual(res['ymd'][0], -300)
+        assert.strictEqual(res['isOnlyCentury'], true)
+        assert.strictEqual(res['century'], -4)
     })
 
     it('100', () => {

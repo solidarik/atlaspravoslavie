@@ -7,6 +7,15 @@ class JsHelper {
     return a
   }
 
+  //https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+  static onlyUniqueInArray(inputArr) {
+    const onlyUnique = function (value, index, self) {
+      return self.indexOf(value) === index
+    }
+
+    return inputArr.filter(onlyUnique)
+  }
+
   static getMapSize(x) {
     let len = 0
     for (let count in x) {
