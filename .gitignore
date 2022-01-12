@@ -3,9 +3,6 @@ Thubms.db
 *.log
 *.class
 *.py[co]
-**/config
-config/default.js
-config/
 secret*
 *.class
 package-lock.json
