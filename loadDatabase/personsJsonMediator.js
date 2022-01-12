@@ -1,14 +1,13 @@
-const PersonsModel = require('../models/personsModel')
-const StrHelper = require('../helper/strHelper')
-const DateHelper = require('../helper/dateHelper')
-const InetHelper = require('../helper/inetHelper')
-const SuperJsonMediator = require('./superJsonMediator')
+import personsModel from '../models/personsModel'
+import StrHelper from '../helper/strHelper'
+import InetHelper from '../helper/inetHelper'
+import SuperJsonMediator from './superJsonMediator'
 
-class PersonsJsonMediator extends SuperJsonMediator {
+export default class PersonsJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
     this.equilFields = ['surname', 'name', 'middlename']
-    this.model = PersonsModel
+    this.model = personsModel
   }
 
   checkJsonSync(json) {
@@ -94,5 +93,3 @@ class PersonsJsonMediator extends SuperJsonMediator {
     console.log(json.name, json.middlename)
   }
 }
-
-module.exports = new PersonsJsonMediator()

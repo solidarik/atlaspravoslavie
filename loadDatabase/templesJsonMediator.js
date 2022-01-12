@@ -1,9 +1,9 @@
-const inetHelper = require('../helper/inetHelper')
-const StrHelper = require('../helper/strHelper')
-const SuperJsonMediator = require('./superJsonMediator')
-const TemplesModel = require('../models/templesModel');
+import inetHelper from '../helper/inetHelper'
+import StrHelper from '../helper/strHelper'
+import SuperJsonMediator from './superJsonMediator'
+import templesModel from '../models/templesModel'
 
-class TemplesJsonMediator extends SuperJsonMediator {
+export default class TemplesJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
     this.equilFields = ['pageUrl']
@@ -42,5 +42,3 @@ class TemplesJsonMediator extends SuperJsonMediator {
     })
   }
 }
-
-module.exports = new TemplesJsonMediator()

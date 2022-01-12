@@ -1,6 +1,6 @@
 import * as olStyle from 'ol/style'
 
-class SuperFeature {
+export default class SuperFeature {
   static getKind() {
     return undefined
   }
@@ -47,5 +47,3 @@ class SuperFeature {
     return 'Not implemented'
   }
 }
-
-module.exports = SuperFeature

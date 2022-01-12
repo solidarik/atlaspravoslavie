@@ -1,10 +1,10 @@
-const Log = require('../helper/logHelper')
+import Log from '../helper/logHelper'
 const log = Log.create()
 
-const fileHelper = require('../helper/fileHelper')
-const geoHelper = require('../helper/geoHelper')
-const strHelper = require('../helper/strHelper')
-const axios = require('axios')
+import FileHelper from '../helper/fileHelper'
+import GeoHelper from '../helper/geoHelper'
+import StrHelper from '../helper/strHelper'
+import axios from 'axios'
 
 class InetHelper {
   constructor() { }
@@ -16,8 +16,8 @@ class InetHelper {
   }
 
   loadCoords(filename) {
-    this.coords = fileHelper.isFileExists(filename)
-      ? fileHelper.getJsonFromFile(filename)
+    this.coords = FileHelper.isFileExists(filename)
+      ? FileHelper.getJsonFromFile(filename)
       : {}
     console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
     let itemNames = []
@@ -40,7 +40,7 @@ class InetHelper {
 
   saveCoords(filename) {
     console.log(`Before saving coords... Length: ${Object.keys(this.coords).length}`)
-    fileHelper.saveJsonToFileSync(this.coords, filename)
+    FileHelper.saveJsonToFileSync(this.coords, filename)
   }
 
   getDataFromUrl(url) {
@@ -100,11 +100,11 @@ class InetHelper {
     input = input.replace(',', '').trim().toLowerCase().replace(/"/g, '')
     let testNames = [input]
 
-    let name = strHelper.shrinkStringBeforeDelim(input)
+    let name = StrHelper.shrinkStringBeforeDelim(input)
     testNames.push(name)
 
-    testNames.push(strHelper.removeShortStrings(name, '', true).replace('  ', ' '))
-    testNames.push(strHelper.removeShortStrings(name, '', false).replace('  ', ' '))
+    testNames.push(StrHelper.removeShortStrings(name, '', true).replace('  ', ' '))
+    testNames.push(StrHelper.removeShortStrings(name, '', false).replace('  ', ' '))
 
     testNames = testNames.filter((value, index, self) => self.indexOf(value) === index)
 
@@ -131,8 +131,8 @@ class InetHelper {
     // console.log(`Не найдены предустановленные координаты для ${input}`)
 
     input = input.replace(',', '')
-    let name = strHelper.shrinkStringBeforeDelim(input)
-    name = strHelper.removeShortStrings(name)
+    let name = StrHelper.shrinkStringBeforeDelim(input)
+    name = StrHelper.removeShortStrings(name)
 
     let coords = null
 
@@ -156,7 +156,7 @@ class InetHelper {
       }
     }
 
-    return coords ? geoHelper.fromLonLat([coords.lon, coords.lat]) : null
+    return coords ? GeoHelper.fromLonLat([coords.lon, coords.lat]) : null
   }
 
   async getCoordsByPageId(pageId, isRus) {
@@ -428,4 +428,4 @@ InetHelper.getInstance = function () {
   return global.singleton_instance
 }
 
-module.exports = InetHelper.getInstance()
+export default InetHelper.getInstance()

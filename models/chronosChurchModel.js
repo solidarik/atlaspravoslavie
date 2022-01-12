@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 var chronosChurchSchema = new mongoose.Schema(
   {
@@ -48,4 +48,4 @@ var chronosChurchSchema = new mongoose.Schema(
 
 chronosChurchSchema.statics.publicFields = ['place', 'start.dateStr', 'end.dateStr']
 
-module.exports = mongoose.model('chronosChurch', chronosChurchSchema)
+export default mongoose.model('chronosChurch', chronosChurchSchema)

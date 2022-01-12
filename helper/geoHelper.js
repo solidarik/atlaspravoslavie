@@ -1,6 +1,6 @@
-const StrHelper = require('./strHelper')
+import StrHelper from './strHelper'
 
-class GeoHelper {
+export default class GeoHelper {
   static fromLonLat(input) {
     if (!input || input.length !== 2) {
       return undefined
@@ -85,5 +85,3 @@ class GeoHelper {
     else return (values[half - 1] + values[half]) / 2.0
   }
 }
-
-module.exports = GeoHelper

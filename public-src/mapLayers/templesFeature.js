@@ -2,8 +2,7 @@ import SuperFeature from './superFeature'
 import StrHelper from '../../helper/strHelper'
 import DateHelper from '../../helper/dateHelper'
 
-
-class TemplesFeature extends SuperFeature {
+export default class TemplesFeature extends SuperFeature {
   static getIcon() {
     return '/images/temples.png'
   }
@@ -65,5 +64,3 @@ class TemplesFeature extends SuperFeature {
     })
   }
 }
-
-module.exports = TemplesFeature

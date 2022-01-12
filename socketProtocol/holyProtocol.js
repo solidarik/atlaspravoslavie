@@ -1,10 +1,10 @@
-const ServerProtocol = require('../libs/serverProtocol')
-const ChronosModel = require('../models/chronosReligionModel')
-const ChronosChurchModel = require('../models/chronosChurchModel')
-const PersonsModel = require('../models/personsModel')
-const PersonsAggrModel = require('../models/personsAggrModel')
-const TemplesModel = require('../models/templesModel')
-const ServiceModel = require('../models/serviceModel')
+import ServerProtocol from '../libs/serverProtocol'
+import chronosModel from '../models/chronosReligionModel'
+import chronosChurchModel from '../models/chronosChurchModel'
+import personsModel from '../models/personsModel'
+import personsAggrModel from '../models/personsAggrModel'
+import templesModel from '../models/templesModel'
+import serviceModel from '../models/serviceModel'
 
 function trycatch(func, cb) {
   let res = {}
@@ -25,6 +25,12 @@ function trycatch(func, cb) {
 }
 
 class HolyProtocol extends ServerProtocol {
+
+  constructor() {
+    super()
+    this.init()
+  }
+
   init() {
     super.addHandler('clQueryDataByYear', this.getDataByYear)
     super.addHandler('clGetCurrentYear', this.getCurrentYear)
@@ -110,14 +116,14 @@ class HolyProtocol extends ServerProtocol {
       const shortBriefSearchParam = { ...defaultSelectParam, 'shortBrief': 1 }
 
       const promices = [
-        ChronosModel.find(defaultSearchParam).select(shortBriefSearchParam),
-        ChronosChurchModel.find(defaultSearchParam).select(shortBriefSearchParam),
-        TemplesModel.find(gteSearchParam).select(defaultSelectParam),
-        PersonsAggrModel.find(personSearchParam)
+        chronosModel.find(defaultSearchParam).select(shortBriefSearchParam),
+        chronosChurchModel.find(defaultSearchParam).select(shortBriefSearchParam),
+        templesModel.find(gteSearchParam).select(defaultSelectParam),
+        personsAggrModel.find(personSearchParam)
 
-        // PersonsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
-        // PersonsAggrModel.find({...defaultSearchParam, "kind": "death"}),
-        // PersonsAggrModel.find({...defaultSearchParam, "kind": "achiev"})
+        // personsAggrModel.find({...defaultSearchParam, "kind": "birth"}),
+        // personsAggrModel.find({...defaultSearchParam, "kind": "death"}),
+        // personsAggrModel.find({...defaultSearchParam, "kind": "achiev"})
       ]
 
       Promise.all(promices)
@@ -145,7 +151,7 @@ class HolyProtocol extends ServerProtocol {
     let res = {}
 
     try {
-      TemplesModel.find({})
+      templesModel.find({})
         .then(
           (res) => {
             cb(
@@ -169,7 +175,7 @@ class HolyProtocol extends ServerProtocol {
     let data = JSON.parse(msg)
     let res = {}
     try {
-      TemplesModel.find({ '_id': data.id })
+      templesModel.find({ '_id': data.id })
         .then(
           (res) => {
             if (res.length == 0) {
@@ -198,19 +204,19 @@ class HolyProtocol extends ServerProtocol {
       let model = undefined
       switch (data.classFeature) {
         case 'ChronosFeature':
-          model = ChronosModel
+          model = chronosModel
           break
         case 'ChronosChurchFeature':
-          model = ChronosChurchModel
+          model = chronosChurchModel
           break
         case 'TemplesFeature':
-          model = TemplesModel
+          model = templesModel
           break;
         case 'PersonAggrFeature':
-          model = PersonsAggrModel
+          model = personsAggrModel
           break;
         case 'PersonFeature':
-          model = PersonsModel
+          model = personsModel
           break;
         default:
           throw new Error(`Undefined model by classFeature ${data.classFeature}`)
@@ -239,7 +245,7 @@ class HolyProtocol extends ServerProtocol {
   getLoadStatus(socket, msg, cb) {
     let res = {}
     try {
-      ServiceModel.find({ 'kind': 'status' }).select({ 'name': 1, 'value': 1, '_id': 0 })
+      serviceModel.find({ 'kind': 'status' }).select({ 'name': 1, 'value': 1, '_id': 0 })
         .then(
           (res) => {
             let outRes = {}
@@ -259,7 +265,7 @@ class HolyProtocol extends ServerProtocol {
     let res = {}
 
     try {
-      PersonsModel.find({})
+      personsModel.find({})
         .then(
           (res) => {
             cb(
@@ -278,20 +284,20 @@ class HolyProtocol extends ServerProtocol {
     }
   }
   // {
-  //   trycatch(PersonsModel.find({}), cb)
+  //   trycatch(personsModel.find({}), cb)
   // }
 
   getPersonsMartyrs(socket, msg, cb) {
-    trycatch(PersonsModel.find({ "groupStatus": "мученик" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "мученик" }), cb)
   }
 
   getPersonsReverends(socket, msg, cb) {
-    trycatch(PersonsModel.find({ "groupStatus": "преподобный" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "преподобный" }), cb)
   }
 
   getPersonsHoly(socket, msg, cb) {
-    trycatch(PersonsModel.find({ "groupStatus": "святой" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "святой" }), cb)
   }
 }
 
-module.exports = new HolyProtocol()
+export default new HolyProtocol()

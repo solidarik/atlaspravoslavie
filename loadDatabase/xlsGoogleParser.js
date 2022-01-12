@@ -1,19 +1,18 @@
-const log = require('../helper/logHelper')
-const chalk = require('chalk')
-const { google } = require('googleapis')
-const InetHelper = require('../helper/inetHelper')
-const GeoHelper = require('../helper/geoHelper')
-const DateHelper = require('../helper/dateHelper')
-const StrHelper = require('../helper/strHelper')
-const TemplesModel = require('../models/templesModel')
-const ServiceModel = require('../models/serviceModel')
+import chalk from 'chalk'
+import { google } from 'googleapis'
+import InetHelper from '../helper/inetHelper'
+import GeoHelper from '../helper/geoHelper'
+import DateHelper from '../helper/dateHelper'
+import StrHelper from '../helper/strHelper'
+import templesModel from '../models/templesModel'
+import serviceModel from '../models/serviceModel'
 
-const readline = require('readline')
-const fs = require('fs')
+import readline from 'readline'
+import fs from 'fs'
 
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 
-class XlsGoogleParser {
+export default class XlsGoogleParser {
 
     constructor(log) {
         this.log = log
@@ -192,7 +191,7 @@ class XlsGoogleParser {
 
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
-        let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+        let res = await serviceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
         const sheets = google.sheets({ version: 'v4' })
 
@@ -202,7 +201,7 @@ class XlsGoogleParser {
         // if (!last_update) {
         //     return this.log.error('Don\'t found last update time from Google API')
         // }
-        // res = await ServiceModel.find({ name: 'lastUpdateSheet' })
+        // res = await serviceModel.find({ name: 'lastUpdateSheet' })
         // console.log(res)
         // if (res && res.length > 0 && res[0].value === last_update) {
         //     this.log.info(`Don\'t update info from last loading: ${last_update}`)
@@ -255,7 +254,7 @@ class XlsGoogleParser {
             }
         }
 
-        res = await TemplesModel.insertMany(insertObjects)
+        res = await templesModel.insertMany(insertObjects)
 
         if (res) {
             this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
@@ -279,7 +278,7 @@ class XlsGoogleParser {
             { name: 'checkedTime', kind: 'status', value: checkedTime }
         ]
 
-        res = await ServiceModel.insertMany(serviceObjects)
+        res = await serviceModel.insertMany(serviceObjects)
         if (res) {
             this.log.info(chalk.green(`Успешное сохранение статуса`))
         } else {
@@ -289,5 +288,3 @@ class XlsGoogleParser {
         return true
     }
 }
-
-module.exports = XlsGoogleParser

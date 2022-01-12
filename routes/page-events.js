@@ -1,4 +1,4 @@
-module.exports = async function(ctx, next) {
-    console.log('render page events');
-    ctx.body = ctx.render('page-events', {state: JSON.stringify(ctx.state)});
+export default async function (ctx, next) {
+    console.log('render page events' + JSON.stringify(ctx))
+    ctx.body = ctx.render('page-events', { state: JSON.stringify(ctx.state) });
 };

@@ -1,9 +1,11 @@
-const chalk = require('chalk');
-const moment = require('moment');
-const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, label, colorize, splat, printf } = format;
+import chalk from 'chalk'
+import winston from 'winston'
 
-class Log {
+const createLogger = winston.createLogger
+const transports = winston.transports
+const { combine, colorize, splat, printf } = winston.format;
+
+export default class Log {
     static create(fileName = undefined) {
         return new Log(fileName)
     }
@@ -48,19 +50,10 @@ class Log {
     }
 
     success(text) {
-        log.info(chalk.blue(text));
+        this.log.info(chalk.blue(text));
     }
 
     boom(text) {
-        log.info(chalk.magenta(text));
+        this.log.info(chalk.magenta(text));
     }
 }
-
-warn = (text) => { log.warn(text); }
-info = (text) => { log.info(text); }
-error = (text, err) => { log.error(text, err) }
-warn = (text) => { log.warn(text); }
-success = (text) => { log.success(text); }
-boom = (text) => { log.boom(text); }
-
-module.exports = Log;

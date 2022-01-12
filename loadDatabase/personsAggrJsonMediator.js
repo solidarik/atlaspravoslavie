@@ -1,14 +1,14 @@
-const PersonsAggrModel = require('../models/personsAggrModel')
-const StrHelper = require('../helper/strHelper')
-const DateHelper = require('../helper/dateHelper')
-const InetHelper = require('../helper/inetHelper')
-const SuperJsonMediator = require('./superJsonMediator')
+import personsAggrModel from '../models/personsAggrModel'
+import StrHelper from '../helper/strHelper'
+import DateHelper from '../helper/dateHelper'
+import InetHelper from '../helper/inetHelper'
+import SuperJsonMediator from './superJsonMediator'
 
-class PersonsAggrJsonMediator extends SuperJsonMediator {
+export default class PersonsAggrJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
     this.equilFields = ['caption', 'kindEvent', 'point']
-    this.model = PersonsAggrModel
+    this.model = personsAggrModel
   }
 
   checkJsonSync(json) {
@@ -56,5 +56,3 @@ class PersonsAggrJsonMediator extends SuperJsonMediator {
     console.log(json.name, json.middlename)
   }
 }
-
-module.exports = new PersonsAggrJsonMediator()

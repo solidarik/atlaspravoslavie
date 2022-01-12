@@ -1,3 +1,2 @@
-const passport = require('../libs/passport');
-
-exports.init = app => app.use(passport.initialize());
+import passport from '../libs/passport'
+export function init(app) { return app.use(passport.initialize()) }

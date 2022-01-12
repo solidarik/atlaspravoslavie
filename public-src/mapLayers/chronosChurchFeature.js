@@ -2,7 +2,7 @@ import SuperFeature from './superFeature'
 import StrHelper from '../../helper/strHelper'
 import DateHelper from '../../helper/dateHelper'
 
-class ChronosChurchFeature extends SuperFeature {
+export default class ChronosChurchFeature extends SuperFeature {
   static getIcon() {
     return '/images/eventChurch.png'
   }
@@ -45,5 +45,3 @@ class ChronosChurchFeature extends SuperFeature {
     })
   }
 }
-
-module.exports = ChronosChurchFeature

@@ -1,11 +1,11 @@
-const Log = require('../helper/logHelper')
+import Log from '../helper/logHelper'
 const log = Log.create()
 
-const PersonsModel = require('../models/personsModel')
-const aggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
-const StrHelper = require('../helper/strHelper')
+import personsModel from '../models/personsModel'
+import PersonsAggrJsonMediator from '../loadDatabase/personsAggrJsonMediator'
+import StrHelper from '../helper/strHelper'
 
-class PersonsAggr {
+export default class PersonsAggr {
 
     getLivePointsJson(json) {
         return {
@@ -18,8 +18,11 @@ class PersonsAggr {
     }
 
     start() {
+
+        const mediator = new PersonsAggrJsonMediator()
+
         return new Promise((resolve, reject) => {
-            PersonsModel.find({}) //'surname': 'Садзаглишвили'})
+            personsModel.find({}) //'surname': 'Садзаглишвили'})
                 .then(persons => {
                     let promises = []
                     let jsons = []
@@ -146,7 +149,7 @@ class PersonsAggr {
                         //     const printJson = {'kindAndStatus': json.kindAndStatus, 'startYear': json.startYear, 'endYear': json.endYear}
                         //     log.info(JSON.stringify(printJson))
                         // }
-                        promises.push(aggrJsonMediator.addObjectToBase(json))
+                        promises.push(mediator.addObjectToBase(json))
                     })
 
                     Promise.all(promises)
@@ -163,5 +166,3 @@ class PersonsAggr {
         //   log.info('Free PersonsAggr')
     }
 }
-
-module.exports = PersonsAggr

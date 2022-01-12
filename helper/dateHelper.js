@@ -1,11 +1,11 @@
-const StrHelper = require('../helper/StrHelper')
-const moment = require('moment')
+import StrHelper from '../helper/StrHelper.js'
+import moment from 'moment'
 
 const ROMAN_KEYS = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
   "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
   "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"]
 
-class DateHelper {
+export default class DateHelper {
   static ignoreAlterDate(input) {
     if (!input) {
       return input
@@ -483,5 +483,3 @@ class DateHelper {
       return [startYear, endYear]
   }
 }
-
-module.exports = DateHelper

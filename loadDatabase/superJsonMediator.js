@@ -1,4 +1,5 @@
-class SuperJsonMediator {
+export default class SuperJsonMediator {
+
   addObjectToBase(json) {
     return new Promise((resolve, reject) => {
       const obj = new this.model(json)
@@ -39,5 +40,3 @@ class SuperJsonMediator {
     })
   }
 }
-
-module.exports = SuperJsonMediator

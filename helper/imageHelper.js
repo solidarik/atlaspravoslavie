@@ -1,9 +1,9 @@
-const axios = require('axios')
-const fs = require('fs');
-const path = require('path');
-const fileHelper = require('../helper/fileHelper.js')
+import axios from 'axios'
+import fs from 'fs'
+import path from 'path'
+import fileHelper from '../helper/fileHelper.js'
 
-class ImageHelper {
+export default class ImageHelper {
   static resizeImage(url, fixWidth, callback) {
     var sourceImage = new Image()
 
@@ -87,5 +87,3 @@ class ImageHelper {
     })
   }
 }
-
-module.exports = ImageHelper

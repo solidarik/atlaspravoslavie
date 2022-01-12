@@ -1,4 +1,4 @@
-class JsHelper {
+export default class JsHelper {
   static fillArray(value, len) {
     if (len == 0) return []
     var a = [value]
@@ -36,5 +36,3 @@ class JsHelper {
 
   }
 }
-
-module.exports = JsHelper

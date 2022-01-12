@@ -1,14 +1,13 @@
-const ChronosModel = require('../models/chronosReligionModel')
-const inetHelper = require('../helper/inetHelper')
-const StrHelper = require('../helper/strHelper')
-const SuperJsonMediator = require('./superJsonMediator')
-const moment = require('moment')
+import chronosModel from '../models/chronosReligionModel'
+import inetHelper from '../helper/inetHelper'
+import StrHelper from '../helper/strHelper'
+import SuperJsonMediator from './superJsonMediator'
 
-class ChronosJsonMediator extends SuperJsonMediator {
+export default class ChronosJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
     this.equilFields = ['place', 'startDateStr', 'shortBrief']
-    this.model = ChronosModel
+    this.model = chronosModel
   }
 
   processJson(json) {
@@ -41,5 +40,3 @@ class ChronosJsonMediator extends SuperJsonMediator {
     })
   }
 }
-
-module.exports = new ChronosJsonMediator()

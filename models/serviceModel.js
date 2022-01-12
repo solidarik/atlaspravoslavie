@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 var serviceSchema = new mongoose.Schema(
     {
@@ -13,4 +13,4 @@ var serviceSchema = new mongoose.Schema(
 
 serviceSchema.statics.publicFields = ['name', 'value']
 
-module.exports = mongoose.model('service', serviceSchema)
+export default mongoose.model('service', serviceSchema)

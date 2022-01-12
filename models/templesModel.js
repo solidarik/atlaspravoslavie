@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 var templesSchema = new mongoose.Schema(
   {
@@ -46,4 +46,4 @@ var templesSchema = new mongoose.Schema(
 
 templesSchema.statics.publicFields = ['name', 'place']
 
-module.exports = mongoose.model('temples', templesSchema)
+export default mongoose.model('temples', templesSchema)

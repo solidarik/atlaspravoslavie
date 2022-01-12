@@ -1,22 +1,21 @@
-const log = require('../helper/logHelper')
-const chalk = require('chalk')
-const { google } = require('googleapis')
-const InetHelper = require('../helper/inetHelper')
-const GeoHelper = require('../helper/geoHelper')
-const DateHelper = require('../helper/dateHelper')
-const JsHelper = require('../helper/jsHelper')
-const StrHelper = require('../helper/strHelper')
-const PersonModel = require('../models/personsModel')
-const ServiceModel = require('../models/serviceModel')
+import chalk from 'chalk'
+import { google } from 'googleapis'
+import inetHelper from '../helper/inetHelper'
+import GeoHelper from '../helper/geoHelper'
+import DateHelper from '../helper/dateHelper'
+import JsHelper from '../helper/jsHelper'
+import StrHelper from '../helper/strHelper'
+import personModel from '../models/personsModel'
+import serviceModel from '../models/serviceModel'
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
-InetHelper.loadCoords(checkedCoordsPath)
+inetHelper.loadCoords(checkedCoordsPath)
 
 const dateStopWords = ['посередине', 'середина', 'между', 'или',
     '—', '-', '—', 'первая', 'вторая', 'ранее', 'традиции', 'тексту', 'мира',
     'неизвестно', 'монастырь']
 
-class XlsGoogleParserPersons {
+export default class XlsGoogleParserPersons {
 
     constructor(log) {
         this.log = log
@@ -35,13 +34,13 @@ class XlsGoogleParserPersons {
             return GeoHelper.fromLonLat(coords)
         }
 
-        coords = InetHelper.getLonLatSavedCoords(inputPlace)
+        coords = inetHelper.getLonLatSavedCoords(inputPlace)
         if (coords) {
             return GeoHelper.fromLonLat(coords)
         }
 
         // start search coordinates in wiki
-        // const res = await InetHelper.getCoordsForCityOrCountry(inputPlace)
+        // const res = await inetHelper.getCoordsForCityOrCountry(inputPlace)
         // if (res && res.length > 0) {
         //     coords = res[0]
         //     return GeoHelper.fromLonLat(coords)
@@ -224,23 +223,23 @@ class XlsGoogleParserPersons {
             let deathPlace = row[headerColumns.deathPlace]
 
             if (birthPlace)
-                birthPlace = birthPlace.trim().toLowerCase()
+                birthPlace = birthPlace.trim()
 
             if (deathPlace)
-                deathPlace = deathPlace.trim().toLowerCase()
+                deathPlace = deathPlace.trim()
 
-            if ((!birthPlace || birthPlace == 'неизвестно')
-                && (!deathPlace || deathPlace == 'неизвестно')) {
+            if ((!birthPlace || birthPlace.toLowerCase() == 'неизвестно')
+                && (!deathPlace || deathPlace.toLowerCase() == 'неизвестно')) {
                 json.errorArr.push('Пропуск пустых мест рождения и смерти')
             } else {
                 json.birth['isIndirectPlace'] = false
                 json.death['isIndirectPlace'] = false
 
-                if (birthPlace && (!deathPlace || deathPlace == 'неизвестно')) {
+                if (birthPlace && (!deathPlace || deathPlace.toLowerCase() == 'неизвестно')) {
                     deathPlace = birthPlace
                     json.death['isIndirectPlace'] = true
                 } else
-                    if (deathPlace && (!birthPlace || birthPlace == 'неизвестно')) {
+                    if (deathPlace && (!birthPlace || birthPlace.toLowerCase() == 'неизвестно')) {
                         birthPlace = deathPlace
                         json.birth['isIndirectPlace'] = true
                     }
@@ -352,9 +351,9 @@ class XlsGoogleParserPersons {
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]
-            json.imgUrl = row[headerColumns.imgUrl].split('http').map(item => {
+            json.imgUrls = row[headerColumns.imgUrl].split('http').map(item => {
                 return `http${item}`
-            })
+            }).slice(1)
             json.pageUrl = ''
 
             json.isError = json.errorArr.length > 0
@@ -373,7 +372,7 @@ class XlsGoogleParserPersons {
 
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
-        let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+        let res = await serviceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
         const sheets = google.sheets({ version: 'v4' })
 
@@ -436,9 +435,9 @@ class XlsGoogleParserPersons {
         const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
         this.log.info(statusText)
 
-        InetHelper.saveCoords(checkedCoordsPath)
+        inetHelper.saveCoords(checkedCoordsPath)
 
-        res = await PersonModel.insertMany(insertObjects)
+        res = await personModel.insertMany(insertObjects)
 
         if (res) {
             this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
@@ -460,7 +459,7 @@ class XlsGoogleParserPersons {
             { name: 'checkedTimePersons', kind: 'status', value: checkedTime }
         ]
 
-        res = await ServiceModel.insertMany(serviceObjects)
+        res = await serviceModel.insertMany(serviceObjects)
         if (res) {
             this.log.info(chalk.green(`Успешное сохранение статуса`))
         } else {
@@ -470,5 +469,3 @@ class XlsGoogleParserPersons {
         return true
     }
 }
-
-module.exports = XlsGoogleParserPersons

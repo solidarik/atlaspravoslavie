@@ -1,4 +1,4 @@
-class StrHelper {
+export default class StrHelper {
   static toTranslitStr(input) {
     if (!input || input == '') return ''
 
@@ -233,6 +233,8 @@ class StrHelper {
   static capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
-}
 
-module.exports = StrHelper
+  static capitalizeFirstLetterAllWords(string) {
+    return string.split(' ').map(this.capitalizeFirstLetter).join(' ')
+  }
+}

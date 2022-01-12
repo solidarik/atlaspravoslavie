@@ -1,8 +1,8 @@
-const Log = require('../helper/logHelper')
+import Log from '../helper/logHelper'
 const log = Log.create()
-const ImageHelper = require('../helper/imageHelper')
+import ImageHelper from '../helper/imageHelper'
 
-class ImageSaver {
+export default class ImageSaver {
 
     async start(dbModel, saveFolder) {
 
@@ -38,5 +38,3 @@ class ImageSaver {
         //   log.info('Free ImageSaver')
     }
 }
-
-module.exports = ImageSaver

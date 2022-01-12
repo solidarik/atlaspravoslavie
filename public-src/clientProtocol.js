@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
-import EventEmitter from './eventEmitter'
-import CookieHelper from './cookieHelper'
+import EventEmitter from './eventEmitter.js'
+import CookieHelper from './cookieHelper.js'
 
 export default class ClientProtocol extends EventEmitter {
   constructor() {
@@ -156,6 +156,7 @@ export default class ClientProtocol extends EventEmitter {
       'clQueryDataByYear',
       JSON.stringify(searchData),
       (msg) => {
+        console.log(`>> get answer from server ${msg} `)
         this.emit('refreshInfo', JSON.parse(msg))
       }
     )

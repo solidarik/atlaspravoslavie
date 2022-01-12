@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose'
+
 var mapObjectSchema = new mongoose.Schema({
   uid: {
     type: String,
@@ -17,7 +18,7 @@ var mapObjectSchema = new mongoose.Schema({
     type: String,
   },
   coords: {
-    type:     Array,
+    type: Array,
     required: "Объект не может быть пустым",
   },
   headerStr: {
@@ -34,5 +35,4 @@ var mapObjectSchema = new mongoose.Schema({
   timestamps: true
 });
 
-
-module.exports = mongoose.model('mapObjects', mapObjectSchema, 'mapObjects');
+export default mongoose.model('mapObjects', mapObjectSchema, 'mapObjects')

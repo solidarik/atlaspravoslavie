@@ -1,5 +1,7 @@
 'use strict'
 
+import CookieHelper from '../public-src/cookieHelper.js'
+
 window.app = {};
 var app = window.app;
 
@@ -418,7 +420,7 @@ function download(content, fileName, contentType) {
 
 // console.time implementation for IE
 if (window.console && typeof window.console.time == 'undefined') {
-  console.time = function(name, reset) {
+  console.time = function (name, reset) {
     if (!name) {
       return
     }
@@ -433,7 +435,7 @@ if (window.console && typeof window.console.time == 'undefined') {
     console.timeCounters[key] = time
   }
 
-  console.timeEnd = function(name) {
+  console.timeEnd = function (name) {
     var time = new Date().getTime()
     if (!console.timeCounters) {
       return
@@ -456,9 +458,9 @@ var projection
 var width
 var height
 var zoom
-var onClickDropDown = function(d) {
-  console.log("onClickDropDown"+JSON.stringify(d));
-  
+var onClickDropDown = function (d) {
+  console.log("onClickDropDown" + JSON.stringify(d));
+
   var div
   if (document.getElementById('tooltip') !== null) {
     div = d3.select('div#tooltip')
@@ -474,10 +476,10 @@ var onClickDropDown = function(d) {
 
   CookieHelper.setCookie('idInfoCategory', parseInt(d.id));
   buildBubble(d, svg, projection, width);
-  $('#option1').closest('label').off('click').click(function() { 
+  $('#option1').closest('label').off('click').click(function () {
     buildBubble(d, svg, projection, width);
   });
-  $('#option2').closest('label').off('click').click(function() { 
+  $('#option2').closest('label').off('click').click(function () {
     buildBubble(d, svg, projection, width);
   });
 }
@@ -486,7 +488,7 @@ function loadJSON(url, callback) {
   var xobj = new XMLHttpRequest()
   xobj.overrideMimeType('application/json')
   xobj.open('GET', url, true) // Replace 'my_data' with the path to your file
-  xobj.onreadystatechange = function() {
+  xobj.onreadystatechange = function () {
     if (xobj.readyState == 4 && xobj.status == '200') {
       // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
       callback(xobj.responseText)
@@ -495,7 +497,7 @@ function loadJSON(url, callback) {
   xobj.send(null)
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   //addComboBoxFromJson.addBootstrapDropDown(loadedData, "dropDownList", "id", "RusName", onClickDropDown);
 
 })
@@ -522,175 +524,175 @@ function buildBubble(ldata, svg, projection, width) {
     shadow: '0 0 1px transparent', // Box-shadow for the lines
     position: 'absolute' // Element positioning
   };
-  
-  
+
+
   var target = document.getElementById('graph-control');
-  
+
   //var spinner = new Spin.Spinner(opts).spin(target);
-  $.spin('true');   
+  $.spin('true');
   document.getElementById('nameContainer').innerHTML = ''
   document.getElementById('nameContainer').innerHTML =
     '<h4>' + ldata.RusName + '</h4>'
   // if (typeof ldata.listYear === 'undefined') {
-    // console.time("fast load oboe data " + ldata.RusName);
+  // console.time("fast load oboe data " + ldata.RusName);
 
-    // oboe({
-    // 	'url': ldata.url,
-    // 	'method': 'GET',   //optional
-    // 	//'body': data    //no need to encode, the library will JSON stringify it automatically
-    // }).on('done', function (things) {
-    // 	var oboe_actual_JSON = things;
-    // 	console.timeEnd("fast load oboe data " + ldata.RusName);
-    // });
+  // oboe({
+  // 	'url': ldata.url,
+  // 	'method': 'GET',   //optional
+  // 	//'body': data    //no need to encode, the library will JSON stringify it automatically
+  // }).on('done', function (things) {
+  // 	var oboe_actual_JSON = things;
+  // 	console.timeEnd("fast load oboe data " + ldata.RusName);
+  // });
 
-    // console.time("fast load jqery data " + ldata.RusName);
-    // $.getJSON(ldata.url, function (data) {
-    // 	var jqery_actual_JSON = data;
-    // 	console.timeEnd("fast load jqery data " + ldata.RusName);
-    // });
+  // console.time("fast load jqery data " + ldata.RusName);
+  // $.getJSON(ldata.url, function (data) {
+  // 	var jqery_actual_JSON = data;
+  // 	console.timeEnd("fast load jqery data " + ldata.RusName);
+  // });
 
-    // console.time("fast load data " + ldata.RusName);
-    // loadJSON(ldata.url, function (response) {
-    // 	// Parse JSON string into object
-    // 	var actual_JSON = JSON.parse(response);
-    // 	console.timeEnd("fast load data " + ldata.RusName);
-    // });
+  // console.time("fast load data " + ldata.RusName);
+  // loadJSON(ldata.url, function (response) {
+  // 	// Parse JSON string into object
+  // 	var actual_JSON = JSON.parse(response);
+  // 	console.timeEnd("fast load data " + ldata.RusName);
+  // });
 
-    console.time('load data ' + ldata.RusName)
-    d3.json(ldata.url, function(error, dataFromFile) {
-      console.timeEnd('load data ' + ldata.RusName)
-      console.time('build list year')
-      if (error) console.log(error)
-      if($('#option1').prop('checked')){
-        dataFromFile=dataFromFile.filter(function(elem){
-          return parseInt(elem.date)>=1914&&parseInt(elem.date)<=1965;
-        });
-      }
-      ldata.dataFromFile = dataFromFile
-      var listYear
-      if (ldata.jsonType == 'UFA') {
-        listYear = addSlider.getListYearNew(ldata.dataFromFile)
-      } else if (ldata.jsonType == 'SAMARA') {
-        //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
-        listYear = addSlider.getListYear(ldata.dataFromFile)
-      }
-      ldata.listYear = listYear
-      console.timeEnd('build list year')
-      console.time('filte by year')
-      var curDataYearFilter
-      if (ldata.jsonType == 'UFA') {
-        curDataYearFilter = addSlider.filterByYearNew(
-          ldata.dataFromFile,
-          ldata.listYear[0]
-        )
-      } else if (ldata.jsonType == 'SAMARA') {
-        curDataYearFilter = addSlider.filterByYear(
-          ldata.dataFromFile,
-          ldata.listYear[0]
-        )
-      }
-      console.timeEnd('filte by year')
-      console.time('max val')
-      var mxval = 0
-      // if (ldata.jsonType == "UFA") {
-      // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
-      // } else if (ldata.jsonType == "SAMARA") {
-      // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
-      // }
-      console.timeEnd('max val')
-      console.time('addFlagCircleInMap')
+  console.time('load data ' + ldata.RusName)
+  d3.json(ldata.url, function (error, dataFromFile) {
+    console.timeEnd('load data ' + ldata.RusName)
+    console.time('build list year')
+    if (error) console.log(error)
+    if ($('#option1').prop('checked')) {
+      dataFromFile = dataFromFile.filter(function (elem) {
+        return parseInt(elem.date) >= 1914 && parseInt(elem.date) <= 1965;
+      });
+    }
+    ldata.dataFromFile = dataFromFile
+    var listYear
+    if (ldata.jsonType == 'UFA') {
+      listYear = addSlider.getListYearNew(ldata.dataFromFile)
+    } else if (ldata.jsonType == 'SAMARA') {
       //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
-      var flagCircleInMapLoc = new flagCircleInMap(
-        curDataYearFilter,
-        svg,
-        projection,
-        'img_',
-        mxval,
-        width,
-        ldata.dataFromFile
+      listYear = addSlider.getListYear(ldata.dataFromFile)
+    }
+    ldata.listYear = listYear
+    console.timeEnd('build list year')
+    console.time('filte by year')
+    var curDataYearFilter
+    if (ldata.jsonType == 'UFA') {
+      curDataYearFilter = addSlider.filterByYearNew(
+        ldata.dataFromFile,
+        ldata.listYear[0]
       )
-      if (ldata.jsonType == 'UFA') {
-        flagCircleInMapLoc.addFlagCircleInMapNew()
-      } else if (ldata.jsonType == 'SAMARA') {
-        flagCircleInMapLOc.addFlagCircleInMap()
+    } else if (ldata.jsonType == 'SAMARA') {
+      curDataYearFilter = addSlider.filterByYear(
+        ldata.dataFromFile,
+        ldata.listYear[0]
+      )
+    }
+    console.timeEnd('filte by year')
+    console.time('max val')
+    var mxval = 0
+    // if (ldata.jsonType == "UFA") {
+    // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
+    // } else if (ldata.jsonType == "SAMARA") {
+    // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
+    // }
+    console.timeEnd('max val')
+    console.time('addFlagCircleInMap')
+    //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
+    var flagCircleInMapLoc = new flagCircleInMap(
+      curDataYearFilter,
+      svg,
+      projection,
+      'img_',
+      mxval,
+      width,
+      ldata.dataFromFile
+    )
+    if (ldata.jsonType == 'UFA') {
+      flagCircleInMapLoc.addFlagCircleInMapNew()
+    } else if (ldata.jsonType == 'SAMARA') {
+      flagCircleInMapLOc.addFlagCircleInMap()
+    }
+    var amid = new AddMapInfoDiagramm("mapContainerInfo", curDataYearFilter, parseInt(d3.select("#mapContainerInfo").style("width")), parseInt(d3.select("#mapContainerInfo").style("height")));
+    amid.addMapInfoDiagrammInDivTop5();
+    console.timeEnd('addFlagCircleInMap')
+    var updateFunction
+    if (ldata.jsonType == 'UFA') {
+      updateFunction = function (h, handle, label, xScale) {
+        // update position and text of label according to slider scale
+        var h2 = Number(h.toFixed(0))
+        handle.attr('cx', xScale(h))
+
+        label.attr('x', xScale(h)).text(listYear[h2])
+
+        var curDataYearFilter = addSlider.filterByYearNew(
+          ldata.dataFromFile,
+          listYear[h2]
+        )
+        var mxval = 0
+        // if (ldata.jsonType == "UFA") {
+        // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
+        // } else if (ldata.jsonType == "SAMARA") {
+        // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
+        // }
+        //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
+        svg.call(zoom.transform, d3.zoomIdentity);
+        var flagCircleInMapLoc = new flagCircleInMap(
+          curDataYearFilter,
+          svg,
+          projection,
+          'img_',
+          mxval,
+          width,
+          ldata.dataFromFile
+        )
+        flagCircleInMapLoc.addFlagCircleInMapNew();
+        var amid = new AddMapInfoDiagramm("mapContainerInfo", curDataYearFilter, parseInt(d3.select("#mapContainerInfo").style("width")), parseInt(d3.select("#mapContainerInfo").style("height")));
+        amid.addMapInfoDiagrammInDivTop5();
       }
-      var amid =  new AddMapInfoDiagramm("mapContainerInfo",curDataYearFilter,parseInt(d3.select("#mapContainerInfo").style("width")),parseInt(d3.select("#mapContainerInfo").style("height")));
-      amid.addMapInfoDiagrammInDivTop5();
-      console.timeEnd('addFlagCircleInMap')
-      var updateFunction
-      if (ldata.jsonType == 'UFA') {
-        updateFunction = function(h, handle, label, xScale) {
-          // update position and text of label according to slider scale
-          var h2 = Number(h.toFixed(0))
-          handle.attr('cx', xScale(h))
+    } else if (ldata.jsonType == 'SAMARA') {
+      updateFunction = function (h, handle, label, xScale) {
+        // update position and text of label according to slider scale
+        var h2 = Number(h.toFixed(0))
+        handle.attr('cx', xScale(h))
 
-          label.attr('x', xScale(h)).text(listYear[h2])
-
-          var curDataYearFilter = addSlider.filterByYearNew(
-            ldata.dataFromFile,
-            listYear[h2]
-          )
-          var mxval = 0
-          // if (ldata.jsonType == "UFA") {
-          // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
-          // } else if (ldata.jsonType == "SAMARA") {
-          // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
-          // }
-          //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
-          svg.call(zoom.transform, d3.zoomIdentity);
-          var flagCircleInMapLoc = new flagCircleInMap(
-            curDataYearFilter,
-            svg,
-            projection,
-            'img_',
-            mxval,
-            width,
-            ldata.dataFromFile
-          )
-          flagCircleInMapLoc.addFlagCircleInMapNew();
-          var amid =  new AddMapInfoDiagramm("mapContainerInfo",curDataYearFilter,parseInt(d3.select("#mapContainerInfo").style("width")),parseInt(d3.select("#mapContainerInfo").style("height")));
-          amid.addMapInfoDiagrammInDivTop5();
-        }
-      } else if (ldata.jsonType == 'SAMARA') {
-        updateFunction = function(h, handle, label, xScale) {
-          // update position and text of label according to slider scale
-          var h2 = Number(h.toFixed(0))
-          handle.attr('cx', xScale(h))
-
-          label.attr('x', xScale(h)).text(listYear[h2])
-          var mxval = 0
-          // if (ldata.jsonType == "UFA") {
-          // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
-          // } else if (ldata.jsonType == "SAMARA") {
-          // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
-          // }
-          svg.call(zoom.transform, d3.zoomIdentity);
-          var curDataYearFilter = addSlider.filterByYear(
-            ldata.dataFromFile,
-            listYear[h2]
-          )
-          //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
-          var flagCircleInMapLoc = new flagCircleInMap(
-            curDataYearFilter,
-            svg,
-            projection,
-            'img_',
-            mxval,
-            width,
-            ldata.dataFromFile
-          )
-          flagCircleInMapLoc.addFlagCircleInMap()
-          var amid =  new AddMapInfoDiagramm("mapContainerInfo",curDataYearFilter,parseInt(d3.select("#mapContainerInfo").style("width")),parseInt(d3.select("#mapContainerInfo").style("height")));
-          amid.addMapInfoDiagrammInDivTop5();
-        }
+        label.attr('x', xScale(h)).text(listYear[h2])
+        var mxval = 0
+        // if (ldata.jsonType == "UFA") {
+        // 	mxval = flagCircleInMap.getMaxValueNew(ldata.dataFromFile);
+        // } else if (ldata.jsonType == "SAMARA") {
+        // 	mxval = flagCircleInMap.getMaxValue(ldata.dataFromFile);
+        // }
+        svg.call(zoom.transform, d3.zoomIdentity);
+        var curDataYearFilter = addSlider.filterByYear(
+          ldata.dataFromFile,
+          listYear[h2]
+        )
+        //console.log("ldata.dataFromFile=" + JSON.stringify(ldata.dataFromFile));
+        var flagCircleInMapLoc = new flagCircleInMap(
+          curDataYearFilter,
+          svg,
+          projection,
+          'img_',
+          mxval,
+          width,
+          ldata.dataFromFile
+        )
+        flagCircleInMapLoc.addFlagCircleInMap()
+        var amid = new AddMapInfoDiagramm("mapContainerInfo", curDataYearFilter, parseInt(d3.select("#mapContainerInfo").style("width")), parseInt(d3.select("#mapContainerInfo").style("height")));
+        amid.addMapInfoDiagrammInDivTop5();
       }
+    }
 
-      console.time('addSlider')
-      addSlider.addSlider('vis', width, listYear, updateFunction)
-      console.timeEnd('addSlider')
-      //spinner.stop();
-      $.spin('false');
-    });
+    console.time('addSlider')
+    addSlider.addSlider('vis', width, listYear, updateFunction)
+    console.timeEnd('addSlider')
+    //spinner.stop();
+    $.spin('false');
+  });
   // } else {
   //   console.time('filte by year')
   //   var curDataYearFilter;
@@ -804,8 +806,8 @@ function zoomed() {
 
   t.x = d3.min([t.x, 0]);
   t.y = d3.min([t.y, 0]);
-  t.x = d3.max([t.x, (1-t.k) * width]);
-  t.y = d3.max([t.y, (1-t.k) * height]);
+  t.x = d3.max([t.x, (1 - t.k) * width]);
+  t.y = d3.max([t.y, (1 - t.k) * height]);
 
   svg.selectAll('path').attr('transform', t);
   svg.selectAll('circle').attr('transform', t);
@@ -813,8 +815,8 @@ function zoomed() {
 
 
 function startApp() {
-  
- d3.json(url3, function(error, ld) {
+
+  d3.json(url3, function (error, ld) {
     if (error) console.log(error);
     // console.log("ld="+JSON.stringify(ld));
     // console.log("loadedData end");
@@ -831,7 +833,7 @@ function startApp() {
     );
 
     console.time('load countries');
-    d3.json(url, function(error, countries) {
+    d3.json(url, function (error, countries) {
       console.timeEnd('load countries')
       if (error) console.log(error)
 
@@ -872,15 +874,15 @@ function startApp() {
         //.translateExtent([[0,0], [width, height]])
         //.extent([[0, 0], [width, height]])
         .on('zoom', zoomed)
-        
+
       var isMobile = false; //initiate as false
       // device detection
-      if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) 
-          || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4))) { 
-          isMobile = true;
+      if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
+        || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) {
+        isMobile = true;
       }
 
-      if(isMobile){
+      if (isMobile) {
         svg = d3
           .select('div#mapContainer')
           .append('svg')
@@ -890,16 +892,16 @@ function startApp() {
           //	svg.attr("transform", d3.event.transform)
           // }))
           .call(zoom)
-      }else{
+      } else {
         svg = d3
           .select('div#mapContainer')
           .append('svg')
           .attr('width', width)
           .attr('height', height)
-          //.call(d3.zoom().on("zoom", function () {
-          //	svg.attr("transform", d3.event.transform)
-          // }))
-          //.call(zoom)
+        //.call(d3.zoom().on("zoom", function () {
+        //	svg.attr("transform", d3.event.transform)
+        // }))
+        //.call(zoom)
       }
 
 
@@ -908,7 +910,7 @@ function startApp() {
       addCountries.addContries(countries.features, svg, projection)
       console.timeEnd('add countries')
       console.time('load places')
-      d3.json(url2, function(error, places) {
+      d3.json(url2, function (error, places) {
         console.timeEnd('load places')
         if (error) console.log(error)
 
@@ -927,17 +929,17 @@ function startApp() {
         //	return item.type == "ar";
         //})
 
-        var ldata = loadedData.filter(function(d) {
+        var ldata = loadedData.filter(function (d) {
           return d.id == idInfoCategory
         })
         ldata = ldata[0]
         //console.log(ldata)
         //console.time('add buuble')
         buildBubble(ldata, svg, projection, width);
-        $('#option1').closest('label').off('click').click(function() { 
+        $('#option1').closest('label').off('click').click(function () {
           buildBubble(ldata, svg, projection, width);
         });
-        $('#option2').closest('label').off('click').click(function() { 
+        $('#option2').closest('label').off('click').click(function () {
           buildBubble(ldata, svg, projection, width);
         });
         //console.timeEnd('add buuble')

@@ -1,24 +1,25 @@
-const chalk = require('chalk')
-const Log = require('../helper/logHelper')
-const FileHelper = require('../helper/fileHelper')
+
+import chalk from 'chalk'
+import Log from '../helper/logHelper'
+import FileHelper from '../helper/fileHelper'
 
 if (FileHelper.isFileExists('load.log')) {
   FileHelper.deleteFile('load.log')
 }
-log = Log.create('load.log')
 
-const DbHelper = require('../loadDatabase/dbHelper')
-const PersonsAggr = require('../loadDatabase/personsAggr')
-const inetHelper = require('../helper/inetHelper')
+const log = Log.create('load.log')
+import DbHelper from '../loadDatabase/dbHelper'
+import PersonsAggr from '../loadDatabase/personsAggr'
+import inetHelper from '../helper/inetHelper'
 
-const chronosJsonMediator = require('../loadDatabase/chronosJsonMediator')
-const chronosChurchJsonMediator = require('../loadDatabase/chronosChurchJsonMediator')
-const personsJsonMediator = require('../loadDatabase/personsJsonMediator')
-const personsAggrJsonMediator = require('../loadDatabase/personsAggrJsonMediator')
-const usersJsonMediator = require('../loadDatabase/usersJsonMediator')
-const templesJsonMediator = require('../loadDatabase/templesJsonMediator')
-const XlsGoogleParser = require('./xlsGoogleParser')
-const XlsGoogleParserPersons = require('./xlsGoogleParserPersons')
+import ChronosJsonMediator from '../loadDatabase/chronosJsonMediator'
+import ChronosChurchJsonMediator from '../loadDatabase/chronosChurchJsonMediator'
+import PersonsJsonMediator from '../loadDatabase/personsJsonMediator'
+import PersonsAggrJsonMediator from '../loadDatabase/personsAggrJsonMediator'
+import UsersJsonMediator from '../loadDatabase/usersJsonMediator'
+import TemplesJsonMediator from '../loadDatabase/templesJsonMediator'
+import XlsGoogleParser from './xlsGoogleParser'
+import XlsGoogleParserPersons from './xlsGoogleParserPersons'
 
 const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
 
@@ -31,6 +32,9 @@ const xlsGoogleParserPersons = new XlsGoogleParserPersons(log)
 const personsAggr = new PersonsAggr()
 
 Promise.resolve(true)
+  .then(() => {
+    return dbHelper.connect()
+  })
   // .then(() => {
   //   return dbHelper.clearDb('users')
   // })
@@ -39,7 +43,7 @@ Promise.resolve(true)
   //     source: 'dataSources/secretUsers.json',
   //     procdir: 'out/out_user_process',
   //     errdir: 'out/out_user_errors',
-  //     mediztor: usersJsonMediator
+  //     mediztor: UsersJsonMediator
   //   })
   // })
   // .then(() => {
@@ -50,7 +54,7 @@ Promise.resolve(true)
   //     source: 'python/out_chronos_religion',
   //     procdir: 'out/out_chronos_religion_process',
   //     errdir: 'out/out_chronos_religion_errors',
-  //     mediator: chronosJsonMediator,
+  //     mediator: ChronosJsonMediator,
   //   })
   // })
   // .then(() => {
@@ -61,7 +65,7 @@ Promise.resolve(true)
   //     source: 'python/out_chronos_church',
   //     procdir: 'out/out_chronos_church_process',
   //     errdir: 'out/out_chronos_church_errors',
-  //     mediator: chronosChurchJsonMediator,
+  //     mediator: ChronosChurchJsonMediator,
   //   })
   // })
   // .then(() => {
@@ -72,17 +76,17 @@ Promise.resolve(true)
   //     source: 'python/out_temples',
   //     procdir: 'out/out_temples_process',
   //     errdir: 'out/out_temples_errors',
-  //     mediator: templesJsonMediator,
+  //     mediator: TemplesJsonMediator,
   //   })
   // })
   // .then(() => {
   //   return XlsParser.loadData({
   //     source: `${__dirname}/religion/temples_azbuka.xlsx`,
-  //     mediator: templesJsonMediator
+  //     mediator: TemplesJsonMediator
   //   })
   // })
   // .then(() => {
-  //   return xlsGoogleParser.loadData(dbHelper)
+  //   return XlsGoogleParser.loadData(dbHelper)
   // })
   .then(() => {
     return dbHelper.clearDb('persons')
@@ -91,11 +95,11 @@ Promise.resolve(true)
     return xlsGoogleParserPersons.loadData(dbHelper)
   })
   // .then(() => {
-  //   return dbHelper.saveFilesFrom({
+  //   return DbHelper.saveFilesFrom({
   //     source: 'python/out_persons',
   //     procdir: 'out/out_person_process',
   //     errdir: 'out/out_person_errors',
-  //     mediator: personsJsonMediator,
+  //     mediator: PersonsJsonMediator,
   //   })
   // })
   .then(() => {

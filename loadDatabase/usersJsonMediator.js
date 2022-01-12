@@ -1,7 +1,7 @@
-const SuperJsonMediator = require('./superJsonMediator');
-const usersModel = require('../models/usersModel');
+import SuperJsonMediator from './superJsonMediator'
+import usersModel from '../models/usersModel'
 
-class UserJsonMediator extends SuperJsonMediator {
+export default class UsersJsonMediator extends SuperJsonMediator {
 
     constructor() {
         super();
@@ -14,5 +14,3 @@ class UserJsonMediator extends SuperJsonMediator {
         return new Promise((resolve) => { resolve(json) })
     }
 }
-
-module.exports = new UserJsonMediator();

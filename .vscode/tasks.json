@@ -7,6 +7,7 @@
       "type": "shell",
       "command": "node",
       "args": [
+        "--es-module-specifier-resolution=node",
         "${file}"
       ],
       "group": {

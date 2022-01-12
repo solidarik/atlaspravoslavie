@@ -1,5 +1,3 @@
-import * as d3 from './libs/d3.min.js';
-
 export default class addHolyPersons {
   constructor(idTable, data) {
     this.idTable = idTable
@@ -82,19 +80,103 @@ export default class addHolyPersons {
       ((typeof thisThis.data[id].profession !== 'undefined') ? thisThis.data[id].profession : '')
     )
 
-    console.log(JSON.stringify(thisThis.data[id]))
+    const cur = thisThis.data[id]
+    console.log(JSON.stringify(cur))
 
-    $('#imgPerson').src = thisThis.data[id].photoUrl
-    $('#imgPerson').attr('src', thisThis.data[id].photoUrl)
-    // $('#description').html(
-    //   thisThis.data[id].Description +
-    //     " <a target='_blank' rel='noopener noreferrer' href='" +
-    //     thisThis.data[id].Source +
-    //     "'>" +
-    //     'Подробнее...</a>'
-    // )
+    let imgCount = cur.imgUrls.length
+
+    let elm = document.getElementById('image-cont');
+    elm.innerHTML = '';
+    let elemSC = document.createElement('div');
+    elemSC.classList.add("slideshow-container");
+    elm.appendChild(elemSC);
+
+    for (let index = 0; index < cur.imgUrls.length; index++) {
+      let elemMS = document.createElement('div');
+      elemMS.classList.add("mySlides");
+      elemMS.classList.add("fade");
+      elemSC.appendChild(elemMS);
+      let elemNT = document.createElement('div');
+      elemNT.classList.add("numbertext");
+      elemNT.innerHTML = index + ' / ' + imgCount;
+      let img = document.createElement('img');
+      img.classList.add("image-center");
+      img.classList.add("img-rounded");
+      img.classList.add("resized-image");
+      img.src = cur.imgUrls[index];
+      elemMS.appendChild(img);
+    }
+
+    for (let index = 0; index <= imgCount; index++) {
+
+      continue; //soli
+
+      let iUFN;
+      if (index > 0) {
+        iUFN = 'imgUrl' + '_' + index;
+      }
+      else {
+        iUFN = 'imgUrl';
+      }
+      if (cur.hasOwnProperty(iUFN)) {
+        let pu;
+        if (index > 0) {
+          pu = cur.pageUrl + '_' + index
+        } else {
+          pu = cur.pageUrl;
+        }
+        //console.log(cur[iUFN]);
+        if (cur[iUFN] !== 'undefined' && cur[iUFN] !== null && cur[iUFN] !== '') {
+          //console.log('if');
+          let elemMS = document.createElement('div');
+          elemMS.classList.add("mySlides");
+          elemMS.classList.add("fade");
+          elemSC.appendChild(elemMS);
+          let elemNT = document.createElement('div');
+          elemNT.classList.add("numbertext");
+          elemNT.innerHTML = index + ' / ' + imgCount;
+          let img = document.createElement('img');
+          img.classList.add("image-center");
+          img.classList.add("img-rounded");
+          img.classList.add("resized-image");
+          img.src = '/images/temples/' + pu + '.jpg';
+          elemMS.appendChild(img);
+        }
+
+      }
+    }
+    let al = document.createElement('a');
+    al.classList.add("prev");
+    al.innerHTML = '&#10094;';
+    al.onclick = function () { window.plusSlides(-1) };
+    elemSC.appendChild(al);
+
+    let ar = document.createElement('a');
+    ar.classList.add("next");
+    ar.innerHTML = '&#10095;';
+    ar.onclick = function () { window.plusSlides(1) };
+    elemSC.appendChild(ar);
+
+    let elemBR = document.createElement('div');
+    elemBR.classList.add("w-100");
+    //<div class="w-100"></div>
+    elm.appendChild(elemBR);
+
+    let elemDD = document.createElement('div');
+    elemDD.style = "margin-left: auto; margin-right: auto;"
+    elm.appendChild(elemDD);
+
+    for (let index = 0; index < imgCount; index++) {
+      let elemD = document.createElement('span');
+      elemD.classList.add("dot");
+      elemD.onclick = function () { window.currentSlide(index + 1) };
+      elemDD.appendChild(elemD);
+    }
+
+    window.showSlides(1);
+
     $('#fullDescription').html(
-      thisThis.data[id].fullDescription +
+      thisThis.data[id].description +
       " <a target='_blank' rel='noopener noreferrer' href='" +
       thisThis.data[id].srcUrl +
       "'>" +

@@ -1,12 +1,12 @@
-const Log = require('../helper/logHelper')
+import Log from '../helper/logHelper'
 const log = Log.create()
-const XLSX = require('xlsx')
-const chalk = require('chalk')
-const geoHelper = require('../helper/geoHelper')
-const dateHelper = require('../helper/dateHelper')
-const strHelper = require('../helper/strHelper')
+import XLSX from 'xlsx'
+import chalk from 'chalk'
+import geoHelper from '../helper/geoHelper'
+import dateHelper from '../helper/dateHelper'
+import strHelper from '../helper/strHelper'
 
-class XlsParser {
+export default class XlsParser {
 
     getValue(sheet, row, col) {
         const cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
@@ -97,5 +97,3 @@ class XlsParser {
         return true
     }
 }
-
-module.exports = new XlsParser()
