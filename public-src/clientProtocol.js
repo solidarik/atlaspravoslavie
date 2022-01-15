@@ -103,6 +103,19 @@ export default class ClientProtocol extends EventEmitter {
       })
   }
 
+  getPersonItem(id) {
+    const searchData = { 'id': id }
+    this.socket.emit('clGetPersonItem', JSON.stringify(searchData),
+      (msg) => {
+        const res = JSON.parse(msg)
+        if (res.error) {
+          console.log(`Ошибка от сервера ${res.error}`)
+        } else {
+          this.emit('onGetPersonItem', res)
+        }
+      })
+  }
+
   getInfoItem(item) {
     const classFeature = item.get('classFeature')
     const info = item.get('info')

@@ -40,6 +40,7 @@ class HolyProtocol extends ServerProtocol {
     super.addHandler('clGetPersonsReverends', this.getPersonsReverends)
     super.addHandler('clGetPersonsHoly', this.getPersonsHoly)
     super.addHandler('clGetTempleItem', this.getTempleItem)
+    super.addHandler('clGetPersonItem', this.getPersonItem)
     super.addHandler('clGetInfoItem', this.getInfoItem)
     super.addHandler('clGetLoadStatus', this.getLoadStatus)
   }
@@ -191,6 +192,32 @@ class HolyProtocol extends ServerProtocol {
         })
     } catch (err) {
       res.err = 'Ошибка возврата храма: ' + err
+      res.events = ''
+      cb(JSON.stringify(res))
+    }
+  }
+
+  getPersonItem(socket, msg, cb) {
+
+    let data = JSON.parse(msg)
+    let res = {}
+    try {
+      personsModel.find({ '_id': data.id })
+        .then(
+          (res) => {
+            if (res.length == 0) {
+              throw new Error('Person by id is not Found')
+            } else {
+              cb(
+                JSON.stringify(res[0])
+              )
+            }
+          })
+        .catch((error) => {
+          cb(JSON.stringify({ error: error }))
+        })
+    } catch (err) {
+      res.err = 'Ошибка возврата святого: ' + err
       res.events = ''
       cb(JSON.stringify(res))
     }

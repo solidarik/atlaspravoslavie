@@ -48,8 +48,16 @@ class PersonFeature extends SuperFeature {
     }
 
     let monkname = ''
-    if (info.monkname) {
-      monkname = `<h1>Имя в монашестве: ${info.monkname}</h1>`
+    if (info.monkname && info.monkname != outerInfo.caption) {
+      monkname = `<h2>Имя в монашестве: ${info.monkname}</h2>`
+    }
+
+    let fio = `${info.surname} ${info.name} ${info.middlename}`
+    fio = fio.trim()
+    if (fio == outerInfo.caption) {
+      fio = ''
+    } else {
+      fio = `<h2>${fio}</h2>`
     }
 
     const imgUrls = info.imgUrls
@@ -66,8 +74,15 @@ class PersonFeature extends SuperFeature {
         <div class="col">
           <h1>${outerInfo.caption}</h1>
           ${monkname}
-          <h2>${info.status}</h2>
-          <table id='person-table' class='table table-borderless'>
+          ${fio}
+          <h2>${info.status}</h2>`
+
+
+    if (worshipStr) {
+      html += `<h2 class='worship-days'>${worshipStr}</h2>`
+    }
+
+    html += `<table id='person-table' class='table table-borderless'>
             <thead>
               <tr>
                 <th scope='col'></th>
@@ -83,7 +98,7 @@ class PersonFeature extends SuperFeature {
               </tr>`
 
     info.achievements.forEach(achiev => {
-      if (achiev.dateStr) {
+      if (achiev.start.dateStr) {
         html += `
           <tr><th scope='row'>Подвиг</th>
             <td>${achiev.place ? achiev.place : '—'}</td>
@@ -111,10 +126,6 @@ class PersonFeature extends SuperFeature {
 
     html += '</tbody></table>'
 
-    if (worshipStr) {
-      html += `<h2 class='worship-days'>${worshipStr}</h2>`
-    }
-
     const personUrl = `person/${info.pageUrl}`
 
     if (outerInfo.shortDescription) {
@@ -123,7 +134,8 @@ class PersonFeature extends SuperFeature {
 
     html += `
       <div class="source-info">
-        <a rel='noopener noreferrer' href="${personUrl}">Подробнее</a>
+        <a rel='noopener noreferrer' title="Строка-Источник: ${info.lineSource}"
+          href="${personUrl}">Подробнее</a>
       </div>
     </div></div></div>
     `

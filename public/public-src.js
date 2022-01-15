@@ -102456,8 +102456,17 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
 
       var monkname = '';
 
-      if (info.monkname) {
-        monkname = "<h1>\u0418\u043C\u044F \u0432 \u043C\u043E\u043D\u0430\u0448\u0435\u0441\u0442\u0432\u0435: ".concat(info.monkname, "</h1>");
+      if (info.monkname && info.monkname != outerInfo.caption) {
+        monkname = "<h2>\u0418\u043C\u044F \u0432 \u043C\u043E\u043D\u0430\u0448\u0435\u0441\u0442\u0432\u0435: ".concat(info.monkname, "</h2>");
+      }
+
+      var fio = "".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename);
+      fio = fio.trim();
+
+      if (fio == outerInfo.caption) {
+        fio = '';
+      } else {
+        fio = "<h2>".concat(fio, "</h2>");
       }
 
       var imgUrls = info.imgUrls;
@@ -102467,9 +102476,15 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
         imgHtml = "<img src=\"".concat(imgUrls[0], "\" class=\"rounded float-start imageFeatureInfo\"></img>");
       }
 
-      var html = "<div class=\"person-info panel-info\">\n      <div class=\"row\">\n        <div class=\"col-md-auto\">\n          ".concat(imgHtml, "\n        </div>\n        <div class=\"col\">\n          <h1>").concat(outerInfo.caption, "</h1>\n          ").concat(monkname, "\n          <h2>").concat(info.status, "</h2>\n          <table id='person-table' class='table table-borderless'>\n            <thead>\n              <tr>\n                <th scope='col'></th>\n                <th scope='col'>\u041C\u0435\u0441\u0442\u043E</th>\n                <th scope='col'>\u0414\u0430\u0442\u0430</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <th scope='row'>\u0420\u043E\u0436\u0434\u0435\u043D\u0438\u0435</th>\n                <td>").concat(info.birth.place, "</td>\n                <td>").concat(_dateHelper.default.ymdToStr(info.birth), "</td>\n              </tr>");
+      var html = "<div class=\"person-info panel-info\">\n      <div class=\"row\">\n        <div class=\"col-md-auto\">\n          ".concat(imgHtml, "\n        </div>\n        <div class=\"col\">\n          <h1>").concat(outerInfo.caption, "</h1>\n          ").concat(monkname, "\n          ").concat(fio, "\n          <h2>").concat(info.status, "</h2>");
+
+      if (worshipStr) {
+        html += "<h2 class='worship-days'>".concat(worshipStr, "</h2>");
+      }
+
+      html += "<table id='person-table' class='table table-borderless'>\n            <thead>\n              <tr>\n                <th scope='col'></th>\n                <th scope='col'>\u041C\u0435\u0441\u0442\u043E</th>\n                <th scope='col'>\u0414\u0430\u0442\u0430</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <th scope='row'>\u0420\u043E\u0436\u0434\u0435\u043D\u0438\u0435</th>\n                <td>".concat(info.birth.place, "</td>\n                <td>").concat(_dateHelper.default.ymdToStr(info.birth), "</td>\n              </tr>");
       info.achievements.forEach(function (achiev) {
-        if (achiev.dateStr) {
+        if (achiev.start.dateStr) {
           html += "\n          <tr><th scope='row'>\u041F\u043E\u0434\u0432\u0438\u0433</th>\n            <td>".concat(achiev.place ? achiev.place : '—', "</td>\n            <td>").concat(_dateHelper.default.rangeYmdToStr(achiev.start, achiev.end), "</td>\n          </tr>\n        ");
         }
       });
@@ -102483,18 +102498,13 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
       }
 
       html += '</tbody></table>';
-
-      if (worshipStr) {
-        html += "<h2 class='worship-days'>".concat(worshipStr, "</h2>");
-      }
-
       var personUrl = "person/".concat(info.pageUrl);
 
       if (outerInfo.shortDescription) {
         html += "<p>".concat(outerInfo.shortDescription, "</p>");
       }
 
-      html += "\n      <div class=\"source-info\">\n        <a rel='noopener noreferrer' href=\"".concat(personUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div></div></div>\n    ");
+      html += "\n      <div class=\"source-info\">\n        <a rel='noopener noreferrer' title=\"\u0421\u0442\u0440\u043E\u043A\u0430-\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A: ".concat(info.lineSource, "\"\n          href=\"").concat(personUrl, "\">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435</a>\n      </div>\n    </div></div></div>\n    ");
       return html;
     }
   }, {
@@ -107352,9 +107362,27 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       });
     }
   }, {
+    key: "getPersonItem",
+    value: function getPersonItem(id) {
+      var _this6 = this;
+
+      var searchData = {
+        'id': id
+      };
+      this.socket.emit('clGetPersonItem', JSON.stringify(searchData), function (msg) {
+        var res = JSON.parse(msg);
+
+        if (res.error) {
+          console.log("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0442 \u0441\u0435\u0440\u0432\u0435\u0440\u0430 ".concat(res.error));
+        } else {
+          _this6.emit('onGetPersonItem', res);
+        }
+      });
+    }
+  }, {
     key: "getInfoItem",
     value: function getInfoItem(item) {
-      var _this6 = this;
+      var _this7 = this;
 
       var classFeature = item.get('classFeature');
       var info = item.get('info');
@@ -107374,23 +107402,23 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
         if (res.error) {
           console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0442 \u0441\u0435\u0440\u0432\u0435\u0440\u0430 ".concat(res.error));
         } else {
-          _this6.emit('onGetInfoItem', res);
+          _this7.emit('onGetInfoItem', res);
         }
       });
     }
   }, {
     key: "getLoadStatus",
     value: function getLoadStatus() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.socket.emit('clGetLoadStatus', JSON.stringify({}), function (msg) {
-        _this7.emit('onGetLoadStatus', JSON.parse(msg));
+        _this8.emit('onGetLoadStatus', JSON.parse(msg));
       });
     }
   }, {
     key: "getDataByYear",
     value: function getDataByYear(dateObject) {
-      var _this8 = this;
+      var _this9 = this;
 
       if (undefined === dateObject.year) {
         return;
@@ -107423,7 +107451,7 @@ var ClientProtocol = /*#__PURE__*/function (_EventEmitter) {
       this.socket.emit('clQueryDataByYear', JSON.stringify(searchData), function (msg) {
         console.log(">> get answer from server ".concat(msg, " "));
 
-        _this8.emit('refreshInfo', JSON.parse(msg));
+        _this9.emit('refreshInfo', JSON.parse(msg));
       });
     }
   }], [{

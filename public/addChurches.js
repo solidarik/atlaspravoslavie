@@ -24,6 +24,7 @@ export default class addChurches extends EventEmitter {
   showItem(item) {
 
     const cur = item
+
     $('#name').html(
       cur.name
     )
@@ -55,8 +56,6 @@ export default class addChurches extends EventEmitter {
       'Подробнее...</a>'
     )
 
-    //$('#imgChurches').src = '/images/temples/'+cur.pageUrl+'.jpg'
-    //$('#imgChurches').attr('src', '/images/temples/'+cur.pageUrl+'.jpg')
     let imgCount = cur.imgUrls.length;
 
     let elm = document.getElementById('image-cont');
@@ -81,44 +80,6 @@ export default class addChurches extends EventEmitter {
       elemMS.appendChild(img);
     }
 
-    for (let index = 0; index <= imgCount; index++) {
-
-      continue; //soli
-
-      let iUFN;
-      if (index > 0) {
-        iUFN = 'imgUrl' + '_' + index;
-      }
-      else {
-        iUFN = 'imgUrl';
-      }
-      if (cur.hasOwnProperty(iUFN)) {
-        let pu;
-        if (index > 0) {
-          pu = cur.pageUrl + '_' + index
-        } else {
-          pu = cur.pageUrl;
-        }
-        //console.log(cur[iUFN]);
-        if (cur[iUFN] !== 'undefined' && cur[iUFN] !== null && cur[iUFN] !== '') {
-          //console.log('if');
-          let elemMS = document.createElement('div');
-          elemMS.classList.add("mySlides");
-          elemMS.classList.add("fade");
-          elemSC.appendChild(elemMS);
-          let elemNT = document.createElement('div');
-          elemNT.classList.add("numbertext");
-          elemNT.innerHTML = index + ' / ' + imgCount;
-          let img = document.createElement('img');
-          img.classList.add("image-center");
-          img.classList.add("img-rounded");
-          img.classList.add("resized-image");
-          img.src = '/images/temples/' + pu + '.jpg';
-          elemMS.appendChild(img);
-        }
-
-      }
-    }
     let al = document.createElement('a');
     al.classList.add("prev");
     al.innerHTML = '&#10094;';
@@ -149,44 +110,6 @@ export default class addChurches extends EventEmitter {
 
     window.showSlides(1);
 
-
-    // $('#image-cont').html(
-    //   '<!-- Slideshow container --> ' +
-    //   '<div class="slideshow-container"> ' +
-
-    //   '  <!-- Full-width images with number and caption text --> ' +
-    //   '  <div class="mySlides fade"> ' +
-    //   '    <div class="numbertext">1 / 3</div> ' +
-    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" > ' +
-    //   '    <div class="text">Caption Text</div> ' +
-    //   '  </div> ' +
-
-    //   '  <div class="mySlides fade"> ' +
-    //   '    <div class="numbertext">2 / 3</div> ' +
-    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" style="width:100%"> ' +
-    //   '    <div class="text">Caption Two</div> ' +
-    //   '  </div> ' +
-
-    //   '  <div class="mySlides fade"> ' +
-    //   '    <div class="numbertext">3 / 3</div> ' +
-    //   '    <img calss="image-center img-rounded resized-image" src="/images/temples/' + cur.pageUrl + '.jpg" style="width:100%"> ' +
-    //   '    <div class="text">Caption Three</div> ' +
-    //   '  </div> ' +
-
-    //   '  <!-- Next and previous buttons --> ' +
-    //   '  <a class="prev" onclick="window.plusSlides(-1)">&#10094;</a> ' +
-    //   '  <a class="next" onclick="window.plusSlides(1)">&#10095;</a> ' +
-    //   '</div> ' +
-    //   '<br> ' +
-
-    //   '<!-- The dots/circles --> ' +
-    //   '<div style="text-align:center"> ' +
-    //   '  <span class="dot" onclick="window.currentSlide(1)"></span> ' +
-    //   '  <span class="dot" onclick="window.currentSlide(2)"></span> ' +
-    //   '  <span class="dot" onclick="window.currentSlide(3)"></span> ' +
-    //   '</div> '
-    // );
-
     $(window.thisTr).addClass('event-active-row')
     $(window.thisTr).siblings().removeClass('event-active-row')
   }
@@ -197,7 +120,6 @@ export default class addChurches extends EventEmitter {
   }
 
   rowTableClickHandler(thisThis, thisTr) {
-    // console.log("clicked " + $(thisTr).attr('id'));
     var _id = $(thisTr).attr('id');
 
     if (!_id) return
@@ -208,7 +130,6 @@ export default class addChurches extends EventEmitter {
   }
 
   addDataToTable(currChurch) {
-    //console.log("addDataTotable");
     var obj = this.data;
 
     this.clearTable();
@@ -304,8 +225,6 @@ export default class addChurches extends EventEmitter {
     //$('#churches-table tr:eq(0) td:first-child span').click()
     if (currChurch != undefined) {
       var str = '#' + curId;
-      // console.log(str);
-      $(str).click();
     } else {
       $('#0').click();
     }

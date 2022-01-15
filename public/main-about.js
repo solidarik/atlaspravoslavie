@@ -1,4 +1,5 @@
 "use strict";
+import d3 from 'd3'
 
 window.app = {};
 var app = window.app;

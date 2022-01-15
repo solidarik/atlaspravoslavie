@@ -103,7 +103,7 @@ var personsSchema = new mongoose.Schema(
 
     srcUrl: String,
     imgUrls: [String],
-    linkUrl: String,
+    lineSource: Number
   },
   {
     timestamps: false,

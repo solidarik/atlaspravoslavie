@@ -41,16 +41,19 @@ router.get('/video', (await import('./page-video')).default)
 router.get('/events', (await import('./page-events')).default)
 router.get('/logout', (await import('./logout')).get)
 
-const defaultSelectParam = { 'name': 1, 'point': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
+const churchesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
+const personsSelectParam = { 'name': 1, 'birth': 1, 'surname': 1, 'monkname': 1, 'pageUrl': 1, }
 
-const getUsers = async function (ctx, next) {
+const getPersons = async function (ctx, next) {
   // persons = await redisClient.get('persons')
   // if (!persons) return
 
   //! persons только с набором необходимых полей
-  //const persons = await PersonModel.find({}).select(defaultSelectParam)
+  const persons = await personsModel.find({}).select(personsSelectParam)
 
-  const persons = await personsModel.find({})
+  // получение полного набора полей (долго по времени)
+  //const persons = await personsModel.find({})
+
   //ctx.state = {'persons': JSON.parse(persons)}
   ctx.state = { 'persons': persons }
   next()
@@ -62,7 +65,7 @@ const getChurches = async function (ctx, next) {
   // if (!churches) return
 
   //! churches только с набором необходимых полей
-  const churches = await templesModel.find({}).select(defaultSelectParam)
+  const churches = await templesModel.find({}).select(churchesSelectParam)
 
   // получение полного набора полей (долго по времени)
   // const churches = await templesModel.find({})
@@ -72,16 +75,16 @@ const getChurches = async function (ctx, next) {
   next()
 }
 
-const getUser = async function (ctx, next) {
+const getPerson = async function (ctx, next) {
   const person = await personsModel.find({ 'pageUrl': ctx.params.name })
   if (!person) return
 
   // persons = await redisClient.get('persons')
   // if (!persons) return
 
-  const persons = await personsModel.find({})
+  // const persons = await personsModel.find({})
 
-  ctx.state = { 'person': person[0], 'persons': persons }
+  ctx.state = { 'person': person[0], 'persons': [] }
   next()
 }
 
@@ -98,10 +101,10 @@ const getChurch = async function (ctx, next) {
   next()
 }
 
-router.get('/map/person/:name', getUser, (await import('./page-events')).default)
+router.get('/map/person/:name', getPerson, (await import('./page-events')).default)
 
-router.get('/person', getUsers, (await import('./page-person')).default)
-router.get('/person/:name', getUser, (await import('./page-person')).default)
+router.get('/person', getPersons, (await import('./page-person')).default)
+router.get('/person/:name', getPerson, (await import('./page-person')).default)
 
 router.get('/church', getChurches, (await import('./page-church')).default)
 router.get('/church/:name', getChurch, (await import('./page-church')).default)

@@ -1,6 +1,5 @@
 "use strict";
 import addHolyPersons from './addHolyPersons.js';
-import ClientProtocol from '../public-src/clientProtocol.js'
 window.app = {};
 var app = window.app;
 var slideIndex = 1;
@@ -118,6 +117,7 @@ function showSlides(n) {
   // console.log(n);
   var i;
   var slides = document.getElementsByClassName("mySlides");
+  if (!slides.length) return
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) { slideIndex = 1 }
   else if (n < 1) { slideIndex = slides.length }

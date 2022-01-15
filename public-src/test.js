@@ -8,6 +8,8 @@ import ImageSaver from '../loadDatabase/loadImagesIldar'
 const imageSaver = new ImageSaver()
 const imagesFolder = '../loadDatabase/out/out_storage/persons'
 
+import googleParser from '../loadDatabase/xlsGoogleParserPersons'
+
 import personsModel from '../models/personsModel'
 import StrHelper from '../helper/strHelper'
 import GeoHelper from '../helper/geoHelper'
@@ -15,17 +17,11 @@ import inetHelper from '../helper/inetHelper'
 import JsHelper from '../helper/jsHelper'
 import { exit } from 'shelljs'
 
-const imgUrl = 'http://bezhverh.ru/wp-content/uploads/2013/04/icona_nektariy1.jpg'
-const test = imgUrl.split('http').map(item => {
-  return `http${item}`
-}).slice(1)
-console.log(test)
+const input = '17 сентября17 сентября/23 декабря17 сентября17 сентября/23 декабря/19 июля17 сентября17 сентября/23 декабря17 сентября17 сентября/23 декабря/19 июля/1 августа'
+const worshipDays = googleParser.getWorshipDates(input)
+console.log(JSON.stringify(worshipDays))
 exit(0)
 
-
-const input = 'По еврейской традиции: 3138—2773 до н. э. По православной: 4387—4022 до н. э.'
-const res = DateHelper.getDateFromInput(input)
-console.log(res)
 
 //"lat": 54.73333,
 //"lon": 55.96667

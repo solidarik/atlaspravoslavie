@@ -118,6 +118,8 @@ function showSlides(n) {
   // console.log(n);
   var i;
   var slides = document.getElementsByClassName("mySlides");
+  if (!slides.length) return
+
   var dots = document.getElementsByClassName("dot");
   if (n > slides.length) { slideIndex = 1 }
   else if (n < 1) { slideIndex = slides.length }

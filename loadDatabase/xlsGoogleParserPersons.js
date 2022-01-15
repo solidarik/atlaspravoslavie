@@ -135,7 +135,7 @@ export default class XlsGoogleParserPersons {
             'canonizationDate': 'дата канонизации',
             'status': 'статус святости',
             'groupStatus': 'общий статус',
-            'worshipDays': 'даты почитания',
+            'worshipDays': 'дата почитания',
             'profession': 'сфера деятельности',
             'description': 'жизнеописание',
             'srcUrl': 'источник',
@@ -161,6 +161,7 @@ export default class XlsGoogleParserPersons {
     async getJsonFromRow(headerColumns, row) {
         let json = {}
 
+        json.lineSource = 0
         json.isError = false
         json.isCatchError = false
         json.errorArr = []
@@ -347,7 +348,7 @@ export default class XlsGoogleParserPersons {
                 json.groupStatus = 'преподобный'
             else json.groupStatus = 'святой'
 
-            json.worships = this.getWorshipDates(row[headerColumns.worshipDays])
+            json.worshipDays = this.getWorshipDates(row[headerColumns.worshipDays])
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]
@@ -402,6 +403,7 @@ export default class XlsGoogleParserPersons {
             // for (let row = 1; row < 1500; row++) {
             const json = await this.getJsonFromRow(headerColumns, rows[row])
 
+            json.lineSource = row + 1
             json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
 
             if (json.isChecked == '0' || json.isCatchError) {
