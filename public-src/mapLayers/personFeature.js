@@ -54,7 +54,8 @@ class PersonFeature extends SuperFeature {
 
     let fio = `${info.surname} ${info.name} ${info.middlename}`
     fio = fio.trim()
-    if (fio == outerInfo.caption) {
+    if (fio == outerInfo.caption || info.surname == info.name
+      || info.name == outerInfo.caption) {
       fio = ''
     } else {
       fio = `<h2>${fio}</h2>`

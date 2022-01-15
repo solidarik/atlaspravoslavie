@@ -102463,7 +102463,7 @@ var PersonFeature = /*#__PURE__*/function (_SuperFeature) {
       var fio = "".concat(info.surname, " ").concat(info.name, " ").concat(info.middlename);
       fio = fio.trim();
 
-      if (fio == outerInfo.caption) {
+      if (fio == outerInfo.caption || info.surname == info.name || info.name == outerInfo.caption) {
         fio = '';
       } else {
         fio = "<h2>".concat(fio, "</h2>");
