@@ -1,39 +1,180 @@
 import urllib.request
-#import json
+import requests
 import re
 from lxml import html
 from lxml import etree
 import csv
+import sys
+import time
+import ssl
+import wikipedia
+maxInt = sys.maxsize
 
-data = urllib.request.urlretrieve("https://azbyka.ru/days/menology", "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukzPersons.html")
+while True:
+    # decrease the maxInt value by factor 10
+    # as long as the OverflowError occurs.
 
-count=0
+    try:
+        csv.field_size_limit(maxInt)
+        break
+    except OverflowError:
+        maxInt = int(maxInt/10)
 
-with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\persons.csv', 'w', newline='', encoding='utf-8', errors='ignore') as file_csv:
-    writer = csv.writer(file_csv, delimiter=';')
+for x in range(0, 3):
+
+    ssl._create_default_https_context = ssl._create_unverified_context
+    data = urllib.request.urlretrieve("https://azbyka.ru/days/menology", "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukzPersons.html")
+
+    count=0
+    count_parse=0
+
+    with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\persons.csv', newline='', encoding='utf-8', errors='ignore') as f:
+        reader = csv.reader(f, delimiter=';')
+        data = list(reader)
+
+    existDataInFile=[]
+
+    for d in data:
+        existDataInFile.append(d[0])
+
+    with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\persons.csv', 'a', newline='', encoding='utf-8', errors='ignore') as file_csv:
+        writer = csv.writer(file_csv, delimiter=';')
 
 
-    writer.writerow(['Фамилия','Имя для сайта','Имя ','Отчество','Дата рождения','Место рождения','Связь с храмом','Имя в монашестве','Место подвига','Время подвига','Место подвига','Время подвига','Место подвига','Время подвига','Дата канонизации','Статус святости','Общий статус','Дата почитания','Сфера деятельности','Жизнеописание','Источник','Ссылка на фото','Дата смерти','Похоронен'])
+        # writer.writerow(['Фамилия','Имя для сайта','Имя ','Отчество','Дата рождения','Место рождения','Связь с храмом','Имя в монашестве','Место подвига','Время подвига','Место подвига','Время подвига','Место подвига','Время подвига','Дата канонизации','Статус святости','Общий статус','Дата почитания','Сфера деятельности','Жизнеописание','Источник','Ссылка на фото','Дата смерти','Похоронен'])
 
-    with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukzPersons.html', encoding='utf-8', errors='ignore') as f:
-        f_l=f.readlines()
+        with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukzPersons.html', encoding='utf-8', errors='ignore') as f:
+            f_l=f.readlines()
 
-        #print(l)
-        tree = html.fromstring(str(f_l))
-        list_ul_lxml = tree.xpath("//div[@class='saints']/a")
-        for ul in list_ul_lxml:
-            print(ul.text+'-'+ul.attrib['href'])
+            #print(l)
+            tree = html.fromstring(str(f_l))
+            list_ul_lxml = tree.xpath("//div[@class='top-saints']/a")
+            for ul in list_ul_lxml:
+                print(ul.text+'-'+ul.attrib['href'])
 
-            urllib.request.urlretrieve(ul.attrib['href'], "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_letter.html")
-            with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_letter.html', encoding='utf-8', errors='ignore') as f_t:
-                f_t_l=f_t.readlines()
-                tree_persons_letter=html.fromstring(str(f_t_l))
-                saints = tree_persons_letter.xpath("//td[@class='menology-name']/a")
-                for saint in saints:
-                    print(saint.text+'-'+saint.attrib['href'])
-                    count=count+1
 
-print("count="+str(count))
+                urllib.request.urlretrieve('https://www.azbyka.ru'+ul.attrib['href'], "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_letter.html")
+                with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_letter.html', encoding='utf-8', errors='ignore') as f_t:
+                    f_t_l=f_t.readlines()
+                    tree_persons_letter=html.fromstring(str(f_t_l))
+                    saints = tree_persons_letter.xpath("//td[@class='menology-name']/a")
+                    for saint in saints:
+                        print('www.azbyka.ru/'+saint.attrib['href'])
+                        # time.sleep(5)
+                        request = requests.get('https://azbyka.ru'+saint.attrib['href'])
+                        # print('request.status_code='+str(request.status_code))
+                        if request.status_code == 200:
+                            print('web site exists')
+
+                            urllib.request.urlretrieve('https://azbyka.ru/'+saint.attrib['href'], "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_concret.html")
+                            # urllib.request.urlretrieve('https://azbyka.ru/days/sv-aleksandr-miropolskij', "D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_concret.html")
+                            with open('D:\\projJS\\atlaspravoslavie\\loadDatabase\\out\\out_temples_azbuka\\azbukz_persos_concret.html', encoding='utf-8', errors='ignore') as c_p:
+                                c_p_l=c_p.readlines()
+                                c_p_tree = html.fromstring(str(c_p_l))
+
+                                # 'Фамилия',
+                                # 'Имя для сайта',
+                                # 'Имя ','
+                                # Отчество',
+                                name_strs = c_p_tree.xpath("//div[@class='cont clearfix']/h1")
+                                sphera_str = c_p_tree.xpath("//div[@class='cont clearfix']/h1/a")
+                                state_str = c_p_tree.xpath("//div[@class='cont clearfix']/h1/a")
+                                name_str_s=""
+                                for name_str in name_strs:
+                                    name_str_s += str(name_str.text_content())
+                                if (len(sphera_str)==2):
+                                    name_str_s=name_str_s.replace(sphera_str[0].text+" ","").replace(", "+sphera_str[1].text,"")
+                                print("name_str="+name_str_s)
+                                # 'Дата рождения',
+                                # 'Место рождения',
+                                # 'Связь с храмом',
+                                # 'Имя в монашестве',
+                                # 'Место подвига',
+                                # 'Время подвига',
+                                # 'Место подвига',
+                                # 'Время подвига',
+                                # 'Место подвига',
+                                # 'Время подвига',
+                                # 'Дата канонизации',
+                                # 'Статус святости',
+                                state_str = c_p_tree.xpath("//div[@class='cont clearfix']/h1/a")
+                                if(len(state_str)>=1):
+                                    state_str=state_str[0].text
+                                else:
+                                    state_str=""
+                                if state_str is None:
+                                     state_str=""
+                                print("state_str="+state_str)
+                                # 'Общий статус',
+                                # 'Дата почитания',
+                                date_p_strs = c_p_tree.xpath("//div[@class='block remembrance-day']/div[@class='brif']/p/a")
+                                d_p_str=''
+                                for date_p_str in date_p_strs:
+                                    d_p_str+=d_p_str+date_p_str.text if d_p_str=='' else d_p_str+'/'+date_p_str.text
+                                print("date_p_str="+d_p_str)
+                                # 'Сфера деятельности',
+                                sphera_str = c_p_tree.xpath("//div[@class='cont clearfix']/h1/a")
+                                if(len(sphera_str)==2):
+                                    sphera_str=sphera_str[1].text
+                                else:
+                                     sphera_str=""
+                                if sphera_str is None:
+                                     sphera_str=""
+                                print("sphera_str="+sphera_str)
+                                # 'Жизнеописание',
+                                live_strs = c_p_tree.xpath("//div[@class='block']/div[@class='description brif anchor-slice expandable']")
+                                live_str_=""
+                                for live_str in live_strs:
+                                    s=str(etree.tostring(live_str,method="html"))
+                                    s=s.replace("&shy", "").replace("&#173;","")
+                                    live_strs_not_shy = html.fromstring(s)
+                                    p_strs = live_strs_not_shy.xpath("//p")
+                                    for p_str in p_strs :
+                                       live_str_+=str(p_str.text_content())
+                                live_str_=live_str_.replace(";",",")
+                                print("live_str="+live_str_)
+                                # 'Источник',
+                                print("source_url="+'https://azbyka.ru/'+saint.attrib['href'])
+                                # 'Ссылка на фото',
+                                url_photos = c_p_tree.xpath("//div[@class='slideshow']/a")
+                                url_photo_=''
+                                for url_photo in url_photos:
+                                    url_photo_+=str(url_photo.attrib['href'])
+                                print("url_photo="+url_photo_)
+
+                                # 'Дата смерти',
+                                # 'Похоронен'
+
+                                year=re.search(r'[0-9]{4}', live_str_)
+
+                                if (year==None):
+                                    year=re.search(r'[0-9]{3}', live_str_)
+                                    if (year==None):
+                                        year=re.search(r'[0-9]{2}', live_str_)
+                                        if (year==None):
+                                            year='2000'
+                                        else:
+                                            year=year[0]
+                                    else:
+                                        year=year[0]
+                                else:
+                                    year=year[0]
+                                print('year='+str(year))
+                                print('++++++++++++++++++++++')
+
+                                if not name_str_s in  existDataInFile:
+                                    writer.writerow([name_str_s,name_str_s,name_str_s,name_str_s,str(year),'Место рождения','',name_str_s,'','','','','','',str(year),state_str,'',d_p_str,sphera_str,live_str_,'https://azbyka.ru/'+saint.attrib['href'],url_photo_,str(year),'Похоронен'])
+                                    count_parse+=1
+                                else:
+                                    print('name_str_s exist in file')
+                                # sys.exit()
+
+                        else:
+                            print('web site not exists')
+
+                        count+=1
+    print("count_parse="+str(count_parse))
+    print("count_all="+str(count))
             # tree_ul=html.fromstring(etree.tostring(ul))
             # list_li_lxml = tree_ul.xpath('//li')
             # print(len(list_li_lxml))
