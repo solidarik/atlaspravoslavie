@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url'
 export default class FileHelper {
 
   static getRoot() {
-    return path.dirname(fileURLToPath(import.meta.url))
+    return path.resolve('./')
+    // return path.dirname(fileURLToPath(import.meta.url))
   }
 
   static composePath(...paths) {

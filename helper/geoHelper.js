@@ -1,4 +1,4 @@
-import StrHelper from './strHelper'
+import StrHelper from './strHelper.js'
 
 export default class GeoHelper {
   static fromLonLat(input) {

@@ -1,25 +1,22 @@
-import Log from '../helper/logHelper'
+import Log from '../helper/logHelper.js'
 const log = Log.create()
 
-import FileHelper from '../helper/fileHelper'
-import GeoHelper from '../helper/geoHelper'
-import StrHelper from '../helper/strHelper'
+import FileHelper from '../helper/fileHelper.js'
+import GeoHelper from '../helper/geoHelper.js'
+import StrHelper from '../helper/strHelper.js'
 import axios from 'axios'
 
 class InetHelper {
   constructor() { }
 
-  trimNames() {
-    for (let name in this.coords) {
-      this.coords[name.trim()] = this.coords[name]
-    }
-  }
+  loadCoords() {
 
-  loadCoords(filename) {
+    const filename = FileHelper.composePath('loadDatabase/dataSources/checkedCoords.json')
+
     this.coords = FileHelper.isFileExists(filename)
       ? FileHelper.getJsonFromFile(filename)
       : {}
-    console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
+    console.log(`Count of saved coords ${Object.keys(this.coords).length}`)
     let itemNames = []
     for (let coordName in this.coords) {
       itemNames.push(coordName)
@@ -35,10 +32,17 @@ class InetHelper {
     }
 
     this.coords = { ...newCoords }
-    // console.log(`Length of saved coords ${Object.keys(this.coords).length}`)
+    // console.log(`Count of saved coords ${Object.keys(this.coords).length}`)
+
+    for (let name in this.coords) {
+      this.coords[name.trim()] = this.coords[name]
+    }
   }
 
-  saveCoords(filename) {
+  saveCoords() {
+
+    const filename = FileHelper.composePath('loadDatabase/dataSources/checkedCoords.json')
+
     console.log(`Before saving coords... Length: ${Object.keys(this.coords).length}`)
     FileHelper.saveJsonToFileSync(this.coords, filename)
   }

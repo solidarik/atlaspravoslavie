@@ -1,13 +1,13 @@
-import inetHelper from '../helper/inetHelper'
-import StrHelper from '../helper/strHelper'
-import SuperJsonMediator from './superJsonMediator'
-import templesModel from '../models/templesModel'
+import InetHelper from '../helper/inetHelper.js'
+import StrHelper from '../helper/strHelper.js'
+import SuperJsonMediator from './superJsonMediator.js'
+import TempleModel from '../models/templesModel.js'
 
 export default class TemplesJsonMediator extends SuperJsonMediator {
   constructor() {
     super()
     this.equilFields = ['pageUrl']
-    this.model = TemplesModel
+    this.model = TempleModel
   }
 
   processJson(json) {
@@ -19,7 +19,7 @@ export default class TemplesJsonMediator extends SuperJsonMediator {
       let geoName = json.name + ' ' + json.surPlace
       geoName = geoName.replace(',', '')
 
-      inetHelper
+      InetHelper
         .getCoordsForCityOrCountry(geoName)
         .then((placeCoords) => {
           if (placeCoords.length == 0)

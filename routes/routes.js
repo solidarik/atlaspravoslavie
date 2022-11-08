@@ -27,8 +27,8 @@ const ensureAuthenticated = async function (ctx, next) {
 //   redisClient.set('persons', JSON.stringify(persons))
 // })
 
-// templesModel.find({}).then((churches) => {
-//   redisClient.set('churches', JSON.stringify(churches))
+// templesModel.find({}).then((temples) => {
+//   redisClient.set('temples', JSON.stringify(temples))
 // })
 
 router.get('/', pageEvents)
@@ -41,7 +41,7 @@ router.get('/video', (await import('./page-video')).default)
 router.get('/events', (await import('./page-events')).default)
 router.get('/logout', (await import('./logout')).get)
 
-const churchesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
+const templeesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
 const personsSelectParam = { 'name': 1, 'birth': 1, 'surname': 1, 'monkname': 1, 'pageUrl': 1, }
 
 const getPersons = async function (ctx, next) {
@@ -59,19 +59,19 @@ const getPersons = async function (ctx, next) {
   next()
 }
 
-const getChurches = async function (ctx, next) {
+const getTemplees = async function (ctx, next) {
 
-  // churches = await redisClient.get('churches')
-  // if (!churches) return
+  // templees = await redisClient.get('templees')
+  // if (!templees) return
 
-  //! churches только с набором необходимых полей
-  const churches = await templesModel.find({}).select(churchesSelectParam)
+  //! templees только с набором необходимых полей
+  const temples = await templesModel.find({}).select(templesSelectParam)
 
   // получение полного набора полей (долго по времени)
-  // const churches = await templesModel.find({})
+  // const temples = await templesModel.find({})
 
-  // ctx.state = {'churches': JSON.parse(churches)}
-  ctx.state = { 'churches': churches }
+  // ctx.state = {'temples': JSON.parse(temples)}
+  ctx.state = { 'temples': temples }
   next()
 }
 
@@ -88,16 +88,16 @@ const getPerson = async function (ctx, next) {
   next()
 }
 
-const getChurch = async function (ctx, next) {
-  const church = await templesModel.find({ 'pageUrl': ctx.params.name })
-  if (!church) return
+const getTemple = async function (ctx, next) {
+  const temple = await templesModel.find({ 'pageUrl': ctx.params.name })
+  if (!temple) return
 
-  // churches = await redisClient.get('churches')
-  // if (!churches) return
+  // temples = await redisClient.get('temples')
+  // if (!temples) return
 
-  // const churches = await templesModel.find({})
+  // const temples = await templesModel.find({})
 
-  ctx.state = { 'church': church[0], 'churches': [] }
+  ctx.state = { 'temple': temple[0], 'temples': [] }
   next()
 }
 
@@ -106,8 +106,8 @@ router.get('/map/person/:name', getPerson, (await import('./page-events')).defau
 router.get('/person', getPersons, (await import('./page-person')).default)
 router.get('/person/:name', getPerson, (await import('./page-person')).default)
 
-router.get('/church', getChurches, (await import('./page-church')).default)
-router.get('/church/:name', getChurch, (await import('./page-church')).default)
+router.get('/temple', getTemplees, (await import('./page-temple')).default)
+router.get('/temple/:name', getTemple, (await import('./page-temple')).default)
 
 
 export default router.routes()

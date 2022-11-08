@@ -1,5 +1,5 @@
-import FileHelper from '../helper/fileHelper'
-import Log from '../helper/logHelper'
+import FileHelper from '../helper/fileHelper.js'
+import Log from '../helper/logHelper.js'
 
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
@@ -20,9 +20,20 @@ export default class DbHelper {
 
   }
 
+  clearModel(model) {
+    return new Promise((resolve, reject) => {
+      model.deleteMany({}, (err) => {
+        if (err) reject(err)
+
+        resolve(true)
+        this.log.info(`Removed collection: ${model.collection.collectionName}`)
+      })
+    })
+  }
+
   clearDb(filter = '') {
     return new Promise((resolve, reject) => {
-      const modelDirectory = FileHelper.composePath('../models/')
+      const modelDirectory = FileHelper.composePath('models')
       let modelFiles = FileHelper.getFilesFromDir(modelDirectory, '.js')
       let promises = []
       modelFiles.forEach((modelFilePath) => {
@@ -37,7 +48,7 @@ export default class DbHelper {
                       if (err) reject(err)
 
                       resolve(true)
-                      this.log.info(`removed collection: ${modelFilePath}`)
+                      this.log.info(`Removed collection: ${modelFilePath}`)
                     })
                   }
                 )
@@ -66,7 +77,7 @@ export default class DbHelper {
     if (this.isOuter) return
     setTimeout(() => {
       this.db && this.db.disconnect()
-      this.log.info(chalk.yellow('db disconnected'))
+      this.log.info(chalk.yellow('Disconnected database'))
     }, 100)
   }
 
@@ -91,7 +102,7 @@ export default class DbHelper {
         files.push(source)
       }
 
-      this.log.info(`начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
+      this.log.info(`Начинаем обрабатывать ${dataTypeStr} ${chalk.cyan(input.source)}`)
 
       let promises = []
 
@@ -110,6 +121,9 @@ export default class DbHelper {
           promises.push(
             new Promise((resolve) => {
               let newJsonItem = undefined
+              if (!mediator.processJson) {
+                throw `ошибка неинициализации processJson`
+              }
               mediator
                 .processJson(jsonItem)
                 .then((jsonItem) => {
@@ -139,7 +153,7 @@ export default class DbHelper {
           )
         })
       })
-      this.log.info(`количество входящих элементов, промисов: ${promises.length}`)
+      this.log.info(`Количество входящих элементов, промисов: ${promises.length}`)
 
       Promise.all(promises).then(
         (res) => {
@@ -150,12 +164,12 @@ export default class DbHelper {
               this.log.warn(r.errorPlace)
             }
           })
-          const status = `количество успешно обработанных элементов: ${countObjects} из ${res.length}`
+          const status = `Количество успешно обработанных элементов: ${countObjects} из ${res.length}`
           this.log.info(status)
           if (countObjects == res.length) {
-            this.log.info(chalk.green('успешная загрузка'))
+            this.log.info(chalk.green('Успешная загрузка'))
           } else {
-            this.log.warn('не все файлы были обработаны успешно')
+            this.log.warn('Не все файлы были обработаны успешно')
           }
           resolve(status)
         },

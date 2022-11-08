@@ -1,4 +1,4 @@
-import StrHelper from '../helper/StrHelper.js'
+import StrHelper from '../helper/strHelper.js'
 import moment from 'moment'
 
 const ROMAN_KEYS = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",

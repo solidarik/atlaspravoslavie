@@ -2,7 +2,7 @@ import EventEmitter from './eventEmitter'
 import ClassHelper from '../helper/classHelper'
 import JsHelper from '../helper/jsHelper'
 import ChronosFeature from './mapLayers/chronosFeature'
-import ChronosChurchFeature from './mapLayers/chronosChurchFeature'
+import ChronosTempleFeature from './mapLayers/chronosTempleFeature'
 import TemplesFeature from './mapLayers/templesFeature'
 import PersonFeature from './mapLayers/personFeature'
 
@@ -102,9 +102,9 @@ export class LegendControl extends EventEmitter {
     lines.push({
       id: 1,
       caption: 'События Церкви',
-      classFeature: ChronosChurchFeature,
-      fillFunction: ChronosChurchFeature.fillChronosChurchFeature,
-      icon: ChronosChurchFeature.getIcon(),
+      classFeature: ChronosTempleFeature,
+      fillFunction: ChronosTempleFeature.fillChronosTempleFeature,
+      icon: ChronosTempleFeature.getIcon(),
     })
 
     lines.push({
@@ -200,7 +200,7 @@ export class LegendControl extends EventEmitter {
     if (line.icon) htmlIcon += `<img src="${line.icon}" alt="Girl in a jacket">`
     else {
       this.getIcons(line).forEach((icon) => {
-        htmlIcon += `<img src="${icon}" alt="Girl in a jacket">`
+        htmlIcon += `<img src="${icon}" alt="${line.caption}">`
       })
     }
     return htmlIcon
@@ -346,7 +346,7 @@ export class LegendControl extends EventEmitter {
     for (let id = 0; id < this.linesCount; id++) {
       const line = this.searchLinesById(id)
       //injection classFeature property to every item
-      const fillResult = line.fillFunction.call(
+      let fillResult = line.fillFunction.call(
         this,
         rawInfo,
         line.fillFunctionKind

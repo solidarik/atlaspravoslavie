@@ -1,6 +1,6 @@
 import ServerProtocol from '../libs/serverProtocol'
-import chronosModel from '../models/chronosReligionModel'
-import chronosChurchModel from '../models/chronosChurchModel'
+import chronosModel from '../models/chronosModel'
+import chronosTempleModel from '../models/chronosTempleModel'
 import personsModel from '../models/personsModel'
 import personsAggrModel from '../models/personsAggrModel'
 import templesModel from '../models/templesModel'
@@ -118,7 +118,7 @@ class HolyProtocol extends ServerProtocol {
 
       const promices = [
         chronosModel.find(defaultSearchParam).select(shortBriefSearchParam),
-        chronosChurchModel.find(defaultSearchParam).select(shortBriefSearchParam),
+        chronosTempleModel.find(defaultSearchParam).select(shortBriefSearchParam),
         templesModel.find(gteSearchParam).select(defaultSelectParam),
         personsAggrModel.find(personSearchParam)
 
@@ -132,7 +132,7 @@ class HolyProtocol extends ServerProtocol {
           cb(
             JSON.stringify({
               chronos: res[0],
-              chronosChurch: res[1],
+              chronosTemple: res[1],
               temples: res[2],
               persons: res[3]
             })
@@ -233,8 +233,8 @@ class HolyProtocol extends ServerProtocol {
         case 'ChronosFeature':
           model = chronosModel
           break
-        case 'ChronosChurchFeature':
-          model = chronosChurchModel
+        case 'ChronosTempleFeature':
+          model = chronosTempleModel
           break
         case 'TemplesFeature':
           model = templesModel

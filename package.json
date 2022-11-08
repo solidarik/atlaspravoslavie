@@ -10,13 +10,13 @@
   "scripts": {
     "test": "mocha -c",
     "pytest": "cd test && pytest -s -q --color=yes",
-    "parcel-religion-prebuild": "parcel build --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
-    "prebuild": "concurrently --kill-others \"npm run parcel-religion-prebuild\"",
+    "parcel-religion-minify": "parcel build --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
     "parcel-religion": "parcel build --no-minify --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
     "watch": "nodemon -w public-src -x npm run parcel-religion",
     "dev": "nodemon --es-module-specifier-resolution=node index.js index.js",
     "start": "node --es-module-specifier-resolution=node index.js",
-    "pack": "webpack --config webpack.config.js"
+    "pack": "webpack --config webpack.config.js",
+    "pack-map": "concurrently --kill-others \"npm run parcel-religion\""
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "koa",
     "Orthodoxy",
     "events",
-    "churches"
+    "temples"
   ],
   "author": "Ildar Gubaydullin",
   "license": "ISC",

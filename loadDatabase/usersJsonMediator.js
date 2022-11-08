@@ -1,12 +1,12 @@
-import SuperJsonMediator from './superJsonMediator'
-import usersModel from '../models/usersModel'
+import SuperJsonMediator from './superJsonMediator.js'
+import UserModel from '../models/usersModel.js'
 
 export default class UsersJsonMediator extends SuperJsonMediator {
 
     constructor() {
-        super();
-        this.equilFields = ['login', 'email'];
-        this.model = usersModel;
+        super()
+        this.equilFields = ['login', 'email']
+        this.model = UserModel
     }
 
     //processJson from parent class

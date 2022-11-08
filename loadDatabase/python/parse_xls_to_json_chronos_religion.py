@@ -7,17 +7,17 @@ import helper
 import excel_helper
 print(sys.stdout.encoding)
 
-root_folder = 'out_chronos_religion'
+output_folder = 'out_chronos_religion'
 
 col_place = 0
 col_startDateYear, col_endDate, col_startDate = tuple(range(1, 4, 1))
 col_shortBrief, col_longBrief, col_url, col_remark = tuple(range(4, 8, 1))
 col_priority, col_comment = tuple(range(8, 10, 1))
 
-filename = os.path.abspath(__file__)
-filename += os.path.sep + '..' + os.path.sep + '..' + os.path.sep
-filename += 'religion' + os.path.sep + 'файл Ильи.xlsx'
-book = xlrd.open_workbook(filename, encoding_override="cp1251")
+root_folder = os.path.abspath(os.getcwd()) # project folder
+input_filename = os.path.join(
+    root_folder, 'loadDatabase', 'religion', 'файл Ильи.xlsx')
+book = xlrd.open_workbook(input_filename, encoding_override="cp1251")
 
 sheet = book.sheet_by_index(0)
 START_ROW = 1
@@ -87,13 +87,13 @@ for row in range(START_ROW, END_ROW):
         print(f'Exception input line in row {row}: {chrono}')
         raise Exception(e)
 
-helper.clear_folder(helper.get_full_path(root_folder))
-helper.create_folder(helper.get_full_path(root_folder))
+helper.clear_folder(helper.get_full_path(output_folder))
+helper.create_folder(helper.get_full_path(output_folder))
 
 for i in range(len(entities)):
     item = entities[i]
     filename = 'file{}.json'.format(i)
-    filename = helper.get_full_path(os.path.join(root_folder, filename))
+    filename = helper.get_full_path(os.path.join(output_folder, filename))
     helper.save_json(item, filename)
 
 print("Completed read to json files")

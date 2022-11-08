@@ -26,9 +26,7 @@ exit(0)
 //"lat": 54.73333,
 //"lon": 55.96667
 
-const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
-
-InetHelper.loadCoords(checkedCoordsPath)
+InetHelper.loadCoords()
 InetHelper.trimNames()
 
 const testAsync = async function testAsync() {
@@ -55,7 +53,7 @@ const testAsync = async function testAsync() {
 }
 
 testAsync()
-setTimeout(() => InetHelper.saveCoords(checkedCoordsPath), 2000)
+setTimeout(() => InetHelper.saveCoords(), 2000)
 
 // const testUrl = 'https://balashovblag.ru/images/019_2017_9_6_22_10_32_1795892298.jpg'
 // ImageHelper.loadImageToFile(testUrl, imagesFolder, 'test')

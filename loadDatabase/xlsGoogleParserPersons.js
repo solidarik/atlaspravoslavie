@@ -1,53 +1,33 @@
 import chalk from 'chalk'
 import { google } from 'googleapis'
-import inetHelper from '../helper/inetHelper'
-import GeoHelper from '../helper/geoHelper'
-import DateHelper from '../helper/dateHelper'
-import JsHelper from '../helper/jsHelper'
-import StrHelper from '../helper/strHelper'
-import personModel from '../models/personsModel'
-import serviceModel from '../models/serviceModel'
-
-const checkedCoordsPath = 'loadDatabase\\dataSources\\checkedCoords.json'
-inetHelper.loadCoords(checkedCoordsPath)
+import InetHelper from '../helper/inetHelper.js'
+import GeoHelper from '../helper/geoHelper.js'
+import DateHelper from '../helper/dateHelper.js'
+import JsHelper from '../helper/jsHelper.js'
+import StrHelper from '../helper/strHelper.js'
+import PersonModel from '../models/personsModel.js'
+import ServiceModel from '../models/serviceModel.js'
+import XlsGoogleParser from './xlsGoogleParser.js'
 
 const dateStopWords = ['посередине', 'середина', 'между', 'или',
     '—', '-', '—', 'первая', 'вторая', 'ранее', 'традиции', 'тексту', 'мира',
     'неизвестно', 'монастырь']
 
-export default class XlsGoogleParserPersons {
+export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
     constructor(log) {
+        super()
         this.log = log
+        this.pageUrls = ['sitename', 'surname', 'name']
+        this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
+        this.range = 'A1:AF'
+        this.model = PersonModel
+        this.maxRow = 2708
     }
 
-    async getCoords(inputPlace, inputCoords) {
-
-        if (!inputPlace && !inputCoords) {
-            return false
-        }
-
-        let coords = null
-
-        if (inputCoords) {
-            coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
-            return GeoHelper.fromLonLat(coords)
-        }
-
-        coords = inetHelper.getLonLatSavedCoords(inputPlace)
-        if (coords) {
-            return GeoHelper.fromLonLat(coords)
-        }
-
-        // start search coordinates in wiki
-        // const res = await inetHelper.getCoordsForCityOrCountry(inputPlace)
-        // if (res && res.length > 0) {
-        //     coords = res[0]
-        //     return GeoHelper.fromLonLat(coords)
-        // }
-        // end search
-
-        return false
+    getPageUrl(json) {
+        const pageUrlsLocal = json.sitename ? json.sitename : [json.surname, json.name, json.middlename]
+        return StrHelper.generatePageUrl(pageUrlsLocal)
     }
 
     getWorshipDates(input) {
@@ -368,106 +348,4 @@ export default class XlsGoogleParserPersons {
         return json
     }
 
-    async loadData(dbHelper) {
-        this.log.info(`Start of processing Google sheet`)
-
-        // обновляем время последней проверки
-        const checkedTime = DateHelper.dateTimeToStr(new Date())
-        let res = await serviceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
-
-        const sheets = google.sheets({ version: 'v4' })
-
-        const sheetData = await sheets.spreadsheets.values.get({
-            spreadsheetId: process.env.GOOGLE_SHEET_ID_PERSON,
-            key: process.env.GOOGLE_API_KEY,
-            range: 'A1:AF'
-        })
-
-        if (!sheetData) return this.log.error('The Google API returned an error')
-
-        const rows = sheetData.data.values
-        if (!rows.length) return this.log.error('No data found')
-
-        this.log.info(`Сount rows ${rows.length} columns ${rows[0].length}`)
-        let pageUrls = []
-
-        const headerColumns = this.fillHeaderColumns(rows[0])
-        let insertObjects = []
-        let successObjectCount = 0
-        let skipObjectCount = 0
-
-        let errorTypes = {}
-
-        //start from row = 1, because we skip a header row
-        for (let row = 1; row < rows.length; row++) {
-            // for (let row = 1; row < 1500; row++) {
-            const json = await this.getJsonFromRow(headerColumns, rows[row])
-
-            json.lineSource = row + 1
-            json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
-
-            if (json.isChecked == '0' || json.isCatchError) {
-                skipObjectCount += 1
-                this.log.info(`${row + 1}: Skipped`)
-                continue
-            }
-            else if (json.isError) {
-                this.log.info(`${row + 1}: ${json.errorArr.join('; ')}`)
-
-                if (errorTypes.hasOwnProperty(json.isError))
-                    errorTypes[json.isError] += 1
-                else
-                    errorTypes[json.isError] = 1
-            } else {
-                successObjectCount += 1
-                this.log.info(`${row + 1}: Success`)
-            }
-
-            let pageUrlArr = json.sitename ? json.sitename : [json.surname, json.name, json.middlename]
-            json.pageUrl = StrHelper.generatePageUrl(pageUrlArr)
-            if (pageUrls.includes(json.pageUrl)) {
-                json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
-            }
-            pageUrls.push(json.pageUrl)
-            insertObjects.push(json)
-        }
-
-        const totalLinesCount = rows.length - 1
-        const savedCount = insertObjects.length
-        const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
-        this.log.info(statusText)
-
-        inetHelper.saveCoords(checkedCoordsPath)
-
-        res = await personModel.insertMany(insertObjects)
-
-        if (res) {
-            this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
-        } else {
-            this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
-        }
-
-        return true
-
-        res = await dbHelper.clearDb('service')
-
-        const serviceObjects = [
-            { name: 'successObjectCountPersons', kind: 'detailStatus', value: successObjectCount },
-            { name: 'skipObjectCountPersons', kind: 'detailStatus', value: skipObjectCount },
-            { name: 'savedCountPersons', kind: 'detailStatus', value: savedCount },
-            { name: 'totalCountPersons', kind: 'detailStatus', value: totalLinesCount },
-            { name: 'statusTextPersons', kind: 'status', value: statusText },
-            // { name: 'lastUpdateSheet', kind: 'status', value: last_update },
-            { name: 'checkedTimePersons', kind: 'status', value: checkedTime }
-        ]
-
-        res = await serviceModel.insertMany(serviceObjects)
-        if (res) {
-            this.log.info(chalk.green(`Успешное сохранение статуса`))
-        } else {
-            this.log.error(`Ошибка при сохранении статуса ${JSON.stringify(res)}`)
-        }
-
-        return true
-    }
 }

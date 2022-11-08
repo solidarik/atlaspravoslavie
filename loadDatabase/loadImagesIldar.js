@@ -1,6 +1,6 @@
-import Log from '../helper/logHelper'
+import Log from '../helper/logHelper.js'
 const log = Log.create()
-import ImageHelper from '../helper/imageHelper'
+import ImageHelper from '../helper/imageHelper.js'
 
 export default class ImageSaver {
 

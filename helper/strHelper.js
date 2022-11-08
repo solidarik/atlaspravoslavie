@@ -77,13 +77,18 @@ export default class StrHelper {
 
   static generatePageUrl(input, len = 50) {
     if (Array.isArray(input)) {
-      input = input.filter((elem) => elem.trim().length > 0).join('_')
+      input = input.map(elem => elem.trim()).filter((elem) => elem.length > 0).join('_')
     }
 
     let output = this.toTranslitStr(input)
     if (output.length > len) {
       output = output.substring(0, len)
     }
+
+    if (output[output.length - 1] == '_') {
+      output = output.substring(0, len - 1)
+    }
+
     return output
   }
 

@@ -7,7 +7,7 @@ const __dirname = dirname(__filename);
 const params = {
   entry: {
     'main-holy-persons': `${__dirname}/public/main-holy-persons.js`,
-    'main-churches': `${__dirname}/public/main-churches.js`,
+    'main-temples': `${__dirname}/public/main-temples.js`,
     'main-video': `${__dirname}/public/main-video.js`,
   }
 

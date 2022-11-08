@@ -1,7 +1,7 @@
-import personsModel from '../models/personsModel'
-import StrHelper from '../helper/strHelper'
-import InetHelper from '../helper/inetHelper'
-import SuperJsonMediator from './superJsonMediator'
+import personsModel from '../models/personsModel.js'
+import StrHelper from '../helper/strHelper.js'
+import InetHelper from '../helper/inetHelper.js'
+import SuperJsonMediator from './superJsonMediator.js'
 
 export default class PersonsJsonMediator extends SuperJsonMediator {
   constructor() {

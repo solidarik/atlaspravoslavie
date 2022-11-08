@@ -1,9 +1,9 @@
-import Log from '../helper/logHelper'
+import Log from '../helper/logHelper.js'
 const log = Log.create()
 
-import personsModel from '../models/personsModel'
-import PersonsAggrJsonMediator from '../loadDatabase/personsAggrJsonMediator'
-import StrHelper from '../helper/strHelper'
+import personsModel from '../models/personsModel.js'
+import PersonsAggrJsonMediator from '../loadDatabase/personsAggrJsonMediator.js'
+import StrHelper from '../helper/strHelper.js'
 
 export default class PersonsAggr {
 

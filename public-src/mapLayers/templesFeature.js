@@ -25,7 +25,7 @@ export default class TemplesFeature extends SuperFeature {
       info.longBrief = ''
     }
 
-    const templeUrl = `church/${info.pageUrl}`
+    const templeUrl = `temple/${info.pageUrl}`
 
     const imgUrls = info.imgUrls
     let imgHtml = ''
@@ -55,6 +55,7 @@ export default class TemplesFeature extends SuperFeature {
   }
 
   static fillTemplesFeature(info) {
+    console.log(`temples: ${JSON.stringify(info.temples)}`)
     return info.temples.map((elem) => {
       return {
         ...elem,

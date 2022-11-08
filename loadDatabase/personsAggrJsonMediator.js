@@ -1,8 +1,8 @@
-import personsAggrModel from '../models/personsAggrModel'
-import StrHelper from '../helper/strHelper'
-import DateHelper from '../helper/dateHelper'
-import InetHelper from '../helper/inetHelper'
-import SuperJsonMediator from './superJsonMediator'
+import personsAggrModel from '../models/personsAggrModel.js'
+import StrHelper from '../helper/strHelper.js'
+import DateHelper from '../helper/dateHelper.js'
+import InetHelper from '../helper/inetHelper.js'
+import SuperJsonMediator from './superJsonMediator.js'
 
 export default class PersonsAggrJsonMediator extends SuperJsonMediator {
   constructor() {

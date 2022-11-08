@@ -1,7 +1,7 @@
-import chronosModel from '../models/chronosReligionModel'
-import inetHelper from '../helper/inetHelper'
-import StrHelper from '../helper/strHelper'
-import SuperJsonMediator from './superJsonMediator'
+import chronosModel from '../models/chronosModel.js'
+import inetHelper from '../helper/inetHelper.js'
+import StrHelper from '../helper/strHelper.js'
+import SuperJsonMediator from './superJsonMediator.js'
 
 export default class ChronosJsonMediator extends SuperJsonMediator {
   constructor() {

@@ -1,7 +1,7 @@
 const cities = require('cities.json');
 const strHelper = require('../helper/strHelper')
 const dateHelper = require('../helper/dateHelper')
-const inetHelper = require('../helper/inetHelper')
+const InetHelper = require('../helper/InetHelper')
 const fileHelper = require('../helper/fileHelper')
 
 const res0 = dateHelper.dateTimeToStr(new Date())
@@ -14,15 +14,11 @@ let input = 'Храм в честь иконы Пресвятой Богород
 const res1 = strHelper.removeShortStrings(input, '', true)
 const res2 = strHelper.removeShortStrings(input, '', false)
 
-const checkedCoordsPath = fileHelper.composePath('..\\loadDatabase\\dataSources\\checkedCoords.json')
-
-inetHelper.loadCoords(checkedCoordsPath)
-const res3 = inetHelper.getSavedCoords(input)
+InetHelper.loadCoords()
 
 console.log(checkedCoordsPath)
 console.log(`res1 ${JSON.stringify(res1)}`)
 console.log(`res2 ${JSON.stringify(res2)}`)
-console.log(`res3 ${JSON.stringify(res3)}`)
 
 return
 
@@ -53,7 +49,7 @@ console.log(testValue)
 
 return
 
-const InetHelper = require('../helper/inetHelper')
+const InetHelper = require('../helper/InetHelper')
 
 function deleteAbbrev(place) {
     if (!place)

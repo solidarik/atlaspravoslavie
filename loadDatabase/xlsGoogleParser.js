@@ -1,143 +1,49 @@
+// import FileHelper from '../helper/fileHelper.js'
 import chalk from 'chalk'
+import GeoHelper from '../helper/geoHelper.js'
+import InetHelper from '../helper/inetHelper.js'
+import DateHelper from '../helper/dateHelper.js'
+import ServiceModel from '../models/serviceModel.js'
+import StrHelper from '../helper/strHelper.js'
+
 import { google } from 'googleapis'
-import InetHelper from '../helper/inetHelper'
-import GeoHelper from '../helper/geoHelper'
-import DateHelper from '../helper/dateHelper'
-import StrHelper from '../helper/strHelper'
-import templesModel from '../models/templesModel'
-import serviceModel from '../models/serviceModel'
-
-import readline from 'readline'
-import fs from 'fs'
-
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 
 export default class XlsGoogleParser {
 
-    constructor(log) {
-        this.log = log
-    }
+    async getCoords(inputPlace, inputCoords) {
 
-    getCoords(placeForCoords, inputValue) {
-        if (!placeForCoords && !inputValue) {
-            throw new Error(`getCoords empty inputs: ${placeForCoords}, ${inputValue}`)
+        if (!inputPlace && !inputCoords) {
+            return false
         }
 
-        const coords = InetHelper.getSavedCoords(placeForCoords)
+        let coords = null
+
+        if (inputCoords) {
+            coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
+            return GeoHelper.fromLonLat(coords)
+        }
+
+        coords = InetHelper.getLonLatSavedCoords(inputPlace)
         if (coords) {
-            const coordsStr = InetHelper.getLonLatSavedCoords(placeForCoords).reverse()
-            if (!inputValue.includes('_')) {
-                this.log.warn(`Найдена координата для ${placeForCoords}: ${coordsStr.join('_')}`)
-            }
-            return coords
+            return GeoHelper.fromLonLat(coords)
         }
 
-        if (!inputValue) {
-            throw new Error(`Не заполнена координата placeForCoords ${placeForCoords}`)
-        }
+        // start search coordinates in wiki
+        // const res = await InetHelper.getCoordsForCityOrCountry(inputPlace)
+        // if (res && res.length > 0) {
+        //     coords = res[0]
+        //     return GeoHelper.fromLonLat(coords)
+        // }
+        // end search
 
-        const arr = inputValue.split('_')
-        if (arr.length == 0 || arr.length > 2) {
-            throw new Error(`Неизвестный формат координат ${inputValue}`)
-        }
-
-        return GeoHelper.fromLonLat(arr.reverse().map(item => Number(item)))
-    }
-
-    fillHeaderColumns(headerRow) {
-        let headerColumns = {}
-        const colCorresponds = {
-            'author': 'автор',
-            'isChecked': 'проверено',
-            'name': 'название',
-            'point': 'коорд',
-            'city': 'город',
-            'place': 'место',
-            'start': 'дата основа',
-            'longBrief': 'описание',
-            'dedicated': 'посвящен',
-            'abbots': 'настоятели',
-            'eparhy': 'митропология',
-            'templesUrl': 'ссылка на храм',
-            'srcUrl': 'ссылка на источник',
-            'imgUrl': 'изображение 1',
-            'imgUrl_1': 'изображение 2',
-            'imgUrl_2': 'изображение 3',
-            'imgUrl_3': 'изображение 4',
-            'imgUrl_4': 'изображение 5',
-            'imgUrl_5': 'изображение 6',
-        }
-        for (let iCol = 0; iCol < headerRow.length; iCol++) {
-            const xlsColName = headerRow[iCol].toLowerCase()
-            for (let colModel in colCorresponds) {
-                const colSearch = colCorresponds[colModel]
-                if (xlsColName.includes(colSearch)) {
-                    headerColumns[colModel] = iCol
-                }
-            }
-        }
-        return headerColumns
-    }
-
-    getJsonFromRow(headerColumns, row) {
-        let json = {}
-        json.author = row[headerColumns.author]
-        json.isChecked = row[headerColumns.isChecked]
-        json.name = row[headerColumns.name].trim()
-        json.city = row[headerColumns.city].trim()
-        json.place = row[headerColumns.place].trim()
-        json.isError = undefined
-
-        try {
-
-            const placeForCoords = `${json.name} ${json.place}`
-            json.point = this.getCoords(placeForCoords, row[headerColumns.point])
-
-            const dateInput = row[headerColumns.start]
-            if (!dateInput) {
-                throw new Error('Пропуск пустой даты основания')
-            }
-
-            json.start = DateHelper.getDateFromInput(dateInput)
-            json.longBrief = row[headerColumns.longBrief]
-            json.dedicated = row[headerColumns.dedicated]
-            json.abbots = row[headerColumns.abbots]
-            json.eparhy = row[headerColumns.eparhy]
-            json.templesUrl = row[headerColumns.templesUrl]
-            json.srcUrl = row[headerColumns.srcUrl]
-
-            const imgUrls = [
-                row[headerColumns.imgUrl],
-                row[headerColumns.imgUrl_1],
-                row[headerColumns.imgUrl_2],
-                row[headerColumns.imgUrl_3],
-                row[headerColumns.imgUrl_4],
-                row[headerColumns.imgUrl_5]
-            ]
-            json.imgUrls = imgUrls.filter(item => (item && item != ''))
-
-        } catch (e) {
-            json.isError = e
-        }
-
-        return json
-    }
-
-    async getLastUpdateFromSheet() {
-        const sheets = google.sheets({ version: 'v4' });
-        const lastUpdateSheetData = await sheets.spreadsheets.values.get({
-            spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            key: process.env.GOOGLE_API_KEY,
-            range: 'Z1:Z1',
-        })
-
-        if (!lastUpdateSheetData) return false
-
-        return lastUpdateSheetData.data.values[0][0]
+        return false
     }
 
     async getLastUpdateFromGoogleApi() {
-        const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_DRIVE_ID, process.env.GOOGLE_DRIVE_SECRET, 'http://localhost:3000')
+        const oAuth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_DRIVE_ID,
+            process.env.GOOGLE_DRIVE_SECRET,
+            'http://localhost:3000')
 
         let token = undefined
 
@@ -186,34 +92,31 @@ export default class XlsGoogleParser {
         return false
     }
 
+    getPageUrl(json) {
+        const pageUrlsLocal = this.pageUrls.map((colName) => json[colName])
+        return StrHelper.generatePageUrl(pageUrlsLocal)
+    }
+
     async loadData(dbHelper) {
-        this.log.info(`Start of processing Google sheet`)
+
+        const modelName = this.model.collection.collectionName
+
+        await dbHelper.clearModel(this.model)
+
+        this.log.info(`Start of processing Google sheet for ${modelName}`)
 
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
-        let res = await serviceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+        let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
         const sheets = google.sheets({ version: 'v4' })
 
-        // проверяем изменились ли данные
-        // const last_update = await this.getLastUpdateFromGoogleApi()
-        // console.log(last_update)
-        // if (!last_update) {
-        //     return this.log.error('Don\'t found last update time from Google API')
-        // }
-        // res = await serviceModel.find({ name: 'lastUpdateSheet' })
-        // console.log(res)
-        // if (res && res.length > 0 && res[0].value === last_update) {
-        //     this.log.info(`Don\'t update info from last loading: ${last_update}`)
-        //     return
-        // }
-
-        //  обрабатываем данные
+        this.log.info('Before getting Google data...')
 
         const sheetData = await sheets.spreadsheets.values.get({
-            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            spreadsheetId: this.spreadsheetId,
             key: process.env.GOOGLE_API_KEY,
-            range: 'A1:R'
+            range: this.range
         })
 
         if (!sheetData) return this.log.error('The Google API returned an error')
@@ -222,39 +125,55 @@ export default class XlsGoogleParser {
         if (!rows.length) return this.log.error('No data found')
 
         this.log.info(`Сount rows ${rows.length} columns ${rows[0].length}`)
-        let pageUrls = []
 
         const headerColumns = this.fillHeaderColumns(rows[0])
         let insertObjects = []
-        let checkedObjectCount = 0
+        let successObjectCount = 0
         let skipObjectCount = 0
+        let pageUrlsGlobal = []
 
-        //start from row = 1, because skip header row
-        for (let row = 1; row < rows.length; row++) {
-            const json = this.getJsonFromRow(headerColumns, rows[row])
+        let errorTypes = {}
 
-            if (json.isChecked === '0' || json.isError) {
-                if (json.isError)
-                    this.log.error(`Пропуск строки ${row} ${json.name}: ${json.isError}`)
-                else
-                    this.log.info(`Пропуск строки ${json.name}`)
+        //start from row = 1, because we skip a header row
+        // for (let row = 1; row < rows.length; row++) {
+        const maxRow = this.maxRow ? this.maxRow : rows.length
+        for (let row = 1; row < maxRow; row++) {
+            const json = await this.getJsonFromRow(headerColumns, rows[row])
+
+            json.lineSource = row + 1
+            json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
+
+            if (json.isChecked == '0' || json.isCatchError) {
                 skipObjectCount += 1
+                this.log.info(`${row + 1}: Skipped`)
                 continue
             }
+            else if (json.isError) {
+                this.log.info(`${row + 1}: ${json.errorArr.join('; ')}`)
 
-            json.pageUrl = StrHelper.generatePageUrl([json.name, json.place])
-            if (pageUrls.includes(json.pageUrl)) {
+                if (errorTypes.hasOwnProperty(json.isError))
+                    errorTypes[json.isError] += 1
+                else
+                    errorTypes[json.isError] = 1
+            } else {
+                successObjectCount += 1
+                this.log.info(`${row + 1}: Success`)
+            }
+
+            json.pageUrl = this.getPageUrl(json)
+            if (pageUrlsGlobal.includes(json.pageUrl)) {
                 json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
             }
-            pageUrls.push(json.pageUrl)
+            pageUrlsGlobal.push(json.pageUrl)
             insertObjects.push(json)
-
-            if (json.isChecked.trim() != '') {
-                checkedObjectCount += 1
-            }
         }
 
-        res = await templesModel.insertMany(insertObjects)
+        const totalLinesCount = rows.length - 1
+        const savedCount = insertObjects.length
+        const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
+        this.log.info(statusText)
+
+        res = await this.model.insertMany(insertObjects)
 
         if (res) {
             this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
@@ -262,23 +181,21 @@ export default class XlsGoogleParser {
             this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
         }
 
-        const totalLinesCount = rows.length - 1
-        const savedCount = insertObjects.length
-        const statusText = [checkedObjectCount, skipObjectCount, totalLinesCount].join(' / ')
+        return true
 
         res = await dbHelper.clearDb('service')
 
-        const serviceObjects = [
-            { name: 'checkedObjectCount', kind: 'detailStatus', value: checkedObjectCount },
-            { name: 'skipObjectCount', kind: 'detailStatus', value: skipObjectCount },
-            { name: 'savedCount', kind: 'detailStatus', value: savedCount },
-            { name: 'totalCount', kind: 'detailStatus', value: totalLinesCount },
-            { name: 'statusText', kind: 'status', value: statusText },
-            // { name: 'lastUpdateSheet', kind: 'status', value: last_update },
-            { name: 'checkedTime', kind: 'status', value: checkedTime }
+        let serviceObjects = [
+            { name: 'successObjectCount', value: successObjectCount },
+            { name: 'skipObjectCount', value: skipObjectCount },
+            { name: 'savedCount', value: savedCount },
+            { name: 'totalCount', value: totalLinesCount },
+            { name: 'statusText', value: statusText },
+            { name: 'checkedTime', value: checkedTime }
         ]
 
-        res = await serviceModel.insertMany(serviceObjects)
+        serviceObjects = serviceObjects.map(obj => { return { ...obj, 'model': modelName } })
+        res = await ServiceModel.insertMany(serviceObjects)
         if (res) {
             this.log.info(chalk.green(`Успешное сохранение статуса`))
         } else {
@@ -287,4 +204,5 @@ export default class XlsGoogleParser {
 
         return true
     }
+
 }
