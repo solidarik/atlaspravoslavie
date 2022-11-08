@@ -8,7 +8,7 @@ create date: 16th November 2020
 ##
 1. Install Mongodb
 2. Clone the project:
-```git clone https://github.com/solidarik/atlaspravoslavie```
+```git clone git@github.com:solidarik/atlaspravoslavie.git```
 3. Install node libraries:
 ```cd atlaspravoslavie```
 ```npm install```
