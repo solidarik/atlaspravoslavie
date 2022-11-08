@@ -197,7 +197,7 @@ export class LegendControl extends EventEmitter {
 
   getHTMLIcons(line) {
     let htmlIcon = ''
-    if (line.icon) htmlIcon += `<img src="${line.icon}" alt="Girl in a jacket">`
+    if (line.icon) htmlIcon += `<img src="${line.icon}" alt="${line.caption}">`
     else {
       this.getIcons(line).forEach((icon) => {
         htmlIcon += `<img src="${icon}" alt="${line.caption}">`
