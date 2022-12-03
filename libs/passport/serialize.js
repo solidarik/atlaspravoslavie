@@ -1,4 +1,4 @@
-import usersModel from '../../models/usersModel'
+import usersModel from '../../models/usersModel.js'
 import passport from 'koa-passport'
 
 // паспорт напрямую с базой не работает

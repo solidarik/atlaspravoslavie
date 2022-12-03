@@ -16,6 +16,7 @@ export default class XlsGoogleParserChronosTemple extends XlsGoogleParser {
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
+            'status': 'статус',
             'author': 'автор',
             'isChecked': 'проверено',
             'place': 'город',

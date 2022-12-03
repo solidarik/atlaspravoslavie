@@ -5,6 +5,7 @@ import InetHelper from '../helper/inetHelper.js'
 import DateHelper from '../helper/dateHelper.js'
 import ServiceModel from '../models/serviceModel.js'
 import StrHelper from '../helper/strHelper.js'
+import XlsHelper from '../helper/xlsHelper.js'
 
 import { google } from 'googleapis'
 
@@ -143,22 +144,26 @@ export default class XlsGoogleParser {
             json.lineSource = row + 1
             json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
 
+            let status = ''
+
             if (json.isChecked == '0' || json.isCatchError) {
                 skipObjectCount += 1
-                this.log.info(`${row + 1}: Skipped`)
+                status = `Пропущено согласно флагу`
                 continue
             }
             else if (json.isError) {
-                this.log.info(`${row + 1}: ${json.errorArr.join('; ')}`)
-
+                status = json.errorArr.join('; ')
                 if (errorTypes.hasOwnProperty(json.isError))
                     errorTypes[json.isError] += 1
                 else
                     errorTypes[json.isError] = 1
             } else {
                 successObjectCount += 1
-                this.log.info(`${row + 1}: Success`)
+                status = 'Успешно'
             }
+
+            this.log.info(`${row + 1}: ${status}`)
+            json.status = status
 
             json.pageUrl = this.getPageUrl(json)
             if (pageUrlsGlobal.includes(json.pageUrl)) {
@@ -167,6 +172,19 @@ export default class XlsGoogleParser {
             pageUrlsGlobal.push(json.pageUrl)
             insertObjects.push(json)
         }
+
+        const statuses = insertObjects.map(item => item.status)
+        const response = await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: this.spreadsheetId,
+            key: process.env.GOOGLE_API_KEY,
+            valueInputOption: "USER_ENTERED",
+            data: [{
+                range: "A2:A11",
+                values: [Array.from(Array(10).keys())]
+            }]
+        }).data
+        this.log.info(`response batch update: ${JSON.stringify(response)}`)
+
 
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length

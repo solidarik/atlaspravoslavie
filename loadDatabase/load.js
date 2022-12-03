@@ -39,22 +39,22 @@ Promise.resolve(true)
   .then(() => {
     return xlsGoogleParserChronos.loadData(dbHelper)
   })
-  .then(() => {
-    return xlsGoogleParserChronosTemple.loadData(dbHelper)
-  })
-  .then(() => {
-    return xlsGoogleParserTemples.loadData(dbHelper)
-  })
-  .then(() => {
-    return xlsGoogleParserPersons.loadData(dbHelper)
-  })
-  .then(() => {
-    return dbHelper.clearDb('personsAggr')
-  })
-  .then(() => {
-    log.info('аггрегация данных по персоналиям')
-    return personsAggr.start()
-  })
+  // .then(() => {
+  //   return xlsGoogleParserChronosTemple.loadData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserTemples.loadData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserPersons.loadData(dbHelper)
+  // })
+  // .then(() => {
+  //   return dbHelper.clearDb('personsAggr')
+  // })
+  // .then(() => {
+  //   log.info('аггрегация данных по персоналиям')
+  //   return personsAggr.start()
+  // })
   .then(() => {
     log.success(chalk.cyan(`Окончание процесса загрузки`))
     personsAggr.free()

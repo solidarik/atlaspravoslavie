@@ -1,6 +1,6 @@
 // long stack trace (+clarify from co) if needed
 if (process.env.TRACE) {
-  import('./libs/trace')
+  import('./libs/trace.js')
 }
 
 import Koa from 'koa'
@@ -10,7 +10,7 @@ import KoaRange from 'koa-range'
 app.use(KoaRange)
 
 import config from 'config'
-import mongoose from './libs/mongoose'
+import mongoose from './libs/mongoose.js'
 
 // keys for in-koa KeyGrip cookie signing (used in session, maybe other modules)
 app.keys = [config.secret]
@@ -30,7 +30,7 @@ const middlewares = fs.readdirSync(path.join(__dirname, 'middlewares')).sort()
 const forEachPromise = new Promise(async resolve => {
   for (let i = 0; i < middlewares.length; i++) {
     const handlerName = middlewares[i]
-    const middleware = await import('./middlewares/' + handlerName)
+    const middleware = await import(`./middlewares/${handlerName}`)
     middleware.init(app)
   }
 
@@ -44,11 +44,11 @@ const forEachPromise = new Promise(async resolve => {
     .sort()
   for (let i = 0; i < protocolClasses.length; i++) {
     const handlerName = protocolClasses[i]
-    const protocol = (await import('./socketProtocol/' + handlerName)).default
+    const protocol = (await import(`./socketProtocol/${handlerName}`)).default
     protocolFunctions.push(protocol.getProtocol(app))
   }
 
-  const serverSocket = (await import('./libs/serverSocket')).default
+  const serverSocket = (await import('./libs/serverSocket.js')).default
   app.socket = serverSocket(server, protocolFunctions)
 
   resolve(true)

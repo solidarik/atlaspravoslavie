@@ -1,10 +1,10 @@
-import ServerProtocol from '../libs/serverProtocol'
-import chronosModel from '../models/chronosModel'
-import chronosTempleModel from '../models/chronosTempleModel'
-import personsModel from '../models/personsModel'
-import personsAggrModel from '../models/personsAggrModel'
-import templesModel from '../models/templesModel'
-import serviceModel from '../models/serviceModel'
+import ServerProtocol from '../libs/serverProtocol.js'
+import chronosModel from '../models/chronosModel.js'
+import chronosTempleModel from '../models/chronosTempleModel.js'
+import personsModel from '../models/personsModel.js'
+import personsAggrModel from '../models/personsAggrModel.js'
+import templesModel from '../models/templesModel.js'
+import serviceModel from '../models/serviceModel.js'
 
 function trycatch(func, cb) {
   let res = {}

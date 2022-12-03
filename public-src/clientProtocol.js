@@ -92,6 +92,7 @@ export default class ClientProtocol extends EventEmitter {
 
   getTempleItem(id) {
     const searchData = { 'id': id }
+    console.log(`id: ${id}`)
     this.socket.emit('clGetTempleItem', JSON.stringify(searchData),
       (msg) => {
         const res = JSON.parse(msg)

@@ -1,8 +1,8 @@
-const dateHelper = require('../helper/dateHelper')
-const assert = require('assert')
+import DateHelper from '../helper/dateHelper.js'
+import assert from 'assert'
 
 describe('check date input from excel', () => {
-    const func = dateHelper.getDateFromInput
+    const func = DateHelper.getDateFromInput
 
 
     it('17.04.1636', () => {

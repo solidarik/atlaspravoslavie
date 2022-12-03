@@ -1,13 +1,13 @@
 import Router from 'koa-router'
 const router = new Router()
-import personsModel from '../models/personsModel'
-import templesModel from '../models/templesModel'
+import personsModel from '../models/personsModel.js'
+import templesModel from '../models/templesModel.js'
 // import redis from 'redis'
 import config from 'config'
 // const redisClient = redis.createClient(config.redis_uri);
 import util from 'util'
 
-import pageEvents from './page-events'
+import pageEvents from './page-events.js'
 
 const ensureAuthenticated = async function (ctx, next) {
   if (ctx.isAuthenticated()) {
@@ -32,16 +32,16 @@ const ensureAuthenticated = async function (ctx, next) {
 // })
 
 router.get('/', pageEvents)
-router.get('/login', (await import('./login')).get)
-router.post('/login', (await import('./login')).post)
+router.get('/login', (await import('./login.js')).get)
+router.post('/login', (await import('./login.js')).post)
 //router.get('/index', ensureAuthenticated, await import('./page-index'))
-router.get('/about', (await import('./page-about')).default)
+router.get('/about', (await import('./page-about.js')).default)
 
-router.get('/video', (await import('./page-video')).default)
-router.get('/events', (await import('./page-events')).default)
-router.get('/logout', (await import('./logout')).get)
+router.get('/video', (await import('./page-video.js')).default)
+router.get('/events', (await import('./page-events.js')).default)
+router.get('/logout', (await import('./logout.js')).get)
 
-const templeesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
+const templesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
 const personsSelectParam = { 'name': 1, 'birth': 1, 'surname': 1, 'monkname': 1, 'pageUrl': 1, }
 
 const getPersons = async function (ctx, next) {
@@ -59,7 +59,7 @@ const getPersons = async function (ctx, next) {
   next()
 }
 
-const getTemplees = async function (ctx, next) {
+const getTemples = async function (ctx, next) {
 
   // templees = await redisClient.get('templees')
   // if (!templees) return
@@ -101,13 +101,13 @@ const getTemple = async function (ctx, next) {
   next()
 }
 
-router.get('/map/person/:name', getPerson, (await import('./page-events')).default)
+router.get('/map/person/:name', getPerson, (await import('./page-events.js')).default)
 
-router.get('/person', getPersons, (await import('./page-person')).default)
-router.get('/person/:name', getPerson, (await import('./page-person')).default)
+router.get('/person', getPersons, (await import('./page-person.js')).default)
+router.get('/person/:name', getPerson, (await import('./page-person.js')).default)
 
-router.get('/temple', getTemplees, (await import('./page-temple')).default)
-router.get('/temple/:name', getTemple, (await import('./page-temple')).default)
+router.get('/temple', getTemples, (await import('./page-temple.js')).default)
+router.get('/temple/:name', getTemple, (await import('./page-temple.js')).default)
 
 
 export default router.routes()

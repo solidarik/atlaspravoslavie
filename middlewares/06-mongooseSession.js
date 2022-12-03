@@ -1,4 +1,4 @@
-import mongoose from '../libs/mongoose'
+import mongoose from '../libs/mongoose.js'
 import mongooseStore from 'koa-session-mongoose'
 import session from 'koa-session'
 

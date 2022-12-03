@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 var personsSchema = new mongoose.Schema(
   {
     pageId: Number,
-
+    status: String,
     surname: String,
     name: String,
     middlename: String,

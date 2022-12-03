@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 var chronosSchema = new mongoose.Schema(
   {
     pageId: Number,
-
+    status: String,
     start: {
       year: Number,
       month: Number,
@@ -22,7 +22,6 @@ var chronosSchema = new mongoose.Schema(
       isOnlyCentury: Boolean,
       century: Number
     },
-
     place: String,
     point: [],
     pageUrl: {

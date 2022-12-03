@@ -73,19 +73,20 @@ if (!Object.getOwnPropertyDescriptor(NodeList.prototype, 'forEach')) {
 }
 
 function startApp() {
-  var temples = window.state.temples;
-  var temple = window.state.temple;
-  var temples = new addTemples("temples-table", temples);
-  temples.clearTable();
+  const temple = window.state.temple
+  const temples = window.state.temples
+  var templesComponent = new addTemples("temples-table", temples)
+
+  templesComponent.clearTable();
   window.showSlides = showSlides
   window.plusSlides = plusSlides
   window.currentSlide = currentSlide
 
   if (temples && temples.length > 0) {
-    temples.fillTable(temple);
+    templesComponent.fillTable(temple);
   } else {
     $('#temples-info-container').hide()
-    temples.showItem(temple)
+    templesComponent.showItem(temple)
   }
 }
 

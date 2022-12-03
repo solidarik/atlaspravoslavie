@@ -86,6 +86,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
+            'status': 'статус',
             'author': 'автор',
             'isChecked': 'проверено',
             'surname': 'фамилия',

@@ -1,9 +1,9 @@
-const strHelper = require('../helper/strHelper')
-const assert = require('assert')
+import StrHelper from '../helper/strHelper.js'
+import assert from 'assert'
 
-const f = (input) => strHelper.generatePageUrl(input)
-const f2 = (input) => strHelper.getMaxLenNumber(input)
-const f3 = strHelper.replaceEnd
+const f = (input) => StrHelper.generatePageUrl(input)
+const f2 = (input) => StrHelper.getMaxLenNumber(input)
+const f3 = StrHelper.replaceEnd
 
 describe('replaceEnd', () => {
   it('simple replaceEnd', () => {

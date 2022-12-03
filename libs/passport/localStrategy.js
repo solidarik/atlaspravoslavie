@@ -1,6 +1,6 @@
 import passport from 'koa-passport'
 import LocalStrategy from 'passport-local'
-import usersModel from '../../models/usersModel'
+import usersModel from '../../models/usersModel.js'
 
 // Стратегия берёт поля из req.body
 // Вызывает для них функцию
