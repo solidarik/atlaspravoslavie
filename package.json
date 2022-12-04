@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/solidarik/atlaspravoslavie#readme",
   "dependencies": {
+    "@google-cloud/local-auth": "^2.1.1",
     "@popperjs/core": "latest",
     "@types/shelljs": "latest",
     "axios": "latest",
