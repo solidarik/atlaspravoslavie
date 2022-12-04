@@ -18,6 +18,6 @@ export default class XlsHelper {
                 columnNumber = Math.floor(columnNumber / 26);
             }
         }
-        return columnName
+        return columnName.join('')
     }
 }

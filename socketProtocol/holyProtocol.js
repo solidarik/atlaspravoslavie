@@ -75,6 +75,13 @@ class HolyProtocol extends ServerProtocol {
         $gte: intValue // field >= value
       }
 
+      //special case for XXV century - show all items
+      if (!data.isYearMode && intValue == 25) {
+        defaultSearchParam = {}
+        gteSearchParam = {}
+        personSearchParam = {}
+      }
+      else
       if (data.isYearMode) {
         defaultSearchParam = {
           "start.year": searchDates

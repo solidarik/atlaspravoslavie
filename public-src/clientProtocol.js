@@ -78,8 +78,6 @@ export default class ClientProtocol extends EventEmitter {
     )
   }
 
-
-
   getPersons() {
     this.socket.emit(
       'clGetPersons',
