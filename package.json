@@ -1,11 +1,11 @@
 {
   "name": "atlaspravoslavie",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Atlas of Orthodoxy",
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": "16.x"
+    "node": "19.x"
   },
   "scripts": {
     "test": "mocha -c",
@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/solidarik/atlaspravoslavie#readme",
   "dependencies": {
-    "@google-cloud/local-auth": "^2.1.1",
+    "@google-cloud/local-auth": "latest",
     "@popperjs/core": "latest",
     "@types/shelljs": "latest",
     "axios": "latest",
@@ -51,6 +51,7 @@
     "d3-geo-projection": "latest",
     "d3v4": "latest",
     "dotenv": "latest",
+    "google-auth-library": "latest",
     "googleapis": "latest",
     "jquery": "latest",
     "koa": "latest",
@@ -75,6 +76,7 @@
     "passport-local": "latest",
     "proj4": "latest",
     "pug": "latest",
+    "readline": "latest",
     "shelljs": "latest",
     "socket.io": "latest",
     "socket.io-client": "latest",

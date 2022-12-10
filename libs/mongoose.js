@@ -5,6 +5,8 @@ if (process.env.MONGOOSE_DEBUG) {
     mongoose.set('debug', true);
 }
 
+mongoose.set('strictQuery', true)
+
 async function main() {
     mongoose.Promise = global.Promise;
     await mongoose.connect(config.mongoose.uri, config.mongoose.options)

@@ -2,8 +2,6 @@ import DateHelper from '../helper/dateHelper.js'
 import TempleModel from '../models/templesModel.js'
 import XlsGoogleParser from './xlsGoogleParser.js'
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
-
 export default class XlsGoogleParserTemples extends XlsGoogleParser {
 
     constructor(log) {
@@ -12,13 +10,13 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
         this.pageUrls = ['name']
         this.model = TempleModel
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_TEMPLES
-        this.range = 'A1:S'
+        this.range = 'A1:T'
     }
 
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
-            'status': 'статус',
+            'loadStatus': 'статус загрузки',
             'author': 'автор',
             'isChecked': 'проверено',
             'name': 'название',
@@ -58,7 +56,6 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
         json.name = row[headerColumns.name].trim()
         json.city = row[headerColumns.city].trim()
         json.place = row[headerColumns.place].trim()
-        json.isError = undefined
         json.errorArr = []
 
         try {
@@ -90,7 +87,7 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
             json.imgUrls = imgUrls.filter(item => (item && item != ''))
 
         } catch (e) {
-            json.isError = e
+            json.errorArr.push(e + '')
         }
 
         return json

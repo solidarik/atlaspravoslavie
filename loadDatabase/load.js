@@ -6,7 +6,7 @@ import FileHelper from '../helper/fileHelper.js'
 if (FileHelper.isFileExists('load.log')) {
   FileHelper.deleteFile('load.log')
 }
-
+я
 const log = Log.create('load.log')
 import DbHelper from '../loadDatabase/dbHelper.js'
 import PersonsAggr from '../loadDatabase/personsAggr.js'
@@ -36,18 +36,18 @@ Promise.resolve(true)
   .then(() => {
     return dbHelper.connect()
   })
+  // .then(() => {
+  //   return xlsGoogleParserChronos.processData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserChronosTemple.processData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserTemples.processData(dbHelper)
+  // })
   .then(() => {
-    return xlsGoogleParserChronos.loadData(dbHelper)
+    return xlsGoogleParserPersons.processData(dbHelper)
   })
-  // .then(() => {
-  //   return xlsGoogleParserChronosTemple.loadData(dbHelper)
-  // })
-  // .then(() => {
-  //   return xlsGoogleParserTemples.loadData(dbHelper)
-  // })
-  // .then(() => {
-  //   return xlsGoogleParserPersons.loadData(dbHelper)
-  // })
   // .then(() => {
   //   return dbHelper.clearDb('personsAggr')
   // })

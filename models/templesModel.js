@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 var templesSchema = new mongoose.Schema(
   {
     pageId: Number,
-    status: String,
+    loadStatus: String,
     start: {
       year: Number,
       month: Number,

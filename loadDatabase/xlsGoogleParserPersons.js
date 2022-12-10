@@ -1,12 +1,7 @@
-import chalk from 'chalk'
-import { google } from 'googleapis'
-import InetHelper from '../helper/inetHelper.js'
-import GeoHelper from '../helper/geoHelper.js'
 import DateHelper from '../helper/dateHelper.js'
 import JsHelper from '../helper/jsHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import PersonModel from '../models/personsModel.js'
-import ServiceModel from '../models/serviceModel.js'
 import XlsGoogleParser from './xlsGoogleParser.js'
 
 const dateStopWords = ['посередине', 'середина', 'между', 'или',
@@ -20,9 +15,9 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
         this.log = log
         this.pageUrls = ['sitename', 'surname', 'name']
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
-        this.range = 'A1:AF'
+        this.range = 'A1:AE'
         this.model = PersonModel
-        this.maxRow = 2708
+        // this.maxRow = 3000
     }
 
     getPageUrl(json) {
@@ -86,7 +81,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
-            'status': 'статус',
+            'loadStatus': 'статус загрузки',
             'author': 'автор',
             'isChecked': 'проверено',
             'surname': 'фамилия',
@@ -143,8 +138,6 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
         let json = {}
 
         json.lineSource = 0
-        json.isError = false
-        json.isCatchError = false
         json.errorArr = []
 
         try {
@@ -163,6 +156,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             if (!birthDay && !deathDay) {
                 json.errorArr.push('Пропуск пустых дат рождения и смерти')
             } else {
+
                 let maybeBirthDate = false
                 let maybeDeathDate = false
                 if (birthDay != '') {
@@ -338,11 +332,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             }).slice(1)
             json.pageUrl = ''
 
-            json.isError = json.errorArr.length > 0
-
         } catch (e) {
-            json.isError = true
-            json.isCatchError = true
             json.errorArr.push('' + e)
         }
 

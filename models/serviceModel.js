@@ -4,7 +4,7 @@ var serviceSchema = new mongoose.Schema(
     {
         name: String,
         value: String,
-        kind: String,
+        model: String,
     },
     {
         timestamps: true,
