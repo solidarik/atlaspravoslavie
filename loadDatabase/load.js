@@ -6,7 +6,7 @@ import FileHelper from '../helper/fileHelper.js'
 if (FileHelper.isFileExists('load.log')) {
   FileHelper.deleteFile('load.log')
 }
-я
+
 const log = Log.create('load.log')
 import DbHelper from '../loadDatabase/dbHelper.js'
 import PersonsAggr from '../loadDatabase/personsAggr.js'
