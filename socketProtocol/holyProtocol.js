@@ -76,7 +76,7 @@ class HolyProtocol extends ServerProtocol {
       }
 
       //special case for XXV century - show all items
-      if (!data.isYearMode && intValue == 25) {
+      if (!data.isYearMode && intValue == 23) {
         defaultSearchParam = {}
         gteSearchParam = {}
         personSearchParam = {}
@@ -279,7 +279,7 @@ class HolyProtocol extends ServerProtocol {
   getLoadStatus(socket, msg, cb) {
     let res = {}
     try {
-      serviceModel.find({ 'kind': 'status' }).select({ 'name': 1, 'value': 1, '_id': 0 })
+      serviceModel.find({ 'name': 'statusText', 'model': 'temples' }).select({ 'name': 1, 'value': 1, '_id': 0 })
         .then(
           (res) => {
             let outRes = {}

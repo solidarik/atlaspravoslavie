@@ -7,6 +7,8 @@ import ServiceModel from '../models/serviceModel.js'
 import StrHelper from '../helper/strHelper.js'
 import XlsHelper from '../helper/xlsHelper.js'
 import readline from 'readline'
+import fs from 'fs'
+import authentication from '../loadDatabase/googleAuthentication.js'
 
 import { google } from 'googleapis'
 
@@ -41,67 +43,13 @@ export default class XlsGoogleParser {
         return false
     }
 
-    async getLastUpdateFromGoogleApi() {
-        const oAuth2Client = new google.auth.OAuth2(
-            process.env.GOOGLE_DRIVE_ID,
-            process.env.GOOGLE_DRIVE_SECRET,
-            'http://localhost:3000')
-
-        let token = undefined
-        console.log('test after create oAuth2Client')
-
-        try {
-            token = fs.readFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE)
-            token = JSON.parse(token)
-        } catch (err) {
-            // console.log(err)
-            // return
-            const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
-            const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
-            console.log('Authorize this app by visiting this url:', authUrl);
-            const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-            const codePromise = new Promise(res => {
-                rl.question('Enter the code from that page here: ', (code) => {
-                    console.log(code)
-                    res(code)
-                })
-            })
-            const code = await codePromise
-            token = await oAuth2Client.getToken(code)
-            fs.writeFileSync(process.env.GOOGLE_DRIVE_TOKEN_FILE, JSON.stringify(token))
-            rl.close()
-
-
-        }
-        if (!token) return
-
-        oAuth2Client.setCredentials(token)
-
-        const drive = google.drive({ version: 'v3', auth: oAuth2Client });
-        const fileList = await drive.files.list({
-            pageSize: 10,
-            fields: 'nextPageToken, files(id, name, modifiedTime)',
-        })
-
-        console.log(JSON.stringify(fileList))
-
-        const files = fileList.data.files;
-        for (let ifile = 0; ifile < files.length; ifile++) {
-            const file = files[ifile]
-            if (file.id === process.env.GOOGLE_SHEET_ID) {
-                return DateHelper.dateTimeToStr(new Date(file.modifiedTime))
-            }
-        }
-
-        return false
-    }
 
     getPageUrl(json) {
         const pageUrlsLocal = this.pageUrls.map((colName) => json[colName])
         return StrHelper.generatePageUrl(pageUrlsLocal)
     }
 
-    async loadData(dbHelper) {
+    async processData(dbHelper) {
 
         const modelName = this.model.collection.collectionName
 
@@ -136,6 +84,7 @@ export default class XlsGoogleParser {
         let skipObjectCount = 0
         let pageUrlsGlobal = []
 
+        let loadStatuses = []
         let errorTypes = {}
 
         //start from row = 1, because we skip a header row
@@ -146,69 +95,66 @@ export default class XlsGoogleParser {
 
             json.lineSource = row + 1
             json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
+            const isError = json.errorArr.length > 0
 
-            let status = ''
+            let loadStatus = ''
 
-            if (json.isChecked == '0' || json.isCatchError) {
+            if (json.isChecked == '0') {
                 skipObjectCount += 1
-                status = `Пропущено согласно флагу`
-                continue
+                loadStatus = `Пропущено согласно флагу`
             }
-            else if (json.isError) {
-                status = json.errorArr.join('; ')
-                if (errorTypes.hasOwnProperty(json.isError))
-                    errorTypes[json.isError] += 1
-                else
-                    errorTypes[json.isError] = 1
+            else
+            if (isError) {
+                // this.log.error(`Ошибка обработки json: ${JSON.stringify(json)}`)
+                loadStatus = json.errorArr.join('; ').replace('Error: ', '')
             } else {
                 successObjectCount += 1
-                status = 'Успешно'
+                loadStatus = 'Успешно'
+                insertObjects.push(json)
             }
 
             // this.log.info(`${row + 1}: ${status}`)
-            json.status = status
-
+            json.loadStatus = loadStatus
             json.pageUrl = this.getPageUrl(json)
             if (pageUrlsGlobal.includes(json.pageUrl)) {
                 json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
             }
             pageUrlsGlobal.push(json.pageUrl)
-            insertObjects.push(json)
+            loadStatuses.push(loadStatus)
         }
 
-        await this.getLastUpdateFromGoogleApi()
-
-        const oAuth2Client = new google.auth.OAuth2(
-            process.env.GOOGLE_DRIVE_ID,
-            process.env.GOOGLE_DRIVE_SECRET,
-            'http://localhost:3000'
-        )
-
-        const token = await oAuth2Client.getToken('ya29.a0ARrdaM8MzjzvKA6ZbF119-M7lUYYQWjyITmmxqJxYrP2FbfbfsjSjkA2dOuqlULqSLqjJrjLIJtj0qB9pk15qN4_Tc7drHokSwJPv7C58MZdB9JQcPw9GKlFGeQ8wl6SpQ80xEIAY0sKmQ2uZXDN3yeaC4J8","refresh_token":"1//0crwmtRbwEIVvCgYIARAAGAwSNwF-L9IrUDze_VFybDRUYbItu6Nzl1FHkHmDSd-GusxOvRLtHEQzUdminUoUi1lsVqxcgWtBgMg","scope":"https://www.googleapis.com/auth/drive.metadata.readonly","token_type":"Bearer","expiry_date":1631444971544},"res":{"config":{"method":"POST","url":"https://oauth2.googleapis.com/token","data":"code=4%2F0AX4XfWicdYp-b6Od3PzbR6f1xjHDjR3EEkrUwA0mDYQVkjexPoPdTa-YSg1ZeAuQk27stA%26scope%3Dhttps%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.metadata.readonly&client_id=354745299259-0l2gb4nji5v636vh79mjj91vv10010s1.apps.googleusercontent.com&client_secret=a5N55J-rEUTxtmlN-5L8wk0f&redirect_uri=http%3A%2F%2Flocalhost%3A3000&grant_type=authorization_code&code_verifier=","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/3.1.2","Accept":"application/json"},"params":{},"body":"code=4%2F0AX4XfWicdYp-b6Od3PzbR6f1xjHDjR3EEkrUwA0mDYQVkjexPoPdTa-YSg1ZeAuQk27stA%26scope%3Dhttps%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.metadata.readonly&client_id=354745299259-0l2gb4nji5v636vh79mjj91vv10010s1.apps.googleusercontent.com&client_secret=a5N55J-rEUTxtmlN-5L8wk0f&redirect_uri=http%3A%2F%2Flocalhost%3A3000&grant_type=authorization_code&code_verifier=","responseType":"json"},"data":{"access_token":"ya29.a0ARrdaM8MzjzvKA6ZbF119-M7lUYYQWjyITmmxqJxYrP2FbfbfsjSjkA2dOuqlULqSLqjJrjLIJtj0qB9pk15qN4_Tc7drHokSwJPv7C58MZdB9JQcPw9GKlFGeQ8wl6SpQ80xEIAY0sKmQ2uZXDN3yeaC4J8","refresh_token":"1//0crwmtRbwEIVvCgYIARAAGAwSNwF-L9IrUDze_VFybDRUYbItu6Nzl1FHkHmDSd-GusxOvRLtHEQzUdminUoUi1lsVqxcgWtBgMg","scope":"https://www.googleapis.com/auth/drive.metadata.readonly","token_type":"Bearer","expiry_date":1631444971544},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"')
-        oAuth2Client.setCredentials(token)
-
-        const statuses = insertObjects.map(item => item.status)
-        const statusColumnName = XlsHelper.getColumnNameByNumber(headerColumns.status)
+        const statusColumnName = XlsHelper.getColumnNameByNumber(headerColumns.loadStatus + 1)
         const statusRowStart = 2
-        const statusRowEnd = statuses.length + 1
+        const statusRowEnd = loadStatuses.length + 1
         const statusRange = `${statusColumnName}${statusRowStart}:${statusColumnName}${statusRowEnd}`
 
-        const response = await sheets.spreadsheets.batchUpdate({
-            spreadsheetId: this.spreadsheetId,
-            auth: oAuth2Client,
-            valueInputOption: "USER_ENTERED",
-            data: [{
-                range: statusRange,
-                values: statuses
-            }]
-        }).data
-        this.log.info(`response batch update: ${JSON.stringify(response)}`)
+        const authClient = await authentication.authenticate()
 
+        if (loadStatuses.length == 0) {
+            this.log.error(`Ошибка получения статусов`)
+        } else {
+
+            const resource = {
+                range: statusRange,
+                majorDimension: "COLUMNS",
+                values: [loadStatuses]
+            }
+
+            const sheetUpdateStatus = sheets.spreadsheets.values.update({
+                auth: authClient,
+                spreadsheetId: this.spreadsheetId,
+                range: statusRange,
+                valueInputOption: "USER_ENTERED",
+                resource: resource
+            })
+
+            this.log.warn(`Статус обновления источника: ${JSON.stringify(sheetUpdateStatus)}`)
+        }
 
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
         const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
-        this.log.info(statusText)
+        this.log.info(`Кол-во загруженных/пропущенных/всего: ${statusText}`)
 
         res = await this.model.insertMany(insertObjects)
 
@@ -217,10 +163,6 @@ export default class XlsGoogleParser {
         } else {
             this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
         }
-
-        return true
-
-        res = await dbHelper.clearDb('service')
 
         let serviceObjects = [
             { name: 'successObjectCount', value: successObjectCount },
@@ -232,7 +174,10 @@ export default class XlsGoogleParser {
         ]
 
         serviceObjects = serviceObjects.map(obj => { return { ...obj, 'model': modelName } })
+
+        res = await ServiceModel.deleteMany({'model': modelName})
         res = await ServiceModel.insertMany(serviceObjects)
+
         if (res) {
             this.log.info(chalk.green(`Успешное сохранение статуса`))
         } else {

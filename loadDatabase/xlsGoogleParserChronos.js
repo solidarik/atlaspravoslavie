@@ -16,7 +16,7 @@ export default class XlsGoogleParserChronos extends XlsGoogleParser {
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
-            'status': 'статус',
+            'loadStatus': 'статус загрузки',
             'author': 'автор',
             'isChecked': 'проверено',
             'place': 'город',
@@ -47,17 +47,13 @@ export default class XlsGoogleParserChronos extends XlsGoogleParser {
         let json = {}
 
         json.lineSource = 0
-        json.isError = false
-        json.isCatchError = false
         json.errorArr = []
         json.shortBrief = row[headerColumns.shortBrief].trim()
         json.longBrief = row[headerColumns.longBrief].trim()
         json.srcUrl = row[headerColumns.srcUrl]
         json.remark = row[headerColumns.remark]
         json.comment = row[headerColumns.comment]
-
         json.place = row[headerColumns.place].trim()
-        json.isError = undefined
 
         try {
 
@@ -91,11 +87,7 @@ export default class XlsGoogleParserChronos extends XlsGoogleParser {
 
             }
 
-            json.isError = json.errorArr.length > 0
-
         } catch (e) {
-            json.isError = true
-            json.isCatchError = true
             json.errorArr.push('' + e)
         }
 
