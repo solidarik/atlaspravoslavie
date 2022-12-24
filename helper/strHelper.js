@@ -203,10 +203,11 @@ export default class StrHelper {
     input = input.replace('.', floatDelim)
     //return input.replace(/[(][^)]*[)]+/g, '')
     const r = new RegExp(`[0-9${floatDelim}]+`, 'g')
+    const existNumbers = new RegExp(`[0-9]+`, 'g')
     let result = []
     let m
     while ((m = r.exec(input)) != null) {
-      (m[0] != '.') && result.push(m[0])
+      (m[0] != '.' && existNumbers.exec(m[0])) && result.push(m[0])
     }
     // let result = input.match(regexp) || []
     return result

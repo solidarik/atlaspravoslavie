@@ -1,7 +1,8 @@
 import personsModel from '../models/personsModel.js'
 import StrHelper from '../helper/strHelper.js'
-import InetHelper from '../helper/inetHelper.js'
+import inetHelper from '../helper/inetHelper.js'
 import SuperJsonMediator from './superJsonMediator.js'
+import GeoHelper from '../helper/geoHelper.js'
 
 export default class PersonsJsonMediator extends SuperJsonMediator {
   constructor() {
@@ -27,21 +28,21 @@ export default class PersonsJsonMediator extends SuperJsonMediator {
     return new Promise((resolve, reject) => {
 
       let promises = [
-        InetHelper.getLocalCoordsForName(json.birth.place),
-        InetHelper.getLocalCoordsForName(json.death.place)
+        inetHelper.searchCoordsByName(json.birth.place),
+        inetHelper.searchCoordsByName(json.death.place)
       ]
 
       json.achievements.forEach((achiev) => {
         promises.push(
-          InetHelper.getLocalCoordsForName(achiev.place)
+          inetHelper.searchCoordsByName(achiev.place)
         )
       })
 
       Promise.all(promises)
         .then((coords) => {
 
-          const birthCoords = coords[0]
-          const deathCoords = coords[1]
+          const birthCoords = GeoHelper.coordsToBaseFormat(coords[0])
+          const deathCoords = GeoHelper.coordsToBaseFormat(coords[1])
 
           if (birthCoords && birthCoords.length < 2)
             resolve({
@@ -65,7 +66,7 @@ export default class PersonsJsonMediator extends SuperJsonMediator {
             } else {
               json.achievements[i - 2] = {
                 ...json.achievements[i - 2],
-                placeCoord: coords[i]
+                placeCoord: GeoHelper.coordsToBaseFormat(coords[i])
               }
             }
           }

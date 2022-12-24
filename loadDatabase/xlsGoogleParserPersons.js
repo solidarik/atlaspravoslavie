@@ -13,6 +13,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
     constructor(log) {
         super()
         this.log = log
+        this.name = 'Святые'
         this.pageUrls = ['sitename', 'surname', 'name']
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
         this.range = 'A1:AE'
@@ -118,7 +119,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             'imgUrl': 'ссылка на фото',
 
             'deathDay': 'дата смерти',
-            'deathPlace': 'похоронен / умер',
+            'deathPlace': 'Умер',
+            'buriedPlace': 'Похоронен',
             'deathCoord': 'координаты смерти'
         }
 
@@ -135,10 +137,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
     }
 
     async getJsonFromRow(headerColumns, row) {
-        let json = {}
 
-        json.lineSource = 0
-        json.errorArr = []
+        let json = {errorArr: [], warningArr: [], lineSource: 0}
 
         try {
 
@@ -151,6 +151,11 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             json.sitename = row[headerColumns.sitename]
             json.monkname = row[headerColumns.monkname]
 
+            json.birth = {}
+            json.death = {}
+
+            const isDebugLine = (json.sitename == 'Преподобный Дорофе́й Египетский, пустынник')
+
             const birthDay = row[headerColumns.birthDay]
             const deathDay = row[headerColumns.deathDay]
             if (!birthDay && !deathDay) {
@@ -160,23 +165,31 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 let maybeBirthDate = false
                 let maybeDeathDate = false
                 if (birthDay != '') {
-                    maybeBirthDate = DateHelper.getDateFromInput(birthDay, dateStopWords)
+                    try {
+                        maybeBirthDate = DateHelper.getDateFromInput(birthDay, dateStopWords)
+                    } catch(e) {
+                        maybeBirthDate = false
+                    }
                     if (maybeBirthDate) {
                         json.birth = maybeBirthDate
                         json.birth['isIndirectDate'] = false
                     } else {
-                        json.errorArr.push(`Не определена дата рождения ${birthDay}`)
+                        json.warningArr.push(`Не определена дата рождения ${birthDay}`)
                     }
                 }
 
                 if (deathDay != '') {
-                    maybeDeathDate = DateHelper.getDateFromInput(deathDay, dateStopWords)
+                    try {
+                        maybeDeathDate = DateHelper.getDateFromInput(deathDay, dateStopWords)
+                    } catch(e) {
+                        maybeDeathDate = false
+                    }
                     if (maybeDeathDate) {
                         json.death = maybeDeathDate
                         json.death['isIndirectDate'] = false
                     }
                     else {
-                        json.errorArr.push(`Не определена дата смерти ${deathDay}`)
+                        json.warningArr.push(`Не определена дата смерти ${deathDay}`)
                     }
                 }
 
@@ -193,16 +206,26 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                     json.birth['century'] -= 1
                     json.birth['isIndirectDate'] = true
                 }
+
+                if (!maybeBirthDate && !maybeDeathDate) {
+                    json.errorArr.push(`Не определены даты рождения и смерти
+                        ${birthDay} ${deathDay}`)
+                }
             }
 
             let birthPlace = row[headerColumns.birthPlace]
             let deathPlace = row[headerColumns.deathPlace]
 
+            if (!deathPlace || deathPlace.toLowerCase() == 'неизвестно')
+                if (row[headerColumns.buriedPlace]) {
+                    deathPlace = row[headerColumns.buriedPlace]
+                }
+
             if (birthPlace)
-                birthPlace = birthPlace.trim()
+                birthPlace = (birthPlace + '').trim()
 
             if (deathPlace)
-                deathPlace = deathPlace.trim()
+                deathPlace = (deathPlace + '').trim()
 
             if ((!birthPlace || birthPlace.toLowerCase() == 'неизвестно')
                 && (!deathPlace || deathPlace.toLowerCase() == 'неизвестно')) {
@@ -225,7 +248,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 if (birthCoord) {
                     json.birth["placeCoord"] = birthCoord
                 } else {
-                    json.errorArr.push(`Не определена координата рождения для "${birthPlace}"`)
+                    json.errorArr.push(`Не определена координата рождения ${birthPlace}`)
                 }
 
                 json.death['place'] = deathPlace
@@ -233,7 +256,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 if (deathCoord) {
                     json.death['placeCoord'] = deathCoord
                 } else {
-                    json.errorArr.push(`Не определена координата смерти для "${deathPlace}"`)
+                    json.errorArr.push(`Не определена координата смерти ${deathPlace}`)
                 }
             }
 
@@ -268,38 +291,37 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                     if (achievPlaceCoord) {
                         achievModel.placeCoord = achievPlaceCoord
                     } else {
-                        json.errorArr.push(`Не определена координата подвига для "${achiev.place}"`)
+                        json.warningArr.push(`Не определена координата подвига ${achiev.place}`)
                     }
                 }
 
                 if (achiev.date != '') {
                     if (achiev.date.includes('-')) {
                         const arrDates = achiev.date.split('-')
-                        const startDate = DateHelper.getDateFromInput(arrDates[0], dateStopWords)
-                        const endDate = DateHelper.getDateFromInput(arrDates[1], dateStopWords)
-                        if (startDate && endDate) {
-                            achievModel.start = startDate
-                            achievModel.end = endDate
-                        } else {
-                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
+                        try {
+                            const startDate = DateHelper.getDateFromInput(arrDates[0], dateStopWords)
+                            const endDate = DateHelper.getDateFromInput(arrDates[1], dateStopWords)
+                            if (startDate && endDate) {
+                                achievModel.start = startDate
+                                achievModel.end = endDate
+                            } else {
+                                json.warningArr.push(`Не определена дата подвига ${achiev.date}`)
+                            }
+                        }
+                        catch (e) {
+                            json.warningArr.push(`Не определена дата подвига ${achiev.date}`)
                         }
                     }
-                    else if (achiev.date.includes('—')) {
-                        const arrDates = achiev.date.split('—')
-                        const startDate = DateHelper.getDateFromInput(arrDates[0], dateStopWords)
-                        const endDate = DateHelper.getDateFromInput(arrDates[1], dateStopWords)
-                        if (startDate && endDate) {
-                            achievModel.start = startDate
-                            achievModel.end = endDate
-                        } else {
-                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
-                        }
-                    } else {
-                        const startDate = DateHelper.getDateFromInput(achiev.date, dateStopWords)
-                        if (startDate) {
-                            achievModel.start = startDate
-                        } else {
-                            json.errorArr.push(`Не определена дата подвига ${achiev.date}`)
+                    else {
+                        try {
+                            let startDate = DateHelper.getDateFromInput(achiev.date, dateStopWords)
+                            if (startDate) {
+                                achievModel.start = startDate
+                            } else {
+                                json.warningArr.push(`Не определена дата подвига ${achiev.date}`)
+                            }
+                        } catch(e) {
+                            json.warningArr.push(`Не определена дата подвига ${achiev.date}`)
                         }
                     }
                 }
@@ -307,29 +329,62 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 json.achievements.push(achievModel)
             }
 
-            const canonizationDate = DateHelper.getDateFromInput(row[headerColumns.canonizationDate], dateStopWords)
-            if (canonizationDate) {
-                json.canonizationDate = canonizationDate
+            try {
+                const canonizationDate = DateHelper.getDateFromInput(row[headerColumns.canonizationDate], dateStopWords)
+                if (canonizationDate) {
+                    json.canonizationDate = canonizationDate
+                }
+            }
+            catch (e) {
+                json.warningArr.push(`Не удалось распарсить дату канонизации
+                    ${row[headerColumns.canonizationDate]}`)
             }
 
-            json.status = row[headerColumns.status]
-            json.groupStatus = row[headerColumns.groupStatus]
 
-            if (json.groupStatus.includes('муч'))
+            if (row[headerColumns.status]) {
+                json.status = (row[headerColumns.status]).trim()
+            }
+
+            if (row[headerColumns.groupStatus]) {
+                json.groupStatus = (row[headerColumns.groupStatus]).trim()
+            }
+
+            if (!json.groupStatus && json.status) {
+                json.groupStatus = json.status
+            }
+
+            let checkGroupStatus = json.groupStatus
+            if (checkGroupStatus) {
+                checkGroupStatus = json.groupStatus.toLowerCase()
+            }
+
+            if (checkGroupStatus.includes('муч'))
                 json.groupStatus = 'мученик'
-            else if (json.groupStatus.includes('свят'))
+            else if (checkGroupStatus.includes('свят'))
                 json.groupStatus = 'святой'
-            else if (json.groupStatus.includes('препод'))
+            else if (checkGroupStatus.includes('препод'))
                 json.groupStatus = 'преподобный'
-            else json.groupStatus = 'святой'
+            else {
+                json.groupStatus = 'святой'
+                json.errorArr.push(`Не определена группа святости
+                    ${row[headerColumns.status]}
+                    ${row[headerColumns.groupStatus]}`)
+            }
 
             json.worshipDays = this.getWorshipDates(row[headerColumns.worshipDays])
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]
-            json.imgUrls = row[headerColumns.imgUrl].split('http').map(item => {
-                return `http${item}`
-            }).slice(1)
+
+            const imgUrl = row[headerColumns.imgUrl]
+            if (imgUrl) {
+                json.imgUrls = imgUrl.split('http').map(item => {
+                    return `http${item}`
+                }).slice(1)
+            } else {
+                json.warningArr.push(`Нет ссылки на фотографию`)
+            }
+
             json.pageUrl = ''
 
         } catch (e) {

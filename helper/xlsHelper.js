@@ -3,6 +3,7 @@ export default class XlsHelper {
     static getColumnNameByNumber(columnNumber) {
         let columnName = [];
         while (columnNumber > 0) {
+
             // Find remainder
             let rem = columnNumber % 26;
 

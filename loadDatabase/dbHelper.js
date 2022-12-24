@@ -15,6 +15,8 @@ export default class DbHelper {
       mongoose.set('debug', true)
     }
 
+    mongoose.set('strictQuery', true)
+
     mongoose.Promise = global.Promise
     this.db = await mongoose.connect(config.mongoose.uri, config.mongoose.options)
 
@@ -26,7 +28,7 @@ export default class DbHelper {
         if (err) reject(err)
 
         resolve(true)
-        this.log.info(`Removed collection: ${model.collection.collectionName}`)
+        this.log.info(chalk.gray(`Удаление коллекции: ${model.collection.collectionName}`))
       })
     })
   }
@@ -48,7 +50,7 @@ export default class DbHelper {
                       if (err) reject(err)
 
                       resolve(true)
-                      this.log.info(`Removed collection: ${modelFilePath}`)
+                      this.log.info(chalk.gray(`Удаление коллекции: ${modelFilePath}`))
                     })
                   }
                 )
@@ -77,7 +79,7 @@ export default class DbHelper {
     if (this.isOuter) return
     setTimeout(() => {
       this.db && this.db.disconnect()
-      this.log.info(chalk.yellow('Disconnected database'))
+      this.log.info(chalk.gray('Отключение от базы'))
     }, 100)
   }
 

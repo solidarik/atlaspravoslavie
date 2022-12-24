@@ -4,6 +4,7 @@ const log = Log.create()
 import personsModel from '../models/personsModel.js'
 import PersonsAggrJsonMediator from '../loadDatabase/personsAggrJsonMediator.js'
 import StrHelper from '../helper/strHelper.js'
+import chalk from 'chalk'
 
 export default class PersonsAggr {
 
@@ -22,7 +23,7 @@ export default class PersonsAggr {
         const mediator = new PersonsAggrJsonMediator()
 
         return new Promise((resolve, reject) => {
-            personsModel.find({}) //'surname': 'Садзаглишвили'})
+            personsModel.find({"isOnMap": true}) //'surname': 'Садзаглишвили'})
                 .then(persons => {
                     let promises = []
                     let jsons = []
@@ -40,7 +41,8 @@ export default class PersonsAggr {
                             'info': person,
                             'caption': caption,
                             'groupStatus': person.groupStatus,
-                            'shortDescription': StrHelper.ellipseLongString(person.fullDescription, 400)
+                            'shortDescription': StrHelper.ellipseLongString(person.fullDescription, 400),
+                            'lineSource': person.lineSource
                         }
 
                         let engStatus = person.groupStatus
@@ -64,7 +66,7 @@ export default class PersonsAggr {
                         let livePoints = []
 
                         if (person.birth.placeCoord && person.birth.placeCoord.length > 1) {
-                            let json = JSON.parse(JSON.stringify(superJson))
+                            let json = {...superJson}
                             json.point = person.birth.placeCoord
                             json.kind = `birth`
                             json.kindAndStatus = `birth_${engStatus}`
@@ -77,7 +79,7 @@ export default class PersonsAggr {
                             onePersonsJsons.push(json)
                         }
                         person.achievements.forEach(achiev => {
-                            let json = JSON.parse(JSON.stringify(superJson))
+                            let json = {...superJson}
                             json.point = achiev.placeCoord
                             if (json.point) {
                                 json.kind = `achiev`
@@ -96,7 +98,7 @@ export default class PersonsAggr {
                         });
 
                         if (person.death.placeCoord && person.death.placeCoord.length > 0 && person.death.century) {
-                            let json = JSON.parse(JSON.stringify(superJson))
+                            let json = {...superJson}
                             json.point = person.death.placeCoord
                             json.kind = `death`
                             json.kindAndStatus = `death_${engStatus}`
@@ -142,7 +144,7 @@ export default class PersonsAggr {
                             jsons.push(json)
                         })
                     });
-                    log.info(`Количество святых после аггрегации: ${jsons.length}`)
+                    log.info(chalk.gray(`Количество святых после агрегации: ${jsons.length}`))
 
                     jsons.forEach(json => {
                         // if (json.info.surname == 'Садзаглишвили') {

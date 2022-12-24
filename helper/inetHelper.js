@@ -2,9 +2,9 @@ import Log from '../helper/logHelper.js'
 const log = Log.create()
 
 import FileHelper from '../helper/fileHelper.js'
-import GeoHelper from '../helper/geoHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import axios from 'axios'
+import chalk from 'chalk'
 
 class InetHelper {
   constructor() { }
@@ -16,7 +16,7 @@ class InetHelper {
     this.coords = FileHelper.isFileExists(filename)
       ? FileHelper.getJsonFromFile(filename)
       : {}
-    console.log(`Count of saved coords ${Object.keys(this.coords).length}`)
+    console.log(chalk.gray(`Кол-во сохраненных координат ${Object.keys(this.coords).length}`))
     let itemNames = []
     for (let coordName in this.coords) {
       itemNames.push(coordName)
@@ -32,17 +32,26 @@ class InetHelper {
     }
 
     this.coords = { ...newCoords }
-    // console.log(`Count of saved coords ${Object.keys(this.coords).length}`)
 
     for (let name in this.coords) {
       this.coords[name.trim()] = this.coords[name]
     }
   }
 
+  isExistCoord(coordName) {
+    const itemName = coordName.toLowerCase().trim()
+    return (itemName in this.coords)
+  }
+
+  addCoord(coordName, coordValue) {
+    const itemName = coordName.toLowerCase().trim()
+    if (itemName in this.coords)
+      return false
+    this.coords[itemName] = coordValue
+  }
+
   saveCoords() {
-
     const filename = FileHelper.composePath('loadDatabase/dataSources/checkedCoords.json')
-
     console.log(`Before saving coords... Length: ${Object.keys(this.coords).length}`)
     FileHelper.saveJsonToFileSync(this.coords, filename)
   }
@@ -89,20 +98,15 @@ class InetHelper {
     })
   }
 
-  async getCoordsForCityOrCountry(input) {
-    if (!input)
-      return input
-
-    const promises = input.split(';').map((local) => {
-      return this.getLocalCoordsForName(local.trim())
-    })
-
-    return await Promise.all(promises)
-  }
-
   getLonLatSavedCoords(input) {
-    input = input.replace(',', '').trim().toLowerCase().replace(/"/g, '')
+    input = input.replace(/"/g, '')
     let testNames = [input]
+
+    input = input.trim().toLowerCase()
+    testNames.push(input)
+
+    input = input.replace(',', '')
+    testNames.push(input)
 
     let name = StrHelper.shrinkStringBeforeDelim(input)
     testNames.push(name)
@@ -110,26 +114,28 @@ class InetHelper {
     testNames.push(StrHelper.removeShortStrings(name, '', true).replace('  ', ' '))
     testNames.push(StrHelper.removeShortStrings(name, '', false).replace('  ', ' '))
 
+    // console.log(testNames.join('; '))
+
     testNames = testNames.filter((value, index, self) => self.indexOf(value) === index)
 
     for (let i = 0; i < testNames.length; i++) {
       const name = testNames[i]
       if (name && this.coords && this.coords[name]) {
         const coords = this.coords[name]
-        return [coords.lon, coords.lat]
+        return coords
       }
     }
 
     return false
   }
 
-  async getLocalCoordsForName(input) {
+  async searchCoordsByName(input) {
 
     if (!input) return null
 
-    const isExistCoords = this.getLonLatSavedCoords(input)
-    if (isExistCoords) {
-      return isExistCoords
+    const existCoords = this.getLonLatSavedCoords(input)
+    if (existCoords) {
+      return existCoords
     }
 
     // console.log(`Не найдены предустановленные координаты для ${input}`)
@@ -160,7 +166,7 @@ class InetHelper {
       }
     }
 
-    return coords ? GeoHelper.fromLonLat([coords.lon, coords.lat]) : null
+    return coords ? coords : null
   }
 
   async getCoordsByPageId(pageId, isRus) {
@@ -180,7 +186,7 @@ class InetHelper {
       : null
   }
 
-  async getCoordsFromWiki(name) {
+  async  getCoordsFromWiki(name) {
     let coords = undefined
     try {
       const isRus = /[а-яА-ЯЁё]/.test(name)

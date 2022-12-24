@@ -7,6 +7,7 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
     constructor(log) {
         super()
         this.log = log
+        this.name = 'Храмы'
         this.pageUrls = ['name']
         this.model = TempleModel
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_TEMPLES
@@ -50,13 +51,13 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
     }
 
     async getJsonFromRow(headerColumns, row) {
-        let json = {}
+
+        let json = {errorArr: [], warningArr: [], lineSource: 0}
         json.author = row[headerColumns.author]
         json.isChecked = row[headerColumns.isChecked]
         json.name = row[headerColumns.name].trim()
         json.city = row[headerColumns.city].trim()
         json.place = row[headerColumns.place].trim()
-        json.errorArr = []
 
         try {
 

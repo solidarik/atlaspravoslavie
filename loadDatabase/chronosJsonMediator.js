@@ -1,6 +1,7 @@
 import chronosModel from '../models/chronosModel.js'
 import inetHelper from '../helper/inetHelper.js'
 import StrHelper from '../helper/strHelper.js'
+import GeoHelper from '../helper/geoHelper.js'
 import SuperJsonMediator from './superJsonMediator.js'
 
 export default class ChronosJsonMediator extends SuperJsonMediator {
@@ -17,13 +18,13 @@ export default class ChronosJsonMediator extends SuperJsonMediator {
       }
 
       inetHelper
-        .getCoordsForCityOrCountry(json.place)
+        .searchCoordsByName(json.place)
         .then((placeCoords) => {
-          if (placeCoords.length == 0)
+          if (!placeCoords)
             resolve({ error: `не удалось определить координаты` })
           const newJson = {
             ...json,
-            point: placeCoords[0],
+            point: GeoHelper.coordsToBaseFormat(placeCoords),
             startIsOnlyYear: json.startIsOnlyYear == 'True' ? true : false,
             endIsOnlyYear: json.endIsOnlyYear == 'True' ? true : false,
             pageUrl: StrHelper.generatePageUrl([

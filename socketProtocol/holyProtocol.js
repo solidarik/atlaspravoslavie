@@ -59,9 +59,9 @@ class HolyProtocol extends ServerProtocol {
 
       const intValue = parseInt(data.value)
 
-      let defaultSearchParam = {}
-      let gteSearchParam = {}
-      let personSearchParam = {}
+      let defaultSearchParam = {'isOnMap': true}
+      let gteSearchParam = {'isOnMap': true}
+      let personSearchParam = {'isOnMap': true}
 
       const searchDates = {
         $gte: intValue,
@@ -77,19 +77,17 @@ class HolyProtocol extends ServerProtocol {
 
       //special case for XXV century - show all items
       if (!data.isYearMode && intValue == 23) {
-        defaultSearchParam = {}
-        gteSearchParam = {}
-        personSearchParam = {}
+        // default search params are same above
       }
       else
       if (data.isYearMode) {
-        defaultSearchParam = {
+        defaultSearchParam = { ...defaultSearchParam,
           "start.year": searchDates
         }
-        gteSearchParam = {
+        gteSearchParam = { ...gteSearchParam,
           "start.year": lteDates
         }
-        personSearchParam = {
+        personSearchParam = { ...personSearchParam,
           $and: [
             { "startYear": { "$ne": -999 } },
             { "startYear": lteDates },
@@ -97,13 +95,13 @@ class HolyProtocol extends ServerProtocol {
           ]
         }
       } else {
-        defaultSearchParam = {
+        defaultSearchParam = { ...defaultSearchParam,
           "start.century": searchDates
         }
-        gteSearchParam = {
+        gteSearchParam = { ...gteSearchParam,
           "start.century": lteDates
         }
-        personSearchParam = {
+        personSearchParam = { ...personSearchParam,
           $and: [
             { "startCentury": searchDates },
             { "kind": { $ne: "live" } }
@@ -121,11 +119,11 @@ class HolyProtocol extends ServerProtocol {
       // db.getCollection('personsreligions').find({"achievements": {"$elemMatch": {"start.century": 19}}})
 
       const defaultSelectParam = { 'name': 1, 'point': 1 }
-      const shortBriefSearchParam = { ...defaultSelectParam, 'shortBrief': 1 }
+      const shortBriefSelectParam = { ...defaultSelectParam, 'shortBrief': 1 }
 
       const promices = [
-        chronosModel.find(defaultSearchParam).select(shortBriefSearchParam),
-        chronosTempleModel.find(defaultSearchParam).select(shortBriefSearchParam),
+        chronosModel.find(defaultSearchParam).select(shortBriefSelectParam),
+        chronosTempleModel.find(defaultSearchParam).select(shortBriefSelectParam),
         templesModel.find(gteSearchParam).select(defaultSelectParam),
         personsAggrModel.find(personSearchParam)
 
@@ -322,15 +320,15 @@ class HolyProtocol extends ServerProtocol {
   // }
 
   getPersonsMartyrs(socket, msg, cb) {
-    trycatch(personsModel.find({ "groupStatus": "мученик" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "мученик", "isOnMap": true }), cb)
   }
 
   getPersonsReverends(socket, msg, cb) {
-    trycatch(personsModel.find({ "groupStatus": "преподобный" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "преподобный", "isOnMap": true }), cb)
   }
 
   getPersonsHoly(socket, msg, cb) {
-    trycatch(personsModel.find({ "groupStatus": "святой" }), cb)
+    trycatch(personsModel.find({ "groupStatus": "святой", "isOnMap": true }), cb)
   }
 }
 

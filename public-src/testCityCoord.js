@@ -62,7 +62,7 @@ function deleteAbbrev(place) {
 
 
 
-InetHelper.getLocalCoordsForName(deleteAbbrev('Фессалия'))
+InetHelper.searchCoordsByName(deleteAbbrev('Фессалия'))
     .then(res => {
         console.log(`result  ${res}`)
     })

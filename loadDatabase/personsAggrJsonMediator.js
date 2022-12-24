@@ -1,7 +1,6 @@
 import personsAggrModel from '../models/personsAggrModel.js'
-import StrHelper from '../helper/strHelper.js'
-import DateHelper from '../helper/dateHelper.js'
-import InetHelper from '../helper/inetHelper.js'
+import inetHelper from '../helper/inetHelper.js'
+import GeoHelper from '../helper/geoHelper.js'
 import SuperJsonMediator from './superJsonMediator.js'
 
 export default class PersonsAggrJsonMediator extends SuperJsonMediator {
@@ -27,28 +26,23 @@ export default class PersonsAggrJsonMediator extends SuperJsonMediator {
   processJson(json) {
     return new Promise((resolve, reject) => {
 
-      let promises = [
-        InetHelper.getCoordsForCityOrCountry(this.deleteAbbrev(json.place)),
-      ]
+      inetHelper
+      .searchCoordsByName(this.deleteAbbrev(json.place))
+      .then((coords) => {
+        if (!coords)
+          resolve({
+            error: `не удалось определить координаты`,
+            errorPlace: json.place
+          })
 
-      Promise.all(promises)
-        .then((coords) => {
-          coords = coords[0]
+        json = {
+          ...json,
+          point: GeoHelper.coordsToBaseFormat(coords)
+        }
 
-          if (coords && coords.length == 0)
-            resolve({
-              error: `не удалось определить координаты`,
-              errorPlace: json.place
-            })
-
-          json = {
-            ...json,
-            point: coords
-          }
-
-          resolve(json)
-        })
-        .catch((err) => reject(`ошибка в processJson: ${err}`))
+        resolve(json)
+      })
+      .catch((err) => reject(`ошибка в processJson: ${err}`))
     })
   }
 

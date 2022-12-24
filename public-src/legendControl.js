@@ -23,7 +23,8 @@ export class LegendControl extends EventEmitter {
     this.isCheckArr = JsHelper.fillArray(true, this.linesCount)
 
     this.items = JsHelper.fillArray([], this.linesCount)
-    this.uniqueItems = {}
+    this.uniqueItemsForVisibleOnMap = {}
+    this.uniqueItemsForLegend = {}
 
     window.legend = this
     window.legendOnLineClick = (element) => {
@@ -323,7 +324,7 @@ export class LegendControl extends EventEmitter {
     html += `<tr data-href=${line.id} ${classTr} onclick=legendOnLineClick(this)>
       <td ${leftImagePosition}>${this.clickSpan(this.getHTMLIcons(line))}</td>
       <td ${leftCaptionPosition}>${this.clickSpan(line.caption)}</td>
-      <td>${this.items[line.id].length}</td>
+      <td>${Object.keys(this.uniqueItemsForLegend[line.id]).length}</td>
     </tr>`
 
     if (line.childs) {
@@ -342,7 +343,8 @@ export class LegendControl extends EventEmitter {
 
   updateCounter(rawInfo) {
     this.items = JsHelper.fillArray([], this.linesCount)
-    this.uniqueItems = {}
+    this.uniqueItemsForVisibleOnMap = {}
+    this.uniqueItemsForLegend = {}
     for (let id = 0; id < this.linesCount; id++) {
       const line = this.searchLinesById(id)
       //injection classFeature property to every item
@@ -352,13 +354,15 @@ export class LegendControl extends EventEmitter {
         line.fillFunctionKind
       )
       this.items[id] = []
+      this.uniqueItemsForLegend[id] = {}
       if (fillResult) {
         fillResult = this.pointFilter(fillResult)
         this.items[id] = fillResult.map((elem) => {
           return { ...elem, classFeature: line.classFeature }
         })
         this.items[id].forEach((item) => {
-          this.uniqueItems[item._id] = item
+          this.uniqueItemsForLegend[id][item.lineSource] = item
+          this.uniqueItemsForVisibleOnMap[item._id] = item
         })
       } else {
         console.log(`Не удалось инициализировать массив для ${line.caption}`)
@@ -368,7 +372,7 @@ export class LegendControl extends EventEmitter {
 
   filterInfo() {
     let visible = {}
-    for (let id in this.uniqueItems) {
+    for (let id in this.uniqueItemsForVisibleOnMap) {
       visible[id] = true
     }
 
@@ -381,8 +385,8 @@ export class LegendControl extends EventEmitter {
     }
 
     let res = []
-    for (let id in this.uniqueItems) {
-      visible[id] && res.push(this.uniqueItems[id])
+    for (let id in this.uniqueItemsForVisibleOnMap) {
+      visible[id] && res.push(this.uniqueItemsForVisibleOnMap[id])
     }
 
     this.emit('refreshInfo', res)

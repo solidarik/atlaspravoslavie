@@ -1,13 +1,10 @@
-// import FileHelper from '../helper/fileHelper.js'
 import chalk from 'chalk'
 import GeoHelper from '../helper/geoHelper.js'
-import InetHelper from '../helper/inetHelper.js'
+import inetHelper from '../helper/inetHelper.js'
 import DateHelper from '../helper/dateHelper.js'
 import ServiceModel from '../models/serviceModel.js'
 import StrHelper from '../helper/strHelper.js'
 import XlsHelper from '../helper/xlsHelper.js'
-import readline from 'readline'
-import fs from 'fs'
 import authentication from '../loadDatabase/googleAuthentication.js'
 
 import { google } from 'googleapis'
@@ -20,22 +17,23 @@ export default class XlsGoogleParser {
             return false
         }
 
-        let coords = null
+        let coords = inetHelper.getLonLatSavedCoords(inputPlace)
+        if (coords) {
+            return GeoHelper.coordsToBaseFormat(coords)
+        }
 
         if (inputCoords) {
             coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
-            return GeoHelper.fromLonLat(coords)
-        }
-
-        coords = InetHelper.getLonLatSavedCoords(inputPlace)
-        if (coords) {
-            return GeoHelper.fromLonLat(coords)
+            if (coords.length == 2) {
+                inetHelper.addCoord(inputPlace, {lat: coords[0] , lon: coords[1]})
+                return GeoHelper.fromLonLat(coords)
+            }
         }
 
         // start search coordinates in wiki
-        // const res = await InetHelper.getCoordsForCityOrCountry(inputPlace)
-        // if (res && res.length > 0) {
-        //     coords = res[0]
+        // const res = await inetHelper.searchCoordsByName(inputPlace)
+        // if (res) {
+        //     coords = res
         //     return GeoHelper.fromLonLat(coords)
         // }
         // end search
@@ -55,15 +53,14 @@ export default class XlsGoogleParser {
 
         await dbHelper.clearModel(this.model)
 
-        this.log.info(`Start of processing Google sheet for ${modelName}`)
-
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
         let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
         const sheets = google.sheets({ version: 'v4' })
 
-        this.log.info('Before getting Google data...')
+        this.log.info(chalk.yellow(`Загрузка ${this.name}`))
+        // this.log.info(chalk.gray('Получение данных из Google...'))
 
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: this.spreadsheetId,
@@ -94,22 +91,32 @@ export default class XlsGoogleParser {
             const json = await this.getJsonFromRow(headerColumns, rows[row])
 
             json.lineSource = row + 1
-            json.isShowOnMap = (json.isChecked != 0) && (!json.isError)
             const isError = json.errorArr.length > 0
+            const isWarning = json.warningArr.length > 0
+            const isSkip = json.isChecked == '0'
 
             let loadStatus = ''
 
-            if (json.isChecked == '0') {
+            if (isSkip) {
                 skipObjectCount += 1
                 loadStatus = `Пропущено согласно флагу`
             }
             else
             if (isError) {
                 // this.log.error(`Ошибка обработки json: ${JSON.stringify(json)}`)
-                loadStatus = json.errorArr.join('; ').replace('Error: ', '')
+                loadStatus = json.errorArr.join('\r\n').replace('Error: ', '')
+                if (isWarning) {
+                    const warningStatus = json.warningArr.join('\r\n').replace('Error: ', '')
+                    loadStatus += '\r\nЗамечания: ' + warningStatus
+                }
             } else {
                 successObjectCount += 1
                 loadStatus = 'Успешно'
+            }
+            loadStatus = loadStatus.replaceAll('undefined', 'Пусто')
+
+            json.isOnMap = !isError && !isSkip
+            if (!isSkip) {
                 insertObjects.push(json)
             }
 
@@ -148,20 +155,20 @@ export default class XlsGoogleParser {
                 resource: resource
             })
 
-            this.log.warn(`Статус обновления источника: ${JSON.stringify(sheetUpdateStatus)}`)
+            if (JSON.stringify(sheetUpdateStatus) != '{}') {
+                this.log.warn(`Ответ от Google Sheet: ${JSON.stringify(sheetUpdateStatus)}`)
+            }
         }
 
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
-        const statusText = [successObjectCount, skipObjectCount, totalLinesCount].join(' / ')
-        this.log.info(`Кол-во загруженных/пропущенных/всего: ${statusText}`)
+        const statusText = [successObjectCount, savedCount, skipObjectCount, totalLinesCount].join(' / ')
+        this.log.info(chalk.cyanBright(`Кол-во на карте/загруженных/пропущенных/всего: ${statusText}`))
 
         res = await this.model.insertMany(insertObjects)
 
-        if (res) {
-            this.log.info(chalk.green(`Успешная загрузка: ${res.length}`))
-        } else {
-            this.log.error(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
+        if (!res) {
+            this.log.error(chalk.red(`Ошибка при сохранении данных ${JSON.stringify(res)}`))
         }
 
         let serviceObjects = [
@@ -178,10 +185,8 @@ export default class XlsGoogleParser {
         res = await ServiceModel.deleteMany({'model': modelName})
         res = await ServiceModel.insertMany(serviceObjects)
 
-        if (res) {
-            this.log.info(chalk.green(`Успешное сохранение статуса`))
-        } else {
-            this.log.error(`Ошибка при сохранении статуса ${JSON.stringify(res)}`)
+        if (!res) {
+            this.log.error(chalk.red(`Ошибка при сохранении статуса ${JSON.stringify(res)}`))
         }
 
         return true

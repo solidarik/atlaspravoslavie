@@ -26,8 +26,16 @@ export default class GeoHelper {
     return output
   }
 
-  static getCoordsFromHumanCoords(input) {
+  static coordsToBaseFormat(coords) {
+    if (!coords.lon || !coords.lat) {
+      return undefined
+    }
+    return this.fromLonLat([coords.lon, coords.lat])
+  }
 
+  static getCoordsFromHumanCoords(input) {
+    //ширина возвращается первым аргументом lat
+    //долгота возвращается вторым аргументом lon
 
     //сначала проверяем на координаты типа x_y
     const arr = input.split('_')

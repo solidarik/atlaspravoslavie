@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 
 var personsAggrSchema = new mongoose.Schema(
   {
+    lineSource: Number,
+
     caption: {
       type: String,
       required: 'Заголовок обязателей для заполнения',

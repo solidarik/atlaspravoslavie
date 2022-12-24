@@ -4,6 +4,9 @@ var personsSchema = new mongoose.Schema(
   {
     pageId: Number,
     loadStatus: String,
+    isOnMap: Boolean,
+    lineSource: Number,
+
     status: String,
     surname: String,
     name: String,
@@ -70,7 +73,7 @@ var personsSchema = new mongoose.Schema(
 
     groupStatus: {
       type: String,
-      required: 'Статус святости по группам обязателен для заполнения',
+      // required: 'Статус святости по группам обязателен для заполнения',
     },
 
     worshipDays: [{
@@ -103,8 +106,7 @@ var personsSchema = new mongoose.Schema(
     isShowOnMap: Boolean,
 
     srcUrl: String,
-    imgUrls: [String],
-    lineSource: Number
+    imgUrls: [String]
   },
   {
     timestamps: false,

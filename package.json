@@ -77,7 +77,7 @@
     "proj4": "latest",
     "pug": "latest",
     "readline": "latest",
-    "shelljs": "latest",
+    "shelljs": "^0.8.5",
     "socket.io": "latest",
     "socket.io-client": "latest",
     "socket.io-emitter": "latest",

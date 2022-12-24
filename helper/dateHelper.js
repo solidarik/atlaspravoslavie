@@ -314,14 +314,25 @@ export default class DateHelper {
     return (typeof date === "string" ? new Date(date) : date).toLocaleString("ru-RU", { timeZone: tzString })
   }
 
+  static nowToStr() {
+    const now = new Date()
+    const day = ('0' + now.getDate()).slice(-2)
+    const month = ('0' + (now.getMonth() + 1)).slice(-2)
+    const year = now.getFullYear()
+    const h = ('0' + now.getHours()).slice(-2)
+    const m = ('0' + now.getMinutes()).slice(-2)
+    const s = ('0' + now.getSeconds()).slice(-2)
+    return `${[day, month, year].join('.')} ${[h, m, s].join(':')}`
+  }
+
   static dateTimeToStr(inputDate, timeZone = 'Europe/Moscow') {
     const mskDateTime = new Date(DateHelper.convertTZ(inputDate, timeZone))
     const day = ('0' + mskDateTime.getDate()).slice(-2)
     const month = ('0' + (mskDateTime.getMonth() + 1)).slice(-2)
     const year = mskDateTime.getFullYear()
-    var h = ('0' + mskDateTime.getHours()).slice(-2)
-    var m = ('0' + mskDateTime.getMinutes()).slice(-2)
-    var s = ('0' + mskDateTime.getSeconds()).slice(-2)
+    const h = ('0' + mskDateTime.getHours()).slice(-2)
+    const m = ('0' + mskDateTime.getMinutes()).slice(-2)
+    const s = ('0' + mskDateTime.getSeconds()).slice(-2)
     return `${[day, month, year].join('.')} ${[h, m, s].join(':')}`
   }
 

@@ -1,7 +1,8 @@
-import InetHelper from '../helper/inetHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import SuperJsonMediator from './superJsonMediator.js'
 import TempleModel from '../models/templesModel.js'
+import GeoHelper from '../helper/geoHelper.js'
+import inetHelper from '../helper/inetHelper.js'
 
 export default class TemplesJsonMediator extends SuperJsonMediator {
   constructor() {
@@ -19,15 +20,15 @@ export default class TemplesJsonMediator extends SuperJsonMediator {
       let geoName = json.name + ' ' + json.surPlace
       geoName = geoName.replace(',', '')
 
-      InetHelper
-        .getCoordsForCityOrCountry(geoName)
+      inetHelper
+        .searchCoordsByName(geoName)
         .then((placeCoords) => {
-          if (placeCoords.length == 0)
+          if (!placeCoords)
             resolve({ error: `не удалось определить координаты` })
 
           const newJson = {
             ...json,
-            point: placeCoords[0],
+            point: GeoHelper.coordsToBaseFormat(placeCoords),
             pageUrl: StrHelper.generatePageUrl([
               json.name,
               json.place

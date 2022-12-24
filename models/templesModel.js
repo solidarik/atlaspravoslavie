@@ -4,6 +4,9 @@ var templesSchema = new mongoose.Schema(
   {
     pageId: Number,
     loadStatus: String,
+    isOnMap: Boolean,
+    lineSource: Number,
+
     start: {
       year: Number,
       month: Number,

@@ -7,6 +7,7 @@ export default class XlsGoogleParserChronosTemple extends XlsGoogleParser {
     constructor(log) {
         super()
         this.log = log
+        this.name = 'События русской церкви'
         this.pageUrls = ['place', 'shortBrief']
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_CHRONOS_TEMPLE
         this.range = 'A1:K'
@@ -44,15 +45,14 @@ export default class XlsGoogleParserChronosTemple extends XlsGoogleParser {
     }
 
     async getJsonFromRow(headerColumns, row) {
-        let json = {}
 
-        json.lineSource = 0
-        json.errorArr = []
+        let json = {errorArr: [], warningArr: [], lineSource: 0}
         json.shortBrief = row[headerColumns.shortBrief].trim()
         json.longBrief = row[headerColumns.longBrief].trim()
         json.srcUrl = row[headerColumns.srcUrl]
         json.remark = row[headerColumns.remark]
         json.comment = row[headerColumns.comment]
+        json.isChecked = row[headerColumns.isChecked]
 
         json.place = row[headerColumns.place].trim()
 
@@ -83,7 +83,7 @@ export default class XlsGoogleParserChronosTemple extends XlsGoogleParser {
                 if (coords) {
                     json.point = coords
                 } else {
-                    json.errorArr.push(`Не определена координата события "${place}"`)
+                    json.errorArr.push(`Не определена координата события ${place}`)
                 }
 
             }
