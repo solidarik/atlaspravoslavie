@@ -91,12 +91,16 @@ class PersonFeature extends SuperFeature {
                 <th scope='col'>Дата</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <th scope='row'>Рождение</th>
-                <td>${info.birth.place}</td>
-                <td>${DateHelper.ymdToStr(info.birth)}</td>
-              </tr>`
+            <tbody>`
+
+    if (info.birth.dateStr && !info.birth.isIndirectDate) {
+        html += `
+          <tr>
+            <th scope='row'>Рождение</th>
+            <td>${(info.birth.place && !info.birth.isIndirectPlace) ? info.birth.place : '-'}</td>
+            <td>${DateHelper.ymdToStr(info.birth)}</td>
+          </tr>`
+    }
 
     info.achievements.forEach(achiev => {
       if (achiev.start.dateStr) {
@@ -109,10 +113,10 @@ class PersonFeature extends SuperFeature {
       }
     });
 
-    if (info.death.dateStr) {
+    if (info.death.dateStr && !info.death.isIndirectDate) {
       html += `
         <tr><th scope='row'>Смерть</th>
-          <td>${info.death.place ? info.death.place : '—'}</td>
+          <td>${(info.death.place && !info.death.isIndirectPlace) ? info.death.place : '—'}</td>
           <td>${DateHelper.ymdToStr(info.death)}</td>
         </tr>
       `

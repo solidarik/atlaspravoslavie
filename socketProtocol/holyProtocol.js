@@ -118,7 +118,7 @@ class HolyProtocol extends ServerProtocol {
 
       // db.getCollection('personsreligions').find({"achievements": {"$elemMatch": {"start.century": 19}}})
 
-      const defaultSelectParam = { 'name': 1, 'point': 1 }
+      const defaultSelectParam = { 'name': 1, 'point': 1, 'lineSource': 1 }
       const shortBriefSelectParam = { ...defaultSelectParam, 'shortBrief': 1 }
 
       const promices = [

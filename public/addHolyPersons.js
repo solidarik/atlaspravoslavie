@@ -37,10 +37,10 @@ export default class addHolyPersons extends EventEmitter {
     $('#FIO').html(fio)
     $('#LifeTime').html(
       '<b>Дата и место рождения</b> - ' +
-      ((typeof cur.birth.dateStr !== 'undefined') ? cur.birth.dateStr : '')
+      ((cur.birth.dateStr && !cur.birth.isIndirectDate) ? cur.birth.dateStr : '')
       +
       ' ' +
-      ((typeof cur.birth.place !== 'undefined') ? cur.birth.place : '')
+      ((cur.birth.place && !cur.birth.isIndirectPlace) ? cur.birth.place : '')
 
     )
 
@@ -59,9 +59,9 @@ export default class addHolyPersons extends EventEmitter {
     }
     $('#DeathTime').html(
       '<b>Дата смерти, захоронение</b> - ' +
-      ((typeof cur.death.dateStr !== 'undefined') ? cur.death.dateStr : '') +
+      ((cur.death.dateStr && !cur.death.isIndirectDate) ? cur.death.dateStr : '') +
       ' ' +
-      ((typeof cur.death.place !== 'undefined') ? cur.death.place : '')
+      ((cur.death.place && !cur.death.isIndirectPlace) ? cur.death.place : '')
     )
     $('#DateCanonization').html(
       '<b>Дата канонизации</b> - ' +
