@@ -93,6 +93,8 @@ class PersonFeature extends SuperFeature {
             </thead>
             <tbody>`
 
+    console.log(JSON.stringify(info.birth))
+
     if (info.birth.dateStr && !info.birth.isIndirectDate) {
         html += `
           <tr>
