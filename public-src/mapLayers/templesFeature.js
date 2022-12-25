@@ -55,7 +55,6 @@ export default class TemplesFeature extends SuperFeature {
   }
 
   static fillTemplesFeature(info) {
-    console.log(`temples: ${JSON.stringify(info.temples)}`)
     return info.temples.map((elem) => {
       return {
         ...elem,

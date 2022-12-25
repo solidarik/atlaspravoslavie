@@ -168,7 +168,7 @@ export default class ClientProtocol extends EventEmitter {
       'clQueryDataByYear',
       JSON.stringify(searchData),
       (msg) => {
-        console.log(`>> get answer from server ${msg} `)
+        // console.log(`>> get answer from server ${msg} `)
         this.emit('refreshInfo', JSON.parse(msg))
       }
     )
