@@ -25,7 +25,7 @@ export default class XlsGoogleParser {
         if (inputCoords) {
             coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
             if (coords.length == 2) {
-                inetHelper.addCoord(inputPlace, {lat: coords[0] , lon: coords[1]})
+                inetHelper.addCoord(inputPlace, {lat: coords[1] , lon: coords[0]})
                 return GeoHelper.fromLonLat(coords)
             }
         }

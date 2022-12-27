@@ -119,8 +119,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             'imgUrl': 'ссылка на фото',
 
             'deathDay': 'дата смерти',
-            'deathPlace': 'Умер',
-            'buriedPlace': 'Похоронен',
+            'deathPlace': 'умер',
+            'buriedPlace': 'похоронен',
             'deathCoord': 'координаты смерти'
         }
 
@@ -154,7 +154,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             json.birth = {}
             json.death = {}
 
-            const isDebugLine = (json.sitename == 'Преподобный Дорофе́й Египетский, пустынник')
+            //(json.sitename == 'Схиархимандрит Андроник')
+            const isDebugLine = false
 
             const birthDay = row[headerColumns.birthDay]
             const deathDay = row[headerColumns.deathDay]
@@ -226,6 +227,10 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
             if (deathPlace)
                 deathPlace = (deathPlace + '').trim()
+
+            if (isDebugLine) {
+                console.log(`birth: ${birthPlace}, death: ${deathPlace}`)
+            }
 
             if ((!birthPlace || birthPlace.toLowerCase() == 'неизвестно')
                 && (!deathPlace || deathPlace.toLowerCase() == 'неизвестно')) {
@@ -386,6 +391,10 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             }
 
             json.pageUrl = ''
+
+            if (isDebugLine) {
+                console.log(`item: ${JSON.stringify(json)}`)
+            }
 
         } catch (e) {
             json.errorArr.push('' + e)

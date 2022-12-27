@@ -26,7 +26,9 @@ import { exit } from 'shelljs'
 
 (async function() {
   inetHelper.loadCoords()
-  const coords = await inetHelper.searchCoordsByName('Куровское, Калужская обл')
+  const humanCoords = await GeoHelper.getCoordsFromHumanCoords('47°18′45″ с. ш. 28°35′31″ в. д.')
+  console.log(humanCoords)
+  const coords = await inetHelper.searchCoordsByName('село Луппа Полтавской губернии')
   console.log(coords)
   exit(0)
 }
