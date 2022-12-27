@@ -254,7 +254,7 @@ export default class DateHelper {
 
     // если дата типа "15 июня 1389 (года)"
     if (!isFound) {
-      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^0-9]*)\\s*(\\d*)\\s*', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*([^-0-9]*)\\s*(\\d*)\\s*', inputText)
       if (date_groups && date_groups.length === 3) {
         if (date_groups[0] != '') {
           d = parseInt(date_groups[0])

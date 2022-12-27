@@ -25,11 +25,16 @@ import { exit } from 'shelljs'
 //   })
 
 (async function() {
-  inetHelper.loadCoords()
-  const humanCoords = await GeoHelper.getCoordsFromHumanCoords('47°18′45″ с. ш. 28°35′31″ в. д.')
-  console.log(humanCoords)
-  const coords = await inetHelper.searchCoordsByName('село Луппа Полтавской губернии')
-  console.log(coords)
+
+  console.log(parseInt('-17353'))
+  const d = DateHelper.getDateFromInput('-17353')
+  console.log(d)
+
+  // inetHelper.loadCoords()
+  // const humanCoords = await GeoHelper.getCoordsFromHumanCoords('47°18′45″ с. ш. 28°35′31″ в. д.')
+  // console.log(humanCoords)
+  // const coords = await inetHelper.searchCoordsByName('село Луппа Полтавской губернии')
+  // console.log(coords)
   exit(0)
 }
 )()
