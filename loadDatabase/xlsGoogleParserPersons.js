@@ -199,14 +199,14 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 if (maybeBirthDate && !maybeDeathDate) {
                     json.death = { ...json.birth }
                     json.death['year'] += deltaYear
-                    json.death['century'] += 1
+                    json.death['century'] += Math.round(deltaYear / 100)
                     json.death['isIndirectDate'] = true
                 }
 
                 if (!maybeBirthDate && maybeDeathDate) {
                     json.birth = { ...json.death }
                     json.birth['year'] -= deltaYear
-                    json.birth['century'] -= 1
+                    json.birth['century'] -= Math.round(deltaYear / 100)
                     json.birth['isIndirectDate'] = true
                 }
 
