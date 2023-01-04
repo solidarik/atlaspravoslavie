@@ -208,7 +208,8 @@ export default class DateHelper {
 
     if (!isFound && !inputText.includes('.')) {
       testStr = '' + parseInt(inputText)
-      if (inputText.length < 5 && parseInt(testStr) < 2022) {
+      const testInt = parseInt(testStr)
+      if (inputText.length < 7 && testInt > -2000 && testInt < 2022) {
         y = parseInt(testStr)
         isFound = true
         isOnlyYear = true

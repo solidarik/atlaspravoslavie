@@ -120,4 +120,23 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["isOnlyCentury"], false)
         assert.strictEqual(res["century"], 2)
     })
+
+    it('-17661', () => {
+        try {
+            const res = func('-17661')
+            assert.strictEqual(false, true)
+        } catch (err) {
+            //all good
+        }
+    })
+
+    it('-1035', () => {
+        const res = func('-1035')
+        assert.strictEqual(res['ymd'][0], -1035)
+        assert.strictEqual(res["ymd"][1], -1)
+        assert.strictEqual(res["ymd"][2], -1)
+        assert.strictEqual(res["isOnlyCentury"], false)
+        assert.strictEqual(res["century"], -11)
+    })
+
 })

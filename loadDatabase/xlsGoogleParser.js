@@ -91,9 +91,13 @@ export default class XlsGoogleParser {
             const json = await this.getJsonFromRow(headerColumns, rows[row])
 
             json.lineSource = row + 1
-            const isError = json.errorArr.length > 0
-            const isWarning = json.warningArr.length > 0
             const isSkip = json.isChecked == '0'
+
+            const isError = json.errorArr.length > 0
+            const errorStatus = json.errorArr.join('\r\n').replace('Error: ', '')
+
+            const isWarning = json.warningArr.length > 0
+            const warningStatus = '\r\nЗамечания: ' + json.warningArr.join('\r\n').replace('Error: ', '')
 
             let loadStatus = ''
 
@@ -104,15 +108,16 @@ export default class XlsGoogleParser {
             else
             if (isError) {
                 // this.log.error(`Ошибка обработки json: ${JSON.stringify(json)}`)
-                loadStatus = json.errorArr.join('\r\n').replace('Error: ', '')
-                if (isWarning) {
-                    const warningStatus = json.warningArr.join('\r\n').replace('Error: ', '')
-                    loadStatus += '\r\nЗамечания: ' + warningStatus
-                }
+                loadStatus = errorStatus
             } else {
                 successObjectCount += 1
-                loadStatus = 'Успешно'
+                loadStatus = isWarning ? 'Успешно, с замечаниями' : 'Успешно'
             }
+
+            if (isWarning) {
+                loadStatus += warningStatus
+            }
+
             loadStatus = loadStatus.replaceAll('undefined', 'Пусто')
 
             json.isOnMap = !isError && !isSkip
@@ -135,19 +140,25 @@ export default class XlsGoogleParser {
         const statusRowEnd = loadStatuses.length + 1
         const statusRange = `${statusColumnName}${statusRowStart}:${statusColumnName}${statusRowEnd}`
 
-        const authClient = await authentication.authenticate()
+        let authClient = undefined
+        try {
+            authClient = await authentication.authenticate()
+        } catch(err) {
+            throw `auth client error ${err}`
+        }
 
         if (loadStatuses.length == 0) {
-            this.log.error(`Ошибка получения статусов`)
-        } else {
+            throw `Ошибка получения статусов`
+        }
 
-            const resource = {
-                range: statusRange,
-                majorDimension: "COLUMNS",
-                values: [loadStatuses]
-            }
+        const resource = {
+            range: statusRange,
+            majorDimension: "COLUMNS",
+            values: [loadStatuses]
+        }
 
-            const sheetUpdateStatus = sheets.spreadsheets.values.update({
+        try {
+            const sheetUpdateStatus = await sheets.spreadsheets.values.update({
                 auth: authClient,
                 spreadsheetId: this.spreadsheetId,
                 range: statusRange,
@@ -155,9 +166,11 @@ export default class XlsGoogleParser {
                 resource: resource
             })
 
-            if (JSON.stringify(sheetUpdateStatus) != '{}') {
-                this.log.warn(`Ответ от Google Sheet: ${JSON.stringify(sheetUpdateStatus)}`)
-            }
+            // if (JSON.stringify(sheetUpdateStatus) != '{}') {
+            //     this.log.warn(`Ответ от Google Sheet: ${JSON.stringify(sheetUpdateStatus)}`)
+            // }
+        } catch(err) {
+            this.log.error(`Проблема обновления Google: ${err}`)
         }
 
         const totalLinesCount = rows.length - 1

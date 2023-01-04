@@ -378,7 +378,12 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                     ${row[headerColumns.groupStatus]}`)
             }
 
-            json.worshipDays = this.getWorshipDates(row[headerColumns.worshipDays])
+            try {
+                json.worshipDays = this.getWorshipDates(row[headerColumns.worshipDays])
+            } catch (err) {
+                json.warningArr.push(err)
+            }
+
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
             json.srcUrl = row[headerColumns.srcUrl]

@@ -26,8 +26,7 @@ import { exit } from 'shelljs'
 
 (async function() {
 
-  console.log(parseInt('-17353'))
-  const d = DateHelper.getDateFromInput('-17353')
+  const d = DateHelper.getDateFromInput('-1035')
   console.log(d)
 
   // inetHelper.loadCoords()
