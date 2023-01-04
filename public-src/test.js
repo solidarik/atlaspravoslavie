@@ -15,6 +15,7 @@ import inetHelper from '../helper/inetHelper.js'
 import JsHelper from '../helper/jsHelper.js'
 import DateHelper from '../helper/dateHelper.js'
 import { exit } from 'shelljs'
+import chronosTempleModel from '../models/chronosTempleModel.js'
 
 
 // const testUrl = 'https://balashovblag.ru/images/019_2017_9_6_22_10_32_1795892298.jpg'
@@ -28,6 +29,9 @@ import { exit } from 'shelljs'
 
   const d = DateHelper.getDateFromInput('-1035')
   console.log(d)
+
+  const coords = GeoHelper.getCoordsFromHumanCoords('55°38′30″ с. ш. 37°21′30″ в. д.')
+  console.log(coords)
 
   // inetHelper.loadCoords()
   // const humanCoords = await GeoHelper.getCoordsFromHumanCoords('47°18′45″ с. ш. 28°35′31″ в. д.')

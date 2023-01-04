@@ -16,7 +16,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
         this.name = 'Святые'
         this.pageUrls = ['sitename', 'surname', 'name']
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
-        this.range = 'A1:AE'
+        this.range = 'A1:AH'
         this.model = PersonModel
         // this.maxRow = 3000
     }
