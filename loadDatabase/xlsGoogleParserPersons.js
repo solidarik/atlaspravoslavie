@@ -373,7 +373,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 json.groupStatus = 'преподобный'
             else {
                 json.groupStatus = 'святой'
-                json.errorArr.push(`Не определена группа святости
+                json.warningArr.push(`Не определена группа святости
                     ${row[headerColumns.status]}
                     ${row[headerColumns.groupStatus]}`)
             }
