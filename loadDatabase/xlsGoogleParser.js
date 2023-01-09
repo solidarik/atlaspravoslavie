@@ -23,11 +23,11 @@ export default class XlsGoogleParser {
                 inetHelper.addCoord(inputPlace, {lat: coords[1] , lon: coords[0]})
                 return GeoHelper.fromLonLat(coords)
             }
-        } else {
-            let coords = inetHelper.getLonLatSavedCoords(inputPlace)
-            if (coords) {
-                return GeoHelper.coordsToBaseFormat(coords)
-            }
+        }
+
+        let coords = inetHelper.getLonLatSavedCoords(inputPlace)
+        if (coords) {
+            return GeoHelper.coordsToBaseFormat(coords)
         }
 
         // start search coordinates in wiki
