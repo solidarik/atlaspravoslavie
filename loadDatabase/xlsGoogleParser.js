@@ -17,16 +17,16 @@ export default class XlsGoogleParser {
             return false
         }
 
-        let coords = inetHelper.getLonLatSavedCoords(inputPlace)
-        if (coords) {
-            return GeoHelper.coordsToBaseFormat(coords)
-        }
-
         if (inputCoords) {
             coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
             if (coords.length == 2) {
                 inetHelper.addCoord(inputPlace, {lat: coords[1] , lon: coords[0]})
                 return GeoHelper.fromLonLat(coords)
+            }
+        } else {
+            let coords = inetHelper.getLonLatSavedCoords(inputPlace)
+            if (coords) {
+                return GeoHelper.coordsToBaseFormat(coords)
             }
         }
 
