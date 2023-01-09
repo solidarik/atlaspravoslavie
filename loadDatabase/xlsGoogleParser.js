@@ -17,6 +17,8 @@ export default class XlsGoogleParser {
             return false
         }
 
+        let coords
+
         if (inputCoords) {
             coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
             if (coords.length == 2) {
@@ -25,7 +27,7 @@ export default class XlsGoogleParser {
             }
         }
 
-        let coords = inetHelper.getLonLatSavedCoords(inputPlace)
+        coords = inetHelper.getLonLatSavedCoords(inputPlace)
         if (coords) {
             return GeoHelper.coordsToBaseFormat(coords)
         }
