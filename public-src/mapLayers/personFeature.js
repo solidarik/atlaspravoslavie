@@ -122,12 +122,13 @@ class PersonFeature extends SuperFeature {
       `
     }
 
-    if (info.canonizationDate && info.canonizationDate.dateStr) {
-      html += `<tr><th scope='row'>Канонизация</th>
-        <td></td>
-        <td>${DateHelper.ymdToStr(info.canonizationDate)}</td>
-      </tr>`
-    }
+    // Пока дату канонизации не выводим
+    // if (info.canonizationDate && info.canonizationDate.dateStr) {
+    //   html += `<tr><th scope='row'>Канонизация</th>
+    //     <td></td>
+    //     <td>${DateHelper.ymdToStr(info.canonizationDate)}</td>
+    //   </tr>`
+    // }
 
     html += '</tbody></table>'
 

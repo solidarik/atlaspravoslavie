@@ -5,6 +5,7 @@ import FileHelper from '../helper/fileHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import axios from 'axios'
 import chalk from 'chalk'
+import urlExist from 'url-exist'
 
 class InetHelper {
   constructor() { }
@@ -36,6 +37,16 @@ class InetHelper {
     for (let name in this.coords) {
       this.coords[name.trim()] = this.coords[name]
     }
+  }
+
+  async isExistUrl(url) {
+    if (!url)
+      return false
+    let checkUrl = url
+    if (!url.includes('http')) {
+      checkUrl = 'http://' + url
+    }
+    return await urlExist(checkUrl)
   }
 
   isExistCoord(coordName) {

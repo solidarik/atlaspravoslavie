@@ -59,17 +59,16 @@ export default class XlsGoogleParser {
         const checkedTime = DateHelper.dateTimeToStr(new Date())
         let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
-        const sheets = google.sheets({ version: 'v4' })
-
         this.log.info(chalk.yellow(`Загрузка ${this.name}`))
         // this.log.info(chalk.gray('Получение данных из Google...'))
 
+
+        const sheets = google.sheets({ version: 'v4' })
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: this.spreadsheetId,
             key: process.env.GOOGLE_API_KEY,
             range: this.range
         })
-
         if (!sheetData) return this.log.error('The Google API returned an error')
 
         const rows = sheetData.data.values
@@ -123,17 +122,17 @@ export default class XlsGoogleParser {
             loadStatus = loadStatus.replaceAll('undefined', 'Пусто')
 
             json.isOnMap = !isError && !isSkip
-            if (!isSkip) {
+            json.pageUrl = this.getPageUrl(json)
+            if (!isSkip && json.pageUrl) {
+                if (pageUrlsGlobal.includes(json.pageUrl)) {
+                    json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
+                }
+                pageUrlsGlobal.push(json.pageUrl)
                 insertObjects.push(json)
             }
 
             // this.log.info(`${row + 1}: ${status}`)
             json.loadStatus = loadStatus
-            json.pageUrl = this.getPageUrl(json)
-            if (pageUrlsGlobal.includes(json.pageUrl)) {
-                json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
-            }
-            pageUrlsGlobal.push(json.pageUrl)
             loadStatuses.push(loadStatus)
         }
 

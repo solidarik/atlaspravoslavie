@@ -10,8 +10,8 @@
   "scripts": {
     "test": "mocha -c",
     "pytest": "cd test && pytest -s -q --color=yes",
-    "parcel-religion-minify": "parcel build --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
-    "parcel-religion": "parcel build --no-minify --no-source-maps --no-content-hash public-src/index.js && cp dist/index.js public/public-src.js",
+    "parcel-religion-minify": "parcel build --no-source-maps --no-content-hash public-src/index.js && copy dist\\index.js public\\public-src.js /Y",
+    "parcel-religion": "parcel build --no-minify --no-source-maps --no-content-hash public-src/index.js && copy dist\\index.js public\\public-src.js /Y",
     "watch": "nodemon -w public-src -x npm run parcel-religion",
     "dev": "nodemon --es-module-specifier-resolution=node index.js index.js",
     "start": "node --es-module-specifier-resolution=node index.js",
@@ -82,6 +82,7 @@
     "socket.io-client": "latest",
     "socket.io-emitter": "latest",
     "socket.io-redis": "latest",
+    "url-exist": "^3.0.1",
     "winston": "latest",
     "xlsx": "latest"
   },

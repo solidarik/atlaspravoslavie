@@ -27,7 +27,10 @@ export default class GeoHelper {
   }
 
   static coordsToBaseFormat(coords) {
-    if (!coords.lon || !coords.lat) {
+    if (coords.lon == undefined || coords.lat == undefined) {
+      return undefined
+    }
+    if (coords.lon == 0 && coords.lat == 0) {
       return undefined
     }
     return this.fromLonLat([coords.lon, coords.lat])

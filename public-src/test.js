@@ -27,11 +27,13 @@ import chronosTempleModel from '../models/chronosTempleModel.js'
 
 (async function() {
 
-  const d = DateHelper.getDateFromInput('-1035')
-  console.log(d)
+  console.log(`IsExistUrl: ${await inetHelper.isExistUrl('ya.ru')}`)
 
-  const coords = GeoHelper.getCoordsFromHumanCoords('55°38′30″ с. ш. 37°21′30″ в. д.')
-  console.log(coords)
+  // const d = DateHelper.getDateFromInput('-1035')
+  // console.log(d)
+
+  // const coords = GeoHelper.getCoordsFromHumanCoords('55°38′30″ с. ш. 37°21′30″ в. д.')
+  // console.log(coords)
 
   // inetHelper.loadCoords()
   // const humanCoords = await GeoHelper.getCoordsFromHumanCoords('47°18′45″ с. ш. 28°35′31″ в. д.')

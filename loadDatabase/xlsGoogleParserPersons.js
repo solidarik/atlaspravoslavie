@@ -1,4 +1,5 @@
 import DateHelper from '../helper/dateHelper.js'
+import inetHelper from '../helper/inetHelper.js'
 import JsHelper from '../helper/jsHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import PersonModel from '../models/personsModel.js'
@@ -150,6 +151,12 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             json.middlename = row[headerColumns.middlename]
             json.sitename = row[headerColumns.sitename]
             json.monkname = row[headerColumns.monkname]
+
+            if (!json.surname && !json.name
+                && !json.middlename && !json.sitename) {
+                    json.errorArr.push('Пропуск пустых имён')
+                    return json
+                }
 
             json.birth = {}
             json.death = {}
@@ -386,9 +393,15 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
             json.profession = row[headerColumns.profession]
             json.description = row[headerColumns.description]
-            json.srcUrl = row[headerColumns.srcUrl]
+            const srcUrl = row[headerColumns.srcUrl]
+            if (inetHelper.isExistUrl(json.srcUrl)) {
+                json.srcUrl = srcUrl
+            } else {
+                json.warningArr.push(`Невалидная ссылка-источник: ${json.srcUrl}`)
+            }
 
             const imgUrl = row[headerColumns.imgUrl]
+            // json.imgUrls = []
             if (imgUrl) {
                 json.imgUrls = imgUrl.split('http').map(item => {
                     return `http${item}`

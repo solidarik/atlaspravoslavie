@@ -76,13 +76,19 @@ export default class StrHelper {
 
 
   static generatePageUrl(input, len = 50) {
+
     if (Array.isArray(input)) {
-      input = input.map(elem => elem.trim()).filter((elem) => elem.length > 0).join('_')
+      input = input.filter((elem) => elem && elem.length > 0)
+      input = input.map(elem => elem.trim()).join('_')
     }
 
     let output = this.toTranslitStr(input)
     if (output.length > len) {
       output = output.substring(0, len)
+    }
+
+    if (!output) {
+      return ''
     }
 
     if (output[output.length - 1] == '_') {
@@ -236,11 +242,17 @@ export default class StrHelper {
     return Object.keys(varObj)[0]
   }
 
-  static capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1)
+  static capitalizeFirstLetter(input) {
+    if (!input) {
+      return ''
+    }
+    return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
-  static capitalizeFirstLetterAllWords(string) {
-    return string.split(' ').map(this.capitalizeFirstLetter).join(' ')
+  static capitalizeFirstLetterAllWords(input) {
+    if (!input) {
+      return ''
+    }
+    return input.split(' ').map(this.capitalizeFirstLetter).join(' ')
   }
 }

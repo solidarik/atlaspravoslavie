@@ -42,15 +42,15 @@ Promise.resolve(true)
   .then(() => {
     return dbHelper.connect()
   })
-  .then(() => {
-    return xlsGoogleParserChronos.processData(dbHelper)
-  })
-  .then(() => {
-    return xlsGoogleParserChronosTemple.processData(dbHelper)
-  })
-  .then(() => {
-    return xlsGoogleParserTemples.processData(dbHelper)
-  })
+  // .then(() => {
+  //   return xlsGoogleParserChronos.processData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserChronosTemple.processData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleParserTemples.processData(dbHelper)
+  // })
   .then(() => {
     return xlsGoogleParserPersons.processData(dbHelper)
   })

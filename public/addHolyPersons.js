@@ -140,11 +140,15 @@ export default class addHolyPersons extends EventEmitter {
 
     window.showSlides(1);
 
-    $('#fullDescription').html(`${cur.description}
+    if (cur.description) {
+      $('#fullDescription').html(`<h5>Описание</h5>${cur.description}
       <a target='_blank' rel='noopener noreferrer'
         title='Строка-источник: ${cur.lineSource}' href='${cur.srcUrl}'>
       Подробнее...</a>`
     )
+    }
+
+
     $(window.thisTr).addClass('event-active-row')
     $(window.thisTr).siblings().removeClass('event-active-row')
 
