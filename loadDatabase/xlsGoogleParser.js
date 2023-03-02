@@ -21,6 +21,9 @@ export default class XlsGoogleParser {
 
         if (inputCoords) {
             coords = GeoHelper.getCoordsFromHumanCoords(inputCoords)
+            if (!coords) {
+                return false
+            }
             if (coords.length == 2) {
                 inetHelper.addCoord(inputPlace, {lat: coords[1] , lon: coords[0]})
                 return GeoHelper.fromLonLat(coords)
@@ -88,7 +91,8 @@ export default class XlsGoogleParser {
         //start from row = 1, because we skip a header row
         // for (let row = 1; row < rows.length; row++) {
         const maxRow = this.maxRow ? this.maxRow : rows.length
-        for (let row = 1; row < maxRow; row++) {
+        const startRow = this.startRow ? this.startRow : 1
+        for (let row = startRow; row < maxRow; row++) {
             const json = await this.getJsonFromRow(headerColumns, rows[row])
 
             json.lineSource = row + 1

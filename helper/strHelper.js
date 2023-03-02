@@ -257,6 +257,6 @@ export default class StrHelper {
   }
 
   static isEndingByOr(input, wordList) {
-    return wordList.filter(word => input.endsWith(word)).length > 0
+    return wordList.filter(word => input && input.endsWith(word)).length > 0
   }
 }

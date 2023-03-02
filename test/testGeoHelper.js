@@ -22,4 +22,11 @@ describe('test getCoordsFromHumanCoords', () => {
     assert.strictEqual(result[0], 23.633333)
     assert.strictEqual(result[1], 35.416667)
   })
+
+  it('coords by two number with delim comma', () => {
+    let result = GeoHelper.getCoordsFromHumanCoords('31.522856, 34.455904')
+
+    assert.strictEqual(result[0], 34.455904)
+    assert.strictEqual(result[1], 31.522856)
+  })
 })

@@ -99,6 +99,11 @@ export default class GeoHelper {
       }
     }
 
+    const arr = input.split(',')
+    if (arr.length == 2) {
+      return arr.reverse().map(item => Number(item))
+    }
+
   }
 
   static getCenterCoord(ft) {

@@ -20,7 +20,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
         this.range = 'A1:AH'
         this.model = PersonModel
-        // this.maxRow = 3000
+        // this.startRow = 6
+        // this.maxRow = 7
     }
 
     getPageUrl(json) {
@@ -263,6 +264,9 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 if (birthCoord) {
                     json.birth["placeCoord"] = birthCoord
                 } else {
+                    if (row[headerColumns.birthCoord]) {
+                        console.log(`Не удалось распарсить координаты рождения ${birthPlace}, ${row[headerColumns.birthCoord]}`)
+                    }
                     json.errorArr.push(`Не определена координата рождения ${birthPlace}`)
                 }
 
@@ -271,6 +275,9 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 if (deathCoord) {
                     json.death['placeCoord'] = deathCoord
                 } else {
+                    if (row[headerColumns.deathCoord]) {
+                        console.log(`Не удалось распарсить координаты смерти ${deathPlace}, ${row[headerColumns.deathCoord]}`)
+                    }
                     json.errorArr.push(`Не определена координата смерти ${deathPlace}`)
                 }
             }
@@ -296,16 +303,20 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             json.achievements = []
             for (let i = 0; i < achievs.length; i++) {
                 let achiev = achievs[i]
+
                 if (achiev.place == '' || achiev.date == '')
                     continue
-                let achievModel = {}
 
+                let achievModel = {}
                 if (achiev.place != '') {
                     achievModel.place = achiev.place
                     const achievPlaceCoord = await this.getCoords(achiev.place, achiev.coord)
                     if (achievPlaceCoord) {
                         achievModel.placeCoord = achievPlaceCoord
                     } else {
+                        if (achiev.coord) {
+                            console.log(`Не удалось распарсить координаты подвига ${achiev.place}, ${achiev.coord}`)
+                        }
                         json.warningArr.push(`Не определена координата подвига ${achiev.place}`)
                     }
                 }
@@ -401,6 +412,10 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 json.warningArr.push(`Невалидная ссылка-источник: ${json.srcUrl}`)
             }
 
+            if (isDebugLine) {
+                console.log(`item: ${JSON.stringify(json)}`)
+            }
+
             const tempImgUrl = 'tempImgUrl.png'
             const imgUrl = row[headerColumns.imgUrl]
             json.imgUrls = []
@@ -424,9 +439,9 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
             json.pageUrl = ''
 
-            if (isDebugLine) {
-                console.log(`item: ${JSON.stringify(json)}`)
-            }
+            // if (isDebugLine) {
+            //     console.log(`item: ${JSON.stringify(json)}`)
+            // }
 
         } catch (e) {
             json.errorArr.push('' + e)
