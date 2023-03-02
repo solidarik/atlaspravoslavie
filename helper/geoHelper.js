@@ -66,8 +66,6 @@ export default class GeoHelper {
       const regStr = '(\\d+)[^°]*[°](\\d*)[\'′]*(\\d*)[\'′]*(\\d*)\\D'
       const matches = [...input.matchAll(new RegExp(regStr, 'g'))];
 
-      console.log(JSON.stringify(matches))
-
       if (matches.length != 2) {
         console.log(`Неизвестный формат координат: ${input}`)
         return undefined
