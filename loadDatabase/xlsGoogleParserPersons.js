@@ -415,7 +415,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
             for (let idxImg = 0; idxImg < imgUrls.length; idxImg++ ) {
                 const imgUrl = imgUrls[idxImg]
-                if (!inetHelper.isExistUrl(imgUrl) || !StrHelper.isEndingBy(imgUrl, ['png', 'jpg'])) {
+                if (!inetHelper.isExistUrl(imgUrl) || !StrHelper.isEndingByOr(imgUrl, ['png', 'jpg'])) {
                     json.warningArr.push(`Невалидная ссылка на фото: ${imgUrl}`)
                 } else {
                     json.imgUrls.push(imgUrl)
