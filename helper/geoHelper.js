@@ -62,8 +62,11 @@ export default class GeoHelper {
     const isMinSecCoords = (-1 < input.indexOf('°'))
     if (isMinSecCoords) {
 
-      const regStr = '(\\d+)[^°]*[°](\\d+)[^′]*[′](\\d*)'
+      // const regStr = '(\\d+)[^°]*[°](\\d*)[^′\']*[′\']*(\\d*)'
+      const regStr = '(\\d+)[^°]*[°](\\d*)[\'′]*(\\d*)[\'′]*(\\d*)\\D'
       const matches = [...input.matchAll(new RegExp(regStr, 'g'))];
+
+      console.log(JSON.stringify(matches))
 
       if (matches.length != 2) {
         console.log(`Неизвестный формат координат: ${input}`)
@@ -79,10 +82,10 @@ export default class GeoHelper {
         return undefined
       }
 
-      if (input.includes('ю. ш.') || input.includes('S')) {
+      if (input.includes('ю. ш.') || input.includes('ю.ш.') || input.includes('S')) {
         numbers[0] = -numbers[0]
       }
-      if (input.includes('з. д.') || input.includes('W')) {
+      if (input.includes('з. д.') || input.includes('з.д.') || input.includes('W')) {
         numbers[1] = -numbers[1]
       }
 

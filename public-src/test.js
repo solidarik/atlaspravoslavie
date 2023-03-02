@@ -24,7 +24,14 @@ import chronosTempleModel from '../models/chronosTempleModel.js'
 // console.log(StrHelper.isEndingByOr('html png', ['png']))
 // exit(0)
 
-let groups = GeoHelper.getCoordsFromHumanCoords('55°45′13″ с. ш. 37°37′11″ в. д.')
+let groups = GeoHelper.getCoordsFromHumanCoords('57° с. ш. 41° в. д.')
+console.log(JSON.stringify(groups))
+groups = GeoHelper.getCoordsFromHumanCoords('35°25\' с.ш. 23°38\' в.д.')
+console.log(JSON.stringify(groups))
+groups = GeoHelper.getCoordsFromHumanCoords('55°17\' с.ш. и 50°29\' в.д.')
+console.log(JSON.stringify(groups))
+
+groups = GeoHelper.getCoordsFromHumanCoords('55°45′13″ с. ш. 37°37′11″ в. д.')
 console.log(JSON.stringify(groups))
 
 exit(0)
