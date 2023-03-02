@@ -1,4 +1,3 @@
-import StrHelper from './strHelper.js'
 
 export default class GeoHelper {
   static fromLonLat(input) {
@@ -36,29 +35,69 @@ export default class GeoHelper {
     return this.fromLonLat([coords.lon, coords.lat])
   }
 
+  static minutesCoordToDegreeCoord(matchOne) {
+    if (matchOne.length < 2) {
+      console.log(`Неизвестный формат координат: ${input}`)
+      return undefined
+    }
+
+    let degrees = parseFloat(matchOne[1])
+    let minutes = 0.
+    let seconds = 0.
+    if (matchOne.length > 2 && matchOne[2] != '') {
+      minutes = parseFloat(matchOne[2]) / 60.
+      if (matchOne.length > 3 && matchOne[3] != '') {
+        seconds = parseFloat(matchOne[3]) / 3600.
+      }
+    }
+
+    return degrees + parseFloat((minutes + seconds).toFixed(6))
+  }
+
   static getCoordsFromHumanCoords(input) {
     //ширина возвращается первым аргументом lat
     //долгота возвращается вторым аргументом lon
 
-    //сначала проверяем на координаты типа x_y
-    const arr = input.split('_')
-    if (arr.length == 2) {
-      return arr.reverse().map(item => Number(item))
+    //сначала определяем минутные координаты
+    const isMinSecCoords = (-1 < input.indexOf('°'))
+    if (isMinSecCoords) {
+
+      const regStr = '(\\d+)[^°]*[°](\\d+)[^′]*[′](\\d*)'
+      const matches = [...input.matchAll(new RegExp(regStr, 'g'))];
+
+      if (matches.length != 2) {
+        console.log(`Неизвестный формат координат: ${input}`)
+        return undefined
+      }
+
+      let numbers = [0.0, 0.0]
+      numbers[0] = this.minutesCoordToDegreeCoord(matches[0])
+      numbers[1] = this.minutesCoordToDegreeCoord(matches[1])
+
+      if (!numbers[0] || !numbers[1]) {
+        console.log(`Не удалось распарсить дату: ${numbers}`)
+        return undefined
+      }
+
+      if (input.includes('ю. ш.') || input.includes('S')) {
+        numbers[0] = -numbers[0]
+      }
+      if (input.includes('з. д.') || input.includes('W')) {
+        numbers[1] = -numbers[1]
+      }
+
+      return numbers.reverse()
     }
 
-    let output = input.replace(/[°]/g, '.')
-    output = output.replace(/[′]/g, '')
-    output = output.replace(/[″]/g, '')
-
-    let numbers = StrHelper.getAllNumbers(output)
-    if (output.includes('ю. ш.') || output.includes('S')) {
-      numbers[0] = -numbers[0]
-    }
-    if (output.includes('з. д.') || output.includes('W')) {
-      numbers[1] = -numbers[1]
+    //потом проверяем координаты типа x_y и в конце x y
+    const isDelimCoords = (-1 < input.indexOf('_'))
+    if (isDelimCoords) {
+      const arr = input.split('_')
+      if (arr.length == 2) {
+        return arr.reverse().map(item => Number(item))
+      }
     }
 
-    return [parseFloat(numbers[0]), parseFloat(numbers[1])].reverse()
   }
 
   static getCenterCoord(ft) {

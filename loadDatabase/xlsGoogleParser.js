@@ -179,6 +179,14 @@ export default class XlsGoogleParser {
         const statusText = [successObjectCount, savedCount, skipObjectCount, totalLinesCount].join(' / ')
         this.log.info(chalk.cyanBright(`Кол-во на карте/загруженных/пропущенных/всего: ${statusText}`))
 
+        /*
+        for (let idxObj = 0; idxObj < insertObjects.length; idxObj++) {
+            const insertObject = insertObjects[idxObj]
+            // console.log(`${insertObject.birth.year} ${insertObject.name} ${insertObject.surname}`)
+            await this.model.collection.insertOne(insertObject)
+        }
+        */
+
         res = await this.model.insertMany(insertObjects)
 
         if (!res) {

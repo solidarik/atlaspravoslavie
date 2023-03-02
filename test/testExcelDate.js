@@ -139,4 +139,11 @@ describe('check date input from excel', () => {
         assert.strictEqual(res["century"], -11)
     })
 
+    it('Константинополь, 985 г.', () => {
+        const res = func('Константинополь, 985 г.')
+        assert.strictEqual(res['ymd'][0], 985)
+        assert.strictEqual(res["ymd"][1], -1)
+        assert.strictEqual(res["ymd"][2], -1)
+    })
+
 })

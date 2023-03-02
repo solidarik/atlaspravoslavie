@@ -17,13 +17,42 @@ import DateHelper from '../helper/dateHelper.js'
 import { exit } from 'shelljs'
 import chronosTempleModel from '../models/chronosTempleModel.js'
 
+// const dateBirth = DateHelper.getDateFromInput('Константинополь, 985 г.')
+// console.log(dateBirth)
+// exit(0)
 
-// const testUrl = 'https://balashovblag.ru/images/019_2017_9_6_22_10_32_1795892298.jpg'
-// ImageHelper.loadImageToFile(testUrl, imagesFolder, 'test')
-//   .then(res => console.log(`test is finished ${res}`))
-//   .catch(err => {
-//     console.log(`Error in loadImageToFile ${err}`)
-//   })
+// console.log(StrHelper.isEndingByOr('html png', ['png']))
+// exit(0)
+
+let groups = GeoHelper.getCoordsFromHumanCoords('55°45′13″ с. ш. 37°37′11″ в. д.')
+console.log(JSON.stringify(groups))
+
+exit(0)
+
+// 55.792165, 37.763223
+let coords = GeoHelper.getCoordsFromHumanCoords('55°38′30″ с. ш. 37°21′30″ в. д.')
+console.log(coords)
+
+// coords = GeoHelper.getCoordsFromHumanCoords('55.3830 37.2130')
+// console.log(coords)
+
+coords = GeoHelper.getCoordsFromHumanCoords('55.3830, 37.2130')
+console.log(coords)
+
+exit(0)
+
+const testUrl = 'https://drevo-info.ru/pictures/18814.html'
+ImageHelper.loadImageToFile(testUrl, 'tempImgUrl.png', true)
+  .then(res => {
+    console.log(`test is finished ${JSON.stringify(res)}`)
+    exit(0)
+  })
+  .catch(err => {
+    console.log(`Error in loadImageToFile ${err}`)
+  })
+
+
+// exit(0)
 
 (async function() {
 

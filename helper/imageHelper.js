@@ -32,34 +32,39 @@ export default class ImageHelper {
     return (sourceImage.src = url)
   }
 
-  static loadImageToFile(folder, url, fileName) {
+  static loadImageToFile(url, fileName, renew = false) {
+    let res = { saved: false, warning: null, error: null, url: url }
+
     return new Promise((resolve) => {
       try {
 
-        res = { saved: false, warning: null, error: null, url: url }
+        // const re = /(?:\.([^.]+))?$/
+        // const ext = re.exec(url)[1]
+        // let selectedExt = 'png'
 
-        const re = /(?:\.([^.]+))?$/
-        const ext = re.exec(url)[1]
-        let selectedExt = 'png'
+        // if (ext) {
+        //   const acceptedExt = ['png', 'jpg', 'gif']
+        //   for (let i = 0; i < acceptedExt.length; i++) {
+        //     if (ext.indexOf(acceptedExt[i])) {
+        //       selectedExt = acceptedExt[i]
+        //       break
+        //     }
+        //   }
+        // }
+        // fileName += '.' + selectedExt
 
-        if (ext) {
-          const acceptedExt = ['png', 'jpg', 'gif']
-          for (let i = 0; i < acceptedExt.length; i++) {
-            if (ext.indexOf(acceptedExt[i])) {
-              selectedExt = acceptedExt[i]
-              break
-            }
+        if (fileHelper.isFileExists(fileName)) {
+          if (!renew) {
+            res.warning = 'File is exist'
+            resolve(res)
+            return
+          } else {
+            console.log('delete file')
+            fileHelper.deleteFile(fileName)
           }
         }
-        fileName += '.' + selectedExt
 
-        const localFilePath = path.resolve(__dirname, folder, fileName);
-
-        if (fileHelper.isFileExists(localFilePath)) {
-          res.warning = 'File is exist'
-          resolve(res)
-          return
-        }
+        console.log(`before get file`)
 
         axios({
           method: 'GET',
@@ -69,7 +74,7 @@ export default class ImageHelper {
 
         })
           .then(response => {
-            const w = response.data.pipe(fs.createWriteStream(localFilePath))
+            const w = response.data.pipe(fs.createWriteStream(fileName))
             w.on('finish', () => {
               res.saved = true
               resolve(res)
@@ -80,7 +85,9 @@ export default class ImageHelper {
             resolve(res)
           })
       } catch (err) {
-        res.error = `Program error in ${arguments.callee.toString()}`
+        console.log(`try catch err: ${err}`)
+        res.error = `Program error in loadImageToFile from ${url}: ${err}`
+        console.log(res.error)
         resolve(res)
       }
 

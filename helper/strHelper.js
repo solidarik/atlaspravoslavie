@@ -255,4 +255,8 @@ export default class StrHelper {
     }
     return input.split(' ').map(this.capitalizeFirstLetter).join(' ')
   }
+
+  static isEndingByOr(input, wordList) {
+    return wordList.filter(word => input.endsWith(word)).length > 0
+  }
 }

@@ -242,7 +242,7 @@ export default class DateHelper {
 
     // если дата типа "1984, 1 мая"
     if (!isFound) {
-      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d*)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
+      date_groups = StrHelper.getSearchGroupsInRegexp('(\\d+)\\s*[,]\\s*(\\d+)\\s*(\\S+)', inputText)
       if (date_groups && date_groups.length > 0) {
         y = parseInt(date_groups[0])
         if (date_groups[1] != '') {

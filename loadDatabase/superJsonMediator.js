@@ -9,6 +9,7 @@ export default class SuperJsonMediator {
           resolve(obj['_id'.toString()])
         })
         .catch((err) => {
+          console.log(`Error in addObjectToBase: ${JSON.stringify(json)}`)
           reject(err)
         })
     })

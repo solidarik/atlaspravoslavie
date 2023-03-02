@@ -1,6 +1,7 @@
 import DateHelper from '../helper/dateHelper.js'
 import inetHelper from '../helper/inetHelper.js'
 import JsHelper from '../helper/jsHelper.js'
+import ImageHelper from '../helper/imageHelper.js'
 import StrHelper from '../helper/strHelper.js'
 import PersonModel from '../models/personsModel.js'
 import XlsGoogleParser from './xlsGoogleParser.js'
@@ -400,14 +401,25 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 json.warningArr.push(`Невалидная ссылка-источник: ${json.srcUrl}`)
             }
 
+            const tempImgUrl = 'tempImgUrl.png'
             const imgUrl = row[headerColumns.imgUrl]
-            // json.imgUrls = []
+            json.imgUrls = []
+            let imgUrls = []
             if (imgUrl) {
-                json.imgUrls = imgUrl.split('http').map(item => {
+                imgUrls = imgUrl.split('http').map(item => {
                     return `http${item}`
                 }).slice(1)
             } else {
                 json.warningArr.push(`Нет ссылки на фотографию`)
+            }
+
+            for (let idxImg = 0; idxImg < imgUrls.length; idxImg++ ) {
+                const imgUrl = imgUrls[idxImg]
+                if (!inetHelper.isExistUrl(imgUrl) || !StrHelper.isEndingBy(imgUrl, ['png', 'jpg'])) {
+                    json.warningArr.push(`Невалидная ссылка на фото: ${imgUrl}`)
+                } else {
+                    json.imgUrls.push(imgUrl)
+                }
             }
 
             json.pageUrl = ''
