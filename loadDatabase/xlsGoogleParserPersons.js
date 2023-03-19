@@ -131,7 +131,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
             const xlsColName = headerRow[iCol].toLowerCase()
             for (let colModel in colCorresponds) {
                 const colSearch = colCorresponds[colModel]
-                if (xlsColName.includes(colSearch)) {
+                if (xlsColName.includes(colSearch) && !headerColumns[colModel]) {
                     headerColumns[colModel] = iCol
                 }
             }

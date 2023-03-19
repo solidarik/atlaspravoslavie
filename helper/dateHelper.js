@@ -68,7 +68,7 @@ export default class DateHelper {
     if (!inputDate) return ''
     if (inputDate.isOnlyYear) return inputDate.year + ''
     if (inputDate.isOnlyCentury) return inputDate.century + ' в.'
-    if (inputDate.year == -999) return ''
+    if (!inputDate.year || inputDate.year == -999) return ''
 
     let res = '' + inputDate.year
     if (inputDate.month != -1) {

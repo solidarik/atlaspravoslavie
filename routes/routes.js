@@ -42,7 +42,7 @@ router.get('/events', (await import('./page-events.js')).default)
 router.get('/logout', (await import('./logout.js')).get)
 
 const templesSelectParam = { 'name': 1, 'start': 1, 'place': 1, 'city': 1, 'dedicated': 1, 'pageUrl': 1, }
-const personsSelectParam = { 'name': 1, 'birth': 1, 'surname': 1, 'monkname': 1, 'pageUrl': 1, }
+const personsSelectParam = { 'sitename': 1, 'birth': 1, 'pageUrl': 1, }
 
 const getPersons = async function (ctx, next) {
   // persons = await redisClient.get('persons')

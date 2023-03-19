@@ -33,56 +33,56 @@ export default class addHolyPersons extends EventEmitter {
     if (!fio) {
       fio = cur.monkname
     }
-
     $('#FIO').html(fio)
-    $('#LifeTime').html(
-      '<b>Дата и место рождения</b> - ' +
-      ((cur.birth.dateStr && !cur.birth.isIndirectDate) ? cur.birth.dateStr : '')
-      +
-      ' ' +
-      ((cur.birth.place && !cur.birth.isIndirectPlace) ? cur.birth.place : '')
 
-    )
+    const birthDate = DateHelper.ymdToStr(cur.birth)
+    if (birthDate != '' || (cur.birth.place && !cur.birth.isIndirectPlace)) {
+      const birthPlace = ((cur.birth.place && !cur.birth.isIndirectPlace) ? cur.birth.place : '—')
+      $('#LifeTime').html('<b>Дата и место рождения:</b> ' + birthDate + ' ' + birthPlace)
+    }
 
     if (typeof cur.achievements !== 'undefined' && cur.achievements.length > 0) {
-      var str = '<b>Место и дата подвига</b> - '
-
+      let achievStr = '<b>Дата и место подвига:</b> '
+      let delimStr = ''
       for (var i = 0; i < cur.achievements.length; i++) {
-        str = str +
-          ((typeof cur.achievements[i].place !== 'undefined') ? cur.achievements[i].place : '') +
-          ' - ' +
-          ((typeof cur.achievements[i].dateStr !== 'undefined') ? cur.achievements[i].dateStr : '') +
-          ';'
-
-        $('#AchievementPlace').html(str)
+        const achiev = cur.achievements[i]
+        if ((achiev.start && achiev.end) || achiev.place) {
+          const achievDate =  achiev.start && achiev.end ? DateHelper.rangeYmdToStr(achiev.start, achiev.end) : '—'
+          const achievPlace = achiev.place ? achiev.place : '—'
+          achievStr = achievStr + delimStr + achievDate + ' ' + achievPlace
+          delimStr = '; '
+        }
       }
+      $('#AchievementPlace').html(achievStr)
     }
-    $('#DeathTime').html(
-      '<b>Дата смерти, захоронение</b> - ' +
-      ((cur.death.dateStr && !cur.death.isIndirectDate) ? cur.death.dateStr : '') +
-      ' ' +
-      ((cur.death.place && !cur.death.isIndirectPlace) ? cur.death.place : '')
-    )
-    $('#DateCanonization').html(
-      '<b>Дата канонизации</b> - ' +
-      ((typeof cur.canonizationDate !== 'undefined' && cur.canonizationDate.dateStr !== 'undefined') ? cur.canonizationDate.dateStr : '')
-    )
+
+    const deathDate = DateHelper.ymdToStr(cur.death)
+    if (deathDate != '' || (cur.death.place && !cur.death.isIndirectPlace)) {
+      const deathPlace = (cur.death.place && !cur.death.isIndirectPlace) ? cur.death.place : '—'
+      $('#DeathTime').html('<b>Дата и место смерти, захоронение:</b> ' + deathDate + ' ' + deathPlace)
+    }
+
+    if (cur.canonizationDate && cur.canonizationDate.dateStr) {
+      $('#DateCanonization').html(
+        '<b>Дата канонизации:</b> ' + DateHelper.ymdToStr(cur.canonizationDate)
+      )
+    }
 
     $('#HolinessStatus').html(
-      '<b>Статус святости</b> - ' +
+      '<b>Статус святости:</b> ' +
       ((typeof cur.status !== 'undefined') ? cur.status : '')
     )
 
     let worshipStr = ''
     if (cur.worshipDays.length > 0) {
       worshipStr = cur.worshipDays.length == 1 ? 'День почитания' : 'Дни почитания'
-      worshipStr = `<b>${worshipStr}</b> - `
+      worshipStr = `<b>${worshipStr}:</b> `
       worshipStr += ': ' + cur.worshipDays.map((item) => item.dateStr).join(', ')
     }
     $('#DateVeneration').html(worshipStr)
 
     $('#FieldActivity').html(
-      '<b>Сфера деятельности</b> - ' +
+      '<b>Сфера деятельности</b>: ' +
       ((typeof cur.profession !== 'undefined') ? cur.profession : '')
     )
 
@@ -180,9 +180,7 @@ export default class addHolyPersons extends EventEmitter {
     const applyColumns = {
       'birth': 'Дата рождения',
       'place': 'Место рождения',
-      'surname': 'Фамилия',
-      'name': 'Имя',
-      'monkname': 'Имя в монашестве'
+      'sitename': 'Имя'
     }
     const applyColumnNames = Object.keys(applyColumns)
 
@@ -196,24 +194,31 @@ export default class addHolyPersons extends EventEmitter {
 
     var curId = -1;
     for (var i = 0; i < obj.length; i++) {
+      const currObj = obj[i]
       row = $(table[0].insertRow(-1))
       row.addClass('hand-cursor')
       row.attr('id', i)
       for (var j = 0; j < applyColumnNames.length; j++) {
         const columnName = applyColumnNames[j]
-        let columnValue = columnName == 'place' ? obj[i]['birth']['place'] : obj[i][columnName]
+
+        let columnValue = currObj[columnName]
+        if (columnName == 'place') {
+          columnValue = currObj.birth && currObj.birth.place ? currObj.birth.place : ''
+        } else
+        if (columnName == 'birth') {
+          columnValue = DateHelper.ymdToStr(columnValue)
+        }
+
         let cell = $(`<td
           onmouseenter="window.setActiveElement(this, true);"
           onmouseleave="window.setActiveElement(this, false);">
         />`)
-        if (columnName == 'birth') {
-          columnValue = DateHelper.ymdToStr(columnValue)
-        }
+
         cell.html(columnValue)
         row.append(cell)
       }
       // console.log(currPerson);
-      if (currPerson != undefined && currPerson.pageUrl == obj[i]['pageUrl']) {
+      if (currPerson != undefined && currPerson.pageUrl == currObj['pageUrl']) {
         curId = i;
       }
     }
@@ -248,7 +253,7 @@ export default class addHolyPersons extends EventEmitter {
                 (this.asc = !this.asc)
               )
             )
-            .forEach(function (tr) {
+            .forEach(function (tr) {ыше
               table.appendChild(tr)
             })
         })

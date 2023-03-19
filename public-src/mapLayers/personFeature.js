@@ -87,28 +87,28 @@ class PersonFeature extends SuperFeature {
             <thead>
               <tr>
                 <th scope='col'></th>
-                <th scope='col'>Место</th>
                 <th scope='col'>Дата</th>
+                <th scope='col'>Место</th>
               </tr>
             </thead>
             <tbody>`
 
     console.log(`Person Info: ${JSON.stringify(info)}`)
 
-    if (!info.birth && info.birth.dateStr && !info.birth.isIndirectDate) {
+    if (info.birth && info.birth.dateStr && !info.birth.isIndirectDate) {
         html += `
           <tr>
             <th scope='row'>Рождение</th>
-            <td>${(info.birth.place && !info.birth.isIndirectPlace) ? info.birth.place : '-'}</td>
             <td>${DateHelper.ymdToStr(info.birth)}</td>
+            <td>${(info.birth.place && !info.birth.isIndirectPlace) ? info.birth.place : '-'}</td>
           </tr>`
     }
 
     info.achievements.forEach(achiev => {
       html += `
         <tr><th scope='row'>Подвиг</th>
-          <td>${achiev.place ? achiev.place : '—'}</td>
           <td>${achiev.start && achiev.end ? DateHelper.rangeYmdToStr(achiev.start, achiev.end) : '—'}</td>
+          <td>${achiev.place ? achiev.place : '—'}</td>
         </tr>
         `
     });
@@ -116,8 +116,8 @@ class PersonFeature extends SuperFeature {
     if (info.death && info.death.dateStr && !info.death.isIndirectDate) {
       html += `
         <tr><th scope='row'>Смерть</th>
-          <td>${(info.death.place && !info.death.isIndirectPlace) ? info.death.place : '—'}</td>
           <td>${info.death ? DateHelper.ymdToStr(info.death) : '—'}</td>
+          <td>${(info.death.place && !info.death.isIndirectPlace) ? info.death.place : '—'}</td>
         </tr>
       `
     }
