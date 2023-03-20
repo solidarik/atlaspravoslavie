@@ -62,11 +62,11 @@ export default class addHolyPersons extends EventEmitter {
       $('#DeathTime').html('<b>Дата и место смерти, захоронение:</b> ' + deathDate + ' ' + deathPlace)
     }
 
-    if (cur.canonizationDate && cur.canonizationDate.dateStr) {
-      $('#DateCanonization').html(
-        '<b>Дата канонизации:</b> ' + DateHelper.ymdToStr(cur.canonizationDate)
-      )
-    }
+    // if (cur.canonizationDate && cur.canonizationDate.dateStr) {
+    //   $('#DateCanonization').html(
+    //     '<b>Дата канонизации:</b> ' + DateHelper.ymdToStr(cur.canonizationDate)
+    //   )
+    // }
 
     $('#HolinessStatus').html(
       '<b>Статус святости:</b> ' +

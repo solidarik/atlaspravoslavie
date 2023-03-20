@@ -52,15 +52,48 @@ export default class XlsGoogleParser {
         return StrHelper.generatePageUrl(pageUrlsLocal)
     }
 
+    async getDebugInfo(lineNumber, fieldName) {
+        this.log.info(chalk.yellow(`Получение отладочной информации по строке ${lineNumber}`))
+        const sheets = google.sheets({ version: 'v4' })
+        const sheetData = await sheets.spreadsheets.values.get({
+            spreadsheetId: this.spreadsheetId,
+            key: process.env.GOOGLE_API_KEY,
+            range: this.range
+        })
+        if (!sheetData) return this.log.error('The Google API returned an error')
+
+        const rows = sheetData.data.values
+        if (!rows.length) return this.log.error('No data found')
+
+        // this.log.info(`Сount rows ${rows.length} columns ${rows[0].length}`)
+        const startRow = this.startRow ? this.startRow : 1
+        const maxRow = this.maxRow ? this.maxRow : rows.length
+        if (lineNumber < startRow || lineNumber > maxRow) {
+            this.log.error(`Номер строки не входит в диапазон данных: [${startRow}, ${maxRow}]`)
+            return ''
+        }
+
+        const headerColumns = this.fillHeaderColumns(rows[0])
+        const json = await this.getJsonFromRow(headerColumns, rows[lineNumber - 1])
+
+        if (!json[fieldName]) {
+            this.log.error(`В результирующих данных нет искомого столбца: ${fieldName}`)
+            return ''
+        }
+
+        return json[fieldName]
+    }
+
     async processData(dbHelper) {
 
+        let res = undefined
         const modelName = this.model.collection.collectionName
 
         await dbHelper.clearModel(this.model)
 
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
-        let res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+        res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
 
         this.log.info(chalk.yellow(`Загрузка ${this.name}`))
         // this.log.info(chalk.gray('Получение данных из Google...'))
