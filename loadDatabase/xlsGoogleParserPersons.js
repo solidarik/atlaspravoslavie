@@ -18,7 +18,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
         this.name = 'Святые'
         this.pageUrls = ['sitename', 'surname', 'name']
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
-        this.range = 'A1:AH'
+        this.range = 'A1:AL'
         this.model = PersonModel
         // this.startRow = 6
         // this.maxRow = 7
@@ -430,7 +430,7 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
 
             for (let idxImg = 0; idxImg < imgUrls.length; idxImg++ ) {
                 const imgUrl = imgUrls[idxImg]
-                if (!inetHelper.isExistUrl(imgUrl) || !StrHelper.isEndingByOr(imgUrl, ['png', 'jpg'])) {
+                if (!inetHelper.isExistUrl(imgUrl) || !StrHelper.isEndingByOr(imgUrl, ['png', 'jpg', 'jpeg', 'webm'])) {
                     json.warningArr.push(`Невалидная ссылка на фото: ${imgUrl}`)
                 } else {
                     json.imgUrls.push(imgUrl)

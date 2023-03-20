@@ -24,8 +24,8 @@ const dbHelper = new DbHelper(undefined, log)
 
 const xlsGoogleParserPersons = new XlsGoogleParserPersons(log)
 
-const lineNumber = 5759
-const fieldName = 'birth'
+const lineNumber = 11
+const fieldName = 'death'
 
 Promise.resolve(true)
   .then(() => {
