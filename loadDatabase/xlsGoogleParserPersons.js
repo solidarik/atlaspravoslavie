@@ -416,7 +416,6 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
                 console.log(`item: ${JSON.stringify(json)}`)
             }
 
-            const tempImgUrl = 'tempImgUrl.png'
             const imgUrl = row[headerColumns.imgUrl]
             json.imgUrls = []
             let imgUrls = []
