@@ -52,7 +52,7 @@ body::after {
   color: silver;
   font-style: italic;
   line-height: 30px;
-  margin-top: 270px;
+  /* margin-top: 270px; */
   text-align: center;
 }
 
@@ -74,6 +74,12 @@ body::-webkit-scrollbar-thumb {
   text-align: center;
 }
 
+#bless {
+  margin: 5px 0 0 5px;
+  font-style: italic;
+  color: white;
+}
+
 .quote-card {
   /* background: #fff; */
   /* opacity: 0.5; */
@@ -82,7 +88,7 @@ body::-webkit-scrollbar-thumb {
   padding-left: 50px;
   box-sizing: border-box;
   /* box-shadow: 0 2px 4px rgba(34, 34, 34, 0.12); */
-  position: absolute;
+  /* position: absolute; */
   overflow: hidden;
   min-height: 120px;
   font-style: italic;
