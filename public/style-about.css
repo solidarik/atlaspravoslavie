@@ -75,7 +75,7 @@ body::-webkit-scrollbar-thumb {
   font-size: 22px;
   margin: 10px 0 0 10px;
   font-style: italic;
-  font-weight: 300;
+  font-weight: 500;
   color: white;
 }
 
@@ -97,7 +97,7 @@ body::-webkit-scrollbar-thumb {
   font-size: 18px;
   line-height: 1.5;
   margin: 0;
-  max-width: 80%;
+  /* max-width: 80%; */
 }
 .quote-card cite {
   font-size: 20px;
