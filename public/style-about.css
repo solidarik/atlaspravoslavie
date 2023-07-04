@@ -24,7 +24,7 @@ body::after {
 
 .mask {
   color: whitesmoke;
-  margin: 50px 0;
+  margin: 25px 0;
 }
 
 .mask-span {
@@ -35,9 +35,6 @@ body::after {
 }
 
 @media screen and (max-width: 1400px) {
-  .mask-span {
-    font-size: 20px;
-  }
 }
 
 .container {
@@ -75,10 +72,10 @@ body::-webkit-scrollbar-thumb {
 }
 
 #bless {
-  font-size: 20px;
-  margin: 5px 0 0 5px;
+  font-size: 22px;
+  margin: 10px 0 0 10px;
   font-style: italic;
-  font-weight: 200;
+  font-weight: 300;
   color: white;
 }
 
@@ -142,7 +139,7 @@ body::-webkit-scrollbar-thumb {
   }
 
   .main-text {
-    margin-top: 20px;
+    margin-top: 10px;
   }
 }
 
