@@ -76,6 +76,7 @@
     "passport-local": "latest",
     "proj4": "latest",
     "pug": "latest",
+    "punycode": "^2.3.0",
     "readline": "latest",
     "shelljs": "^0.8.5",
     "socket.io": "latest",

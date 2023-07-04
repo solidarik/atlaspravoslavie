@@ -33,6 +33,10 @@ export default class DbHelper {
     })
   }
 
+  getDbConnect() {
+    return this.db
+  }
+
   clearDb(filter = '') {
     return new Promise((resolve, reject) => {
       const modelDirectory = FileHelper.composePath('models')
