@@ -21,4 +21,13 @@ export default class XlsHelper {
         }
         return columnName.join('')
     }
+
+    static getColumnNumberByName(columnName) {
+
+        let columnNumber = 0;
+        for (let i = 0; i < columnName.length; i++) {
+          columnNumber += (columnName.charCodeAt(i) - 64) * Math.pow(26, columnName.length - i - 1);
+        }
+        return columnNumber - 1;
+    }
 }

@@ -54,6 +54,19 @@ class InetHelper {
     return (itemName in this.coords)
   }
 
+  async isSuccessStatusCode(url) {
+    try {
+      const response = await fetch(url);
+      if (response.status !== 200) {
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  }
+
   addCoord(coordName, coordValue) {
     const itemName = coordName.toLowerCase().trim()
     if (itemName in this.coords)

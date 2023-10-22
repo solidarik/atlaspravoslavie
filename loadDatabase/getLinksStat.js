@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import Log from '../helper/logHelper.js'
 import FileHelper from '../helper/fileHelper.js'
 import templesModel from '../models/templesModel.js'
-import personsModel from '../models/chronosTempleModel.js'
+import personsModel from '../models/personsModel.js'
 import chronosTempleModel from '../models/chronosTempleModel.js'
 import chronosModel from '../models/chronosModel.js'
 import DateHelper from '../helper/dateHelper.js'
@@ -26,6 +26,8 @@ function outputCounter(modelName, linkCounter, shortCaption, longCaption, isFile
     // if (isFileDelete && FileHelper.isFileExists(outputFileName)) {
     //     FileHelper.deleteFile(outputFileName)
     // }
+
+    console.log(outputFileName)
 
     const logger = fs.createWriteStream(outputFileName, {
       flags: 'a' // 'a' means appending (old data will be preserved)

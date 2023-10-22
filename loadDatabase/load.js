@@ -21,6 +21,7 @@ import DateHelper from '../helper/dateHelper.js'
 // import TemplesJsonMediator from '../loadDatabase/templesJsonMediator.js'
 import XlsGoogleParserTemples from './xlsGoogleParserTemples.js'
 import XlsGoogleParserPersons from './xlsGoogleParserPersons.js'
+import XlsGoogleFixPersonUrls from './xlsGoogleFixPersonUrls.js'
 import XlsGoogleParserChronos from './xlsGoogleParserChronos.js'
 import XlsGoogleParserChronosTemple from './xlsGoogleParserChronosTemple.js'
 
@@ -32,6 +33,7 @@ InetHelper.loadCoords()
 const dbHelper = new DbHelper(undefined, log)
 const xlsGoogleParserTemples = new XlsGoogleParserTemples(log)
 const xlsGoogleParserPersons = new XlsGoogleParserPersons(log)
+const xlsGoogleFixPersonUrls = new XlsGoogleFixPersonUrls(log)
 const xlsGoogleParserChronos = new XlsGoogleParserChronos(log)
 const xlsGoogleParserChronosTemple = new XlsGoogleParserChronosTemple(log)
 const personsAggr = new PersonsAggr()
@@ -50,6 +52,9 @@ Promise.resolve(true)
   // })
   // .then(() => {
   //   return xlsGoogleParserTemples.processData(dbHelper)
+  // })
+  // .then(() => {
+  //   return xlsGoogleFixPersonUrls.processData()
   // })
   .then(() => {
     return xlsGoogleParserPersons.processData(dbHelper)
