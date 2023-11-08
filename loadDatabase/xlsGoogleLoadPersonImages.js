@@ -7,19 +7,20 @@ import XlsGoogleParser from './xlsGoogleParser.js'
 import XlsHelper from '../helper/xlsHelper.js'
 import chalk from 'chalk'
 import { google } from 'googleapis'
-import authentication from '../loadDatabase/googleAuthentication.js'
+import authentication from './googleAuthentication.js'
 
-export default class XlsGoogleFixPersonUrls {
+export default class XlsGoogleLoadPersonImages {
 
     constructor(log) {
         this.log = log
         this.name = 'Святые'
         this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
-        this.url_cols = ['J', 'AF', 'AG']
-        this.range = 'A1:AL'
+        this.image_header_cols = ['Ссылка на фото']
+        this.status_header_cols = ['Статус обработки фото']
+        this.range = 'A1:AN'
         this.model = PersonModel
-        // this.startRow = 152
-        // this.maxRow = 153
+        this.startRow = 152
+        this.maxRow = 153
     }
 
     async updateUrls(colName, startRow, fixUrls) {
@@ -91,20 +92,26 @@ export default class XlsGoogleFixPersonUrls {
         const maxRow = this.maxRow ? this.maxRow : rows.length
         const startRow = this.startRow ? this.startRow : 1
 
-        await Promise.all(this.url_cols.map(async (colName) => {
-            let fixUrls = []
-            let isChanged = false
-            const colNumber = XlsHelper.getColumnNumberByName(colName)
-            for (let row = startRow; row < maxRow; row++) {
-                const url = rows[row][colNumber]
-                const changedUrl = await this.changeUrl(url)
-                isChanged = isChanged || (url != changedUrl)
-                fixUrls.push(changedUrl)
-            }
-            if (isChanged) {
-                await this.updateUrls(colName, startRow, fixUrls)
-            }
-        }))
+        const headerRow = rows[0]
+        const image_cols = this.image_header_cols.map(
+            headerName => XlsHelper.getColumnNameByHeader(headerRow, headerName))
+
+        console.log(image_cols)
+
+        // await Promise.all(this.url_cols.map(async (colName) => {
+        //     let fixUrls = []
+        //     let isChanged = false
+        //     const colNumber = XlsHelper.getColumnNumberByName(colName)
+        //     for (let row = startRow; row < maxRow; row++) {
+        //         const url = rows[row][colNumber]
+        //         const changedUrl = await this.changeUrl(url)
+        //         isChanged = isChanged || (url != changedUrl)
+        //         fixUrls.push(changedUrl)
+        //     }
+        //     if (isChanged) {
+        //         await this.updateUrls(colName, startRow, fixUrls)
+        //     }
+        // }))
 
 
         this.log.info(chalk.cyanBright(`Обновлено`))

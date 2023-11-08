@@ -1,4 +1,3 @@
-
 import Log from '../helper/logHelper.js'
 import XlsHelper from '../helper/xlsHelper.js'
 import ImageHelper from '../helper/imageHelper.js'
@@ -17,19 +16,24 @@ import DateHelper from '../helper/dateHelper.js'
 import { exit } from 'shelljs'
 import chronosTempleModel from '../models/chronosTempleModel.js'
 
-const linkUrl = 'https://azbyka.ru/days/assets/img/saints/5023/p1avbbk87h1im49ta53gur7tkm3.png'
+// const linkUrl = 'https://azbyka.ru/days/assets/img/saints/5023/p1avbbk87h1im49ta53gur7tkm3.png'
 
-inetHelper.checkUrlStatusCode(linkUrl).then(res => {
-  console.log('test')
-  console.log(res)
-  exit(0)
-})
+// inetHelper.checkUrlStatusCode(linkUrl).then(res => {
+//   console.log('test')
+//   console.log(res)
+//   exit(0)
+// })
 
 // exit(0)
 
-// const res = XlsHelper.getColumnNumberByName('BA')
+let groups = undefined
+groups = GeoHelper.getCoordsFromHumanCoords('37.855088, 15.291087')
+console.log(JSON.stringify(groups))
+
+// const res = XlsHelper.getColumnNameByNumber(255)
 // console.log(res)
-// exit(0)
+// console.log(XlsHelper.getColumnNumberByName(res))
+exit(0)
 
 // const dateBirth = DateHelper.getDateFromInput('Константинополь, 985 г.')
 // console.log(dateBirth)
@@ -76,7 +80,6 @@ inetHelper.checkUrlStatusCode(linkUrl).then(res => {
 //     console.log(`Error in loadImageToFile ${err}`)
 //   })
 
-
 // // exit(0)
 
 // (async function() {
@@ -97,8 +100,6 @@ inetHelper.checkUrlStatusCode(linkUrl).then(res => {
 //   exit(0)
 // }
 // )()
-
-
 
 // // dbHelper.free()
 

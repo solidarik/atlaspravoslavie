@@ -1,33 +1,37 @@
 export default class XlsHelper {
-
-    static getColumnNameByNumber(columnNumber) {
-        let columnName = [];
-        while (columnNumber > 0) {
-
-            // Find remainder
-            let rem = columnNumber % 26;
-
-            // If remainder is 0, then a
-            // 'Z' must be there in output
-            if (rem == 0) {
-                columnName.push("Z");
-                columnNumber = Math.floor(columnNumber / 26) - 1;
-            }
-            else // If remainder is non-zero
-            {
-                columnName.push(String.fromCharCode((rem - 1) + 'A'.charCodeAt(0)));
-                columnNumber = Math.floor(columnNumber / 26);
-            }
-        }
-        return columnName.join('')
+  static getColumnNameByNumber(columnNumber) {
+    // 1 -> A, 2 -> B, 26 -> Z, 27 -> AA
+    let res = ''
+    while (columnNumber > 0) {
+      const reminder = (columnNumber - 1) % 26
+      res = String.fromCharCode(65 + reminder) + res
+      columnNumber = Math.floor((columnNumber - 1) / 26)
     }
 
-    static getColumnNumberByName(columnName) {
+    return res
+  }
 
-        let columnNumber = 0;
-        for (let i = 0; i < columnName.length; i++) {
-          columnNumber += (columnName.charCodeAt(i) - 64) * Math.pow(26, columnName.length - i - 1);
-        }
-        return columnNumber - 1;
+  static getColumnNumberByName(columnName) {
+    // A -> 1, B -> 2, Z -> 26, AA -> 27
+    let columnNumber = 0
+    for (let i = 0; i < columnName.length; i++) {
+      columnNumber +=
+        (columnName.charCodeAt(i) - 64) *
+        Math.pow(26, columnName.length - i - 1)
     }
+    return columnNumber
+  }
+
+  static getColumnNameByHeader(headerRow, headerName) {
+    console.log(headerName)
+    console.log(headerRow)
+
+    const index = headerRow.indexOf(headerName)
+    if (index == -1) {
+      return undefined
+    }
+
+    console.log(index)
+    return XlsHelper.getColumnNameByNumber(index + 1)
+  }
 }
