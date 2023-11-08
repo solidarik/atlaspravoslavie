@@ -33,8 +33,8 @@ export default class XlsGoogleParserPersons extends XlsGoogleParser {
     this.spreadsheetId = process.env.GOOGLE_SHEET_ID_PERSON
     this.range = 'A1:AN'
     this.model = PersonModel
-    this.startRow = 2308
-    this.maxRow = 2309
+    // this.startRow = 2308
+    // this.maxRow = 2309
   }
 
   getPageUrl(json) {
