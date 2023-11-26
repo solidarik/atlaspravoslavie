@@ -50,9 +50,9 @@ Promise.resolve(true)
   // .then(() => {
   //   return xlsGoogleParserChronosTemple.processData(dbHelper)
   // })
-  // .then(() => {
-  //   return xlsGoogleParserTemples.processData(dbHelper)
-  // })
+  .then(() => {
+    return xlsGoogleParserTemples.processData(dbHelper)
+  })
   // .then(() => {
   //   return xlsGoogleFixPersonUrls.processData()
   // })
