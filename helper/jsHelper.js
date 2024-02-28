@@ -26,13 +26,21 @@ export default class JsHelper {
   }
 
   static arrayEquals(a, b) {
-    return Array.isArray(a) &&
+    return (
+      Array.isArray(a) &&
       Array.isArray(b) &&
       a.length === b.length &&
-      a.every((val, index) => val === b[index]);
+      a.every((val, index) => val === b[index])
+    )
   }
 
-  static isNaN(x) {
-
+  static arrayOnlyUniqueFilter(value, index, array) {
+    return array.indexOf(value) === index
   }
+
+  static arrayOnlyUnique(arr) {
+    return arr.filter(JsHelper.arrayOnlyUniqueFilter)
+  }
+
+  static isNaN(x) {}
 }

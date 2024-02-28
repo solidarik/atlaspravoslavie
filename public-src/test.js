@@ -12,7 +12,7 @@ import StrHelper from '../helper/strHelper.js'
 import GeoHelper from '../helper/geoHelper.js'
 import inetHelper from '../helper/inetHelper.js'
 import JsHelper from '../helper/jsHelper.js'
-import DateHelper from '../helper/dateHelper.js'
+import DateHelper from '../helper/dateHelfper.js'
 import { exit } from 'shelljs'
 import chronosTempleModel from '../models/chronosTempleModel.js'
 
@@ -24,7 +24,11 @@ import chronosTempleModel from '../models/chronosTempleModel.js'
 //   exit(0)
 // })
 
+const dates = DateHelper.getWorshipDates('(2)15.12.')
+console.log(dates)
 // exit(0)
+
+exit(0)
 
 let groups = undefined
 groups = GeoHelper.getCoordsFromHumanCoords('37.855088, 15.291087')

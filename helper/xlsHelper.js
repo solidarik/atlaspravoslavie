@@ -23,15 +23,12 @@ export default class XlsHelper {
   }
 
   static getColumnNameByHeader(headerRow, headerName) {
-    console.log(headerName)
-    console.log(headerRow)
-
+    // Получение названия столбца по заголовку
     const index = headerRow.indexOf(headerName)
     if (index == -1) {
       return undefined
     }
 
-    console.log(index)
     return XlsHelper.getColumnNameByNumber(index + 1)
   }
 }

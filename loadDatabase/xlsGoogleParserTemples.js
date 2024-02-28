@@ -3,9 +3,8 @@ import TempleModel from '../models/templesModel.js'
 import XlsGoogleParser from './xlsGoogleParser.js'
 
 export default class XlsGoogleParserTemples extends XlsGoogleParser {
-
-    constructor(log) {
-        super()
+    constructor(log, withSaveLoadStatus = true) {
+        super(withSaveLoadStatus)
         this.log = log
         this.name = 'Храмы'
         this.pageUrls = ['name']
@@ -17,26 +16,26 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
     fillHeaderColumns(headerRow) {
         let headerColumns = {}
         const colCorresponds = {
-            'loadStatus': 'статус загрузки',
-            'author': 'автор',
-            'isChecked': 'проверено',
-            'name': 'название',
-            'point': 'коорд',
-            'city': 'город',
-            'place': 'место',
-            'start': 'дата основа',
-            'longBrief': 'описание',
-            'dedicated': 'посвящен',
-            'abbots': 'настоятели',
-            'eparhy': 'митропология',
-            'templesUrl': 'ссылка на храм',
-            'srcUrl': 'ссылка на источник',
-            'imgUrl': 'изображение 1',
-            'imgUrl_1': 'изображение 2',
-            'imgUrl_2': 'изображение 3',
-            'imgUrl_3': 'изображение 4',
-            'imgUrl_4': 'изображение 5',
-            'imgUrl_5': 'изображение 6',
+            loadStatus: 'статус загрузки',
+            author: 'автор',
+            isChecked: 'проверено',
+            name: 'название',
+            point: 'коорд',
+            city: 'город',
+            place: 'место',
+            start: 'дата основа',
+            longBrief: 'описание',
+            dedicated: 'посвящен',
+            abbots: 'настоятели',
+            eparhy: 'митропология',
+            templesUrl: 'ссылка на храм',
+            srcUrl: 'ссылка на источник',
+            imgUrl: 'изображение 1',
+            imgUrl_1: 'изображение 2',
+            imgUrl_2: 'изображение 3',
+            imgUrl_3: 'изображение 4',
+            imgUrl_4: 'изображение 5',
+            imgUrl_5: 'изображение 6',
         }
         for (let iCol = 0; iCol < headerRow.length; iCol++) {
             const xlsColName = headerRow[iCol].toLowerCase()
@@ -51,8 +50,7 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
     }
 
     async getJsonFromRow(headerColumns, row) {
-
-        let json = {errorArr: [], warningArr: [], lineSource: 0}
+        let json = { errorArr: [], warningArr: [], lineSource: 0 }
         json.author = row[headerColumns.author]
         json.isChecked = row[headerColumns.isChecked]
         json.name = row[headerColumns.name].trim()
@@ -60,9 +58,11 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
         json.place = row[headerColumns.place].trim()
 
         try {
-
             const placeForCoords = `${json.name} ${json.place}`
-            json.point = await this.getCoords(placeForCoords, row[headerColumns.point])
+            json.point = await this.getCoords(
+                placeForCoords,
+                row[headerColumns.point]
+            )
 
             const dateInput = row[headerColumns.start]
             if (!dateInput) {
@@ -83,10 +83,9 @@ export default class XlsGoogleParserTemples extends XlsGoogleParser {
                 row[headerColumns.imgUrl_2],
                 row[headerColumns.imgUrl_3],
                 row[headerColumns.imgUrl_4],
-                row[headerColumns.imgUrl_5]
+                row[headerColumns.imgUrl_5],
             ]
-            json.imgUrls = imgUrls.filter(item => (item && item != ''))
-
+            json.imgUrls = imgUrls.filter((item) => item && item != '')
         } catch (e) {
             json.errorArr.push(e + '')
         }

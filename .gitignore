@@ -15,6 +15,11 @@ loadDatabase/out*
 *-copy.*
 * - copy.*
 .env
+store/
 *credentials*
 *secret*
 *token*
+*.png
+*.jpg
+*.gif
+*.jpeg

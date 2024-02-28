@@ -10,9 +10,11 @@ import authentication from '../loadDatabase/googleAuthentication.js'
 import { google } from 'googleapis'
 
 export default class XlsGoogleParser {
+    constructor(withSaveLoadStatus) {
+        this.withSaveLoadStatus = withSaveLoadStatus
+    }
 
     async getCoords(inputPlace, inputCoords) {
-
         if (!inputPlace && !inputCoords) {
             return false
         }
@@ -25,7 +27,10 @@ export default class XlsGoogleParser {
                 return false
             }
             if (coords.length == 2) {
-                inetHelper.addCoord(inputPlace, {lat: coords[1] , lon: coords[0]})
+                inetHelper.addCoord(inputPlace, {
+                    lat: coords[1],
+                    lon: coords[0],
+                })
                 return GeoHelper.fromLonLat(coords)
             }
         }
@@ -46,21 +51,25 @@ export default class XlsGoogleParser {
         return false
     }
 
-
     getPageUrl(json) {
         const pageUrlsLocal = this.pageUrls.map((colName) => json[colName])
         return StrHelper.generatePageUrl(pageUrlsLocal)
     }
 
     async getDebugInfo(lineNumber, fieldName) {
-        this.log.info(chalk.yellow(`Получение отладочной информации по строке ${lineNumber}`))
+        this.log.info(
+            chalk.yellow(
+                `Получение отладочной информации по строке ${lineNumber}`
+            )
+        )
         const sheets = google.sheets({ version: 'v4' })
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: this.spreadsheetId,
             key: process.env.GOOGLE_API_KEY,
-            range: this.range
+            range: this.range,
         })
-        if (!sheetData) return this.log.error('The Google API returned an error')
+        if (!sheetData)
+            return this.log.error('The Google API returned an error')
 
         const rows = sheetData.data.values
         if (!rows.length) return this.log.error('No data found')
@@ -69,15 +78,22 @@ export default class XlsGoogleParser {
         const startRow = this.startRow ? this.startRow : 1
         const maxRow = this.maxRow ? this.maxRow : rows.length
         if (lineNumber < startRow || lineNumber > maxRow) {
-            this.log.error(`Номер строки не входит в диапазон данных: [${startRow}, ${maxRow}]`)
+            this.log.error(
+                `Номер строки не входит в диапазон данных: [${startRow}, ${maxRow}]`
+            )
             return ''
         }
 
         const headerColumns = this.fillHeaderColumns(rows[0])
-        const json = await this.getJsonFromRow(headerColumns, rows[lineNumber - 1])
+        const json = await this.getJsonFromRow(
+            headerColumns,
+            rows[lineNumber - 1]
+        )
 
         if (!json[fieldName]) {
-            this.log.error(`В результирующих данных нет искомого столбца: ${fieldName}`)
+            this.log.error(
+                `В результирующих данных нет искомого столбца: ${fieldName}`
+            )
             return ''
         }
 
@@ -85,7 +101,6 @@ export default class XlsGoogleParser {
     }
 
     async processData(dbHelper) {
-
         let res = undefined
         const modelName = this.model.collection.collectionName
 
@@ -93,19 +108,22 @@ export default class XlsGoogleParser {
 
         // обновляем время последней проверки
         const checkedTime = DateHelper.dateTimeToStr(new Date())
-        res = await ServiceModel.updateOne({ name: 'checkedTime' }, { value: checkedTime })
+        res = await ServiceModel.updateOne(
+            { name: 'checkedTime' },
+            { value: checkedTime }
+        )
 
         this.log.info(chalk.yellow(`Загрузка ${this.name}`))
         // this.log.info(chalk.gray('Получение данных из Google...'))
-
 
         const sheets = google.sheets({ version: 'v4' })
         const sheetData = await sheets.spreadsheets.values.get({
             spreadsheetId: this.spreadsheetId,
             key: process.env.GOOGLE_API_KEY,
-            range: this.range
+            range: this.range,
         })
-        if (!sheetData) return this.log.error('The Google API returned an error')
+        if (!sheetData)
+            return this.log.error('The Google API returned an error')
 
         const rows = sheetData.data.values
         if (!rows.length) return this.log.error('No data found')
@@ -132,19 +150,21 @@ export default class XlsGoogleParser {
             const isSkip = json.isChecked == '0'
 
             const isError = json.errorArr.length > 0
-            const errorStatus = json.errorArr.join('\r\n').replace('Error: ', '')
+            const errorStatus = json.errorArr
+                .join('\r\n')
+                .replace('Error: ', '')
 
             const isWarning = json.warningArr.length > 0
-            const warningStatus = '\r\nЗамечания: ' + json.warningArr.join('\r\n').replace('Error: ', '')
+            const warningStatus =
+                '\r\nЗамечания: ' +
+                json.warningArr.join('\r\n').replace('Error: ', '')
 
             let loadStatus = ''
 
             if (isSkip) {
                 skipObjectCount += 1
                 loadStatus = `Пропущено согласно флагу`
-            }
-            else
-            if (isError) {
+            } else if (isError) {
                 // this.log.error(`Ошибка обработки json: ${JSON.stringify(json)}`)
                 loadStatus = errorStatus
             } else {
@@ -162,7 +182,10 @@ export default class XlsGoogleParser {
             json.pageUrl = this.getPageUrl(json)
             if (!isSkip && json.pageUrl) {
                 if (pageUrlsGlobal.includes(json.pageUrl)) {
-                    json.pageUrl = StrHelper.replaceEnd(json.pageUrl, '_' + Number(row))
+                    json.pageUrl = StrHelper.replaceEnd(
+                        json.pageUrl,
+                        '_' + Number(row)
+                    )
                 }
                 pageUrlsGlobal.push(json.pageUrl)
                 insertObjects.push(json)
@@ -173,48 +196,62 @@ export default class XlsGoogleParser {
             loadStatuses.push(loadStatus)
         }
 
-        const statusColumnName = XlsHelper.getColumnNameByNumber(headerColumns.loadStatus + 1)
+        const statusColumnName = XlsHelper.getColumnNameByNumber(
+            headerColumns.loadStatus + 1
+        )
         const statusRowStart = 2
-        const statusRowEnd = loadStatuses.length + 1
+        const statusRowEnd = statusRowStart + loadStatuses.length - 1
         const statusRange = `${statusColumnName}${statusRowStart}:${statusColumnName}${statusRowEnd}`
 
-        let authClient = undefined
-        try {
-            authClient = await authentication.authenticate()
-        } catch(err) {
-            throw `auth client error ${err}`
-        }
+        if (this.withSaveLoadStatus) {
+            let authClient = undefined
+            try {
+                authClient = await authentication.authenticate()
+            } catch (err) {
+                throw `auth client error ${err}`
+            }
 
-        if (loadStatuses.length == 0) {
-            throw `Ошибка получения статусов`
-        }
+            if (loadStatuses.length == 0) {
+                throw `Ошибка получения статусов`
+            }
 
-        const resource = {
-            range: statusRange,
-            majorDimension: "COLUMNS",
-            values: [loadStatuses]
-        }
-
-        try {
-            const sheetUpdateStatus = await sheets.spreadsheets.values.update({
-                auth: authClient,
-                spreadsheetId: this.spreadsheetId,
+            const resource = {
                 range: statusRange,
-                valueInputOption: "USER_ENTERED",
-                resource: resource
-            })
+                majorDimension: 'COLUMNS',
+                values: [loadStatuses],
+            }
 
-            // if (JSON.stringify(sheetUpdateStatus) != '{}') {
-            //     this.log.warn(`Ответ от Google Sheet: ${JSON.stringify(sheetUpdateStatus)}`)
-            // }
-        } catch(err) {
-            this.log.error(`Проблема обновления Google: ${err}`)
+            try {
+                const sheetUpdateStatus =
+                    await sheets.spreadsheets.values.update({
+                        auth: authClient,
+                        spreadsheetId: this.spreadsheetId,
+                        range: statusRange,
+                        valueInputOption: 'USER_ENTERED',
+                        resource: resource,
+                    })
+
+                // if (JSON.stringify(sheetUpdateStatus) != '{}') {
+                //     this.log.warn(`Ответ от Google Sheet: ${JSON.stringify(sheetUpdateStatus)}`)
+                // }
+            } catch (err) {
+                this.log.error(`Проблема обновления Google: ${err}`)
+            }
         }
 
         const totalLinesCount = rows.length - 1
         const savedCount = insertObjects.length
-        const statusText = [successObjectCount, savedCount, skipObjectCount, totalLinesCount].join(' / ')
-        this.log.info(chalk.cyanBright(`Кол-во на карте/загруженных/пропущенных/всего: ${statusText}`))
+        const statusText = [
+            successObjectCount,
+            savedCount,
+            skipObjectCount,
+            totalLinesCount,
+        ].join(' / ')
+        this.log.info(
+            chalk.cyanBright(
+                `Кол-во на карте/загруженных/пропущенных/всего: ${statusText}`
+            )
+        )
 
         /*
         for (let idxObj = 0; idxObj < insertObjects.length; idxObj++) {
@@ -227,7 +264,9 @@ export default class XlsGoogleParser {
         res = await this.model.insertMany(insertObjects)
 
         if (!res) {
-            this.log.error(chalk.red(`Ошибка при сохранении данных ${JSON.stringify(res)}`))
+            this.log.error(
+                chalk.red(`Ошибка при сохранении данных ${JSON.stringify(res)}`)
+            )
         }
 
         let serviceObjects = [
@@ -236,19 +275,24 @@ export default class XlsGoogleParser {
             { name: 'savedCount', value: savedCount },
             { name: 'totalCount', value: totalLinesCount },
             { name: 'statusText', value: statusText },
-            { name: 'checkedTime', value: checkedTime }
+            { name: 'checkedTime', value: checkedTime },
         ]
 
-        serviceObjects = serviceObjects.map(obj => { return { ...obj, 'model': modelName } })
+        serviceObjects = serviceObjects.map((obj) => {
+            return { ...obj, model: modelName }
+        })
 
-        res = await ServiceModel.deleteMany({'model': modelName})
+        res = await ServiceModel.deleteMany({ model: modelName })
         res = await ServiceModel.insertMany(serviceObjects)
 
         if (!res) {
-            this.log.error(chalk.red(`Ошибка при сохранении статуса ${JSON.stringify(res)}`))
+            this.log.error(
+                chalk.red(
+                    `Ошибка при сохранении статуса ${JSON.stringify(res)}`
+                )
+            )
         }
 
         return true
     }
-
 }
