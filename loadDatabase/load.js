@@ -27,12 +27,12 @@ InetHelper.loadCoords()
 
 const dbHelper = new DbHelper(undefined, log)
 
-const xlsGoogleParserTemples = new XlsGoogleParserTemples(log, false)
-const xlsGoogleParserPersons = new XlsGoogleParserPersons(log, false)
-const xlsGoogleParserChronos = new XlsGoogleParserChronos(log, false)
+const xlsGoogleParserTemples = new XlsGoogleParserTemples(log, true)
+const xlsGoogleParserPersons = new XlsGoogleParserPersons(log, true)
+const xlsGoogleParserChronos = new XlsGoogleParserChronos(log, true)
 const xlsGoogleParserChronosTemple = new XlsGoogleParserChronosTemple(
     log,
-    false
+    true 
 )
 
 const xlsGoogleFixPersonUrls = new XlsGoogleFixPersonUrls(log)

@@ -267,6 +267,7 @@ export default class DateHelper {
         if (!isFound) {
             inputText = inputText.replace('г.', '').replace('гг.', '')
             inputText = inputText.replace('гг', '')
+            inputText = inputText.replace('год', '') 
             inputText = StrHelper.removeByRegExp('г$', inputText)
         }
 

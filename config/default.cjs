@@ -11,7 +11,6 @@ module.exports = {
   mongoose: {
     uri: process.env.MONGODB_URI || 'mongodb://localhost/app',
     options: {
-      keepAlive: true,
       maxPoolSize: 5,
       serverSelectionTimeoutMS: 5000,
       family: process.env.MONGODB_FAMILY || 4
